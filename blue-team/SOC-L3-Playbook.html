@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC L3 PLAYBOOK</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#08060f;
+  --bg2:#0e0c1a;
+  --bg3:#141228;
+  --border:#231f3a;
+  --accent:#ff4d6d;
+  --accent2:#ff9a3c;
+  --accent3:#c77dff;
+  --accent4:#48cae4;
+  --gold:#ffd700;
+  --text:#dcd8f0;
+  --text-dim:#504870;
+  --code-bg:#060410;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden;}
+body::before{
+  content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(ellipse at 10% 30%, rgba(255,77,109,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 70%, rgba(199,125,255,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 10%, rgba(72,202,228,0.03) 0%, transparent 40%);
+  pointer-events:none;z-index:0;
+}
+
+/* SIDEBAR */
+#sidebar{width:268px;min-width:268px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+#logo{padding:18px 16px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(255,77,109,0.08),rgba(199,125,255,0.05),transparent);}
+#logo .badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,var(--accent),var(--accent3));color:#fff;font-size:9px;font-weight:700;letter-spacing:2px;padding:2px 9px;border-radius:2px;margin-bottom:7px;}
+#logo .title{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;color:#fff;letter-spacing:2px;}
+#logo .title span{background:linear-gradient(90deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+#logo .sub{font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:0.5px;}
+#status-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;background:rgba(255,77,109,0.04);border-bottom:1px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+#search-wrap{padding:10px 12px;border-bottom:1px solid var(--border);}
+#search{width:100%;background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;outline:none;border-radius:4px;transition:border-color .2s;}
+#search:focus{border-color:var(--accent);}
+#search::placeholder{color:var(--text-dim);}
+#nav{flex:1;overflow-y:auto;padding:6px 0;}
+#nav::-webkit-scrollbar{width:3px;}
+#nav::-webkit-scrollbar-thumb{background:var(--border);}
+.nav-section{margin-bottom:2px;}
+.nav-section-label{font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:8px 16px 3px;font-family:'JetBrains Mono',monospace;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 16px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text-dim);border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.02);}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(255,77,109,0.07);}
+.nav-icon{font-size:14px;flex-shrink:0;}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+#topbar{height:46px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px;}
+#breadcrumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
+#breadcrumb span{color:var(--accent);}
+#topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;}
+.tier-badge{padding:3px 10px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:1px;background:linear-gradient(90deg,rgba(255,77,109,0.15),rgba(199,125,255,0.15));border:1px solid rgba(255,77,109,0.3);color:var(--accent);}
+#dl-btn{cursor:pointer;color:var(--accent4);border:1px solid var(--accent4);padding:3px 10px;border-radius:3px;font-size:10px;transition:all .2s;}
+#dl-btn:hover{background:var(--accent4);color:#000;}
+#content{flex:1;overflow-y:auto;padding:24px 30px;}
+#content::-webkit-scrollbar{width:4px;}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.section{display:none;animation:fadeIn .2s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* TYPOGRAPHY */
+h1{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+h1 .h1-icon{font-size:20px;}
+h1 .h1-tag{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(255,77,109,0.1);color:var(--accent);border:1px solid rgba(255,77,109,0.25);padding:2px 8px;border-radius:3px;letter-spacing:1px;margin-left:auto;}
+h2{font-size:12px;font-weight:600;color:var(--accent3);letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+h2::before{content:'◈';opacity:0.7;}
+h3{font-size:12px;font-weight:600;color:var(--accent2);margin:14px 0 8px;}
+p{line-height:1.7;margin-bottom:10px;color:var(--text);font-size:13px;}
+
+/* CODE */
+.code-wrap{position:relative;margin:8px 0;}
+.code-label{background:var(--bg3);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 10px;display:inline-block;letter-spacing:1px;border-radius:3px 3px 0 0;border:1px solid var(--border);border-bottom:none;}
+.code-label.asm{color:var(--accent);}
+.code-label.python{color:var(--accent2);}
+.code-label.bash{color:var(--accent3);}
+.code-label.ps{color:var(--accent4);}
+.code-label.c{color:var(--accent);}
+.code-label.ida{color:var(--gold);}
+.code-label.yara{color:var(--accent3);}
+.code-label.sigma{color:var(--accent3);}
+.code-label.splunk{color:#ff8c00;}
+.code-label.kql{color:var(--accent4);}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:0 3px 3px 3px;padding:14px 16px;overflow-x:auto;position:relative;}
+pre::-webkit-scrollbar{height:3px;}
+pre::-webkit-scrollbar-thumb{background:var(--border);}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.8;color:#b8a8d8;}
+:not(pre)>code{background:var(--bg3);color:var(--accent2);padding:1px 5px;border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;cursor:pointer;border-radius:3px;transition:all .2s;letter-spacing:1px;}
+.copy-btn:hover,.copy-btn.copied{background:var(--accent4);color:#000;border-color:var(--accent4);}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+th{background:var(--bg3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 12px;text-align:left;border:1px solid var(--border);text-transform:uppercase;}
+td{padding:7px 12px;border:1px solid var(--border);color:var(--text);vertical-align:top;font-size:12px;}
+tr:hover td{background:rgba(255,77,109,0.03);}
+
+/* ALERTS */
+.alert{border-left:3px solid;padding:10px 14px;margin:10px 0;background:rgba(255,255,255,0.02);font-size:12px;border-radius:0 4px 4px 0;line-height:1.6;}
+.alert.red{border-color:var(--accent);color:var(--accent);}
+.alert.orange{border-color:var(--accent2);color:var(--accent2);}
+.alert.purple{border-color:var(--accent3);color:var(--accent3);}
+.alert.blue{border-color:var(--accent4);color:var(--accent4);}
+.alert.gold{border-color:var(--gold);color:var(--gold);}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+.step{display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);padding:12px 14px;border-radius:4px;transition:border-color .2s;}
+.step:hover{border-color:var(--accent3);}
+.step-num{width:26px;height:26px;border-radius:50%;background:rgba(199,125,255,0.1);border:1px solid var(--accent3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-content{flex:1;}
+.step-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:4px;}
+.step-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+
+/* HOME GRID */
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:16px;}
+.home-card{background:var(--bg2);border:1px solid var(--border);padding:16px;cursor:pointer;border-radius:4px;transition:all .2s;position:relative;overflow:hidden;}
+.home-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent3),var(--accent4));opacity:0;transition:opacity .2s;}
+.home-card:hover{border-color:var(--accent3);transform:translateY(-2px);}
+.home-card:hover::before{opacity:1;}
+.card-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.card-desc{font-size:11px;color:var(--text-dim);line-height:1.4;}
+
+/* TERMINAL */
+.terminal{background:var(--code-bg);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:12px 0;}
+.terminal-header{background:var(--bg3);padding:8px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-dot.red{background:#ff5f57;}
+.t-dot.yellow{background:#febc2e;}
+.t-dot.green{background:#28c840;}
+.terminal-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin:0 auto;}
+.terminal-body{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.9;}
+.t-prompt{color:var(--accent);}
+.t-cmd{color:var(--text);}
+.t-out{color:var(--text-dim);}
+.t-warn{color:var(--accent2);}
+.t-purple{color:var(--accent3);}
+.t-teal{color:var(--accent4);}
+
+/* CHECKLIST */
+.checklist{list-style:none;margin:10px 0;}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:12px;line-height:1.6;}
+.checklist li::before{content:'◆';color:var(--accent);font-size:8px;flex-shrink:0;margin-top:3px;}
+
+ul{padding-left:20px;margin:8px 0;}
+ul li{margin:5px 0;line-height:1.6;font-size:12px;}
+strong{color:var(--accent2);}
+
+/* TOOL BADGES */
+.tool-badges{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+.tool-badge{padding:3px 10px;border-radius:3px;font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;border:1px solid;}
+.tb-red{color:var(--accent);border-color:rgba(255,77,109,0.3);background:rgba(255,77,109,0.07);}
+.tb-orange{color:var(--accent2);border-color:rgba(255,154,60,0.3);background:rgba(255,154,60,0.07);}
+.tb-purple{color:var(--accent3);border-color:rgba(199,125,255,0.3);background:rgba(199,125,255,0.07);}
+.tb-blue{color:var(--accent4);border-color:rgba(72,202,228,0.3);background:rgba(72,202,228,0.07);}
+.tb-gold{color:var(--gold);border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.07);}
+
+/* APT CARD */
+.apt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin:12px 0;}
+.apt-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+.apt-header{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.apt-name{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--accent);}
+.apt-origin{font-size:10px;color:var(--text-dim);}
+.apt-body{padding:12px 14px;font-size:11px;color:var(--text-dim);line-height:1.7;}
+.apt-body strong{color:var(--accent2);}
+
+/* MATRIX */
+.matrix-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+.matrix-2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0;}
+.m-card{background:var(--bg2);border:1px solid var(--border);padding:14px;border-radius:4px;}
+.m-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.m-body{font-size:11px;color:var(--text-dim);line-height:1.8;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:26px;margin:12px 0;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:linear-gradient(var(--accent),var(--accent3),var(--accent4));}
+.tl-item{position:relative;margin-bottom:16px;}
+.tl-item::before{content:'';position:absolute;left:-22px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--accent3);border:2px solid var(--bg);box-shadow:0 0 8px var(--accent3);}
+.tl-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1px;margin-bottom:3px;}
+.tl-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:3px;}
+.tl-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+
+/* REGISTER TABLE */
+.reg-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--gold);font-size:11px;}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="logo">
+    <div class="badge">★ SOC LEVEL 3 ★</div>
+    <div class="title">SOC<span>L3</span> PLAYBOOK</div>
+    <div class="sub">Security Operations Center — Apex Tier</div>
+  </div>
+  <div id="status-bar">
+    <div class="status-dot"></div>
+    <span style="color:var(--accent)">DEEP ANALYSIS MODE</span>
+    <span style="margin-left:auto;color:var(--text-dim)" id="clock"></span>
+  </div>
+  <div id="search-wrap">
+    <input type="text" id="search" placeholder="🔍  search playbook..." autocomplete="off" spellcheck="false">
+  </div>
+  <nav id="nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" data-section="home"><span class="nav-icon">🏠</span>Home</div>
+      <div class="nav-item" data-section="roles"><span class="nav-icon">👑</span>L3 Roles & Authority</div>
+      <div class="nav-item" data-section="l2intake"><span class="nav-icon">📥</span>L2 Escalation Intake</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Reverse Engineering</div>
+      <div class="nav-item" data-section="re-fundamentals"><span class="nav-icon">🔩</span>RE Fundamentals</div>
+      <div class="nav-item" data-section="ida-ghidra"><span class="nav-icon">🔬</span>IDA Pro & Ghidra</div>
+      <div class="nav-item" data-section="x86-assembly"><span class="nav-icon">⚙️</span>x86/x64 Assembly</div>
+      <div class="nav-item" data-section="anti-analysis"><span class="nav-icon">🛡️</span>Anti-Analysis Techniques</div>
+      <div class="nav-item" data-section="unpacking"><span class="nav-icon">📦</span>Unpacking & Deobfuscation</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Advanced Malware</div>
+      <div class="nav-item" data-section="malware-families"><span class="nav-icon">🦠</span>Malware Family Profiles</div>
+      <div class="nav-item" data-section="rootkits"><span class="nav-icon">👻</span>Rootkits & Bootkits</div>
+      <div class="nav-item" data-section="ransomware-re"><span class="nav-icon">💀</span>Ransomware Deep Dive</div>
+      <div class="nav-item" data-section="c2-frameworks"><span class="nav-icon">📡</span>C2 Framework RE</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">APT Intelligence</div>
+      <div class="nav-item" data-section="apt-profiles"><span class="nav-icon">🌍</span>APT Group Profiles</div>
+      <div class="nav-item" data-section="ttp-analysis"><span class="nav-icon">🧩</span>TTP Deep Analysis</div>
+      <div class="nav-item" data-section="diamond-model"><span class="nav-icon">💎</span>Diamond Model & F3EAD</div>
+      <div class="nav-item" data-section="campaign-tracking"><span class="nav-icon">🗺️</span>Campaign Tracking</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Advanced Forensics</div>
+      <div class="nav-item" data-section="disk-forensics"><span class="nav-icon">💽</span>Disk & Image Forensics</div>
+      <div class="nav-item" data-section="advanced-memory"><span class="nav-icon">🧠</span>Advanced Memory Analysis</div>
+      <div class="nav-item" data-section="network-forensics"><span class="nav-icon">🌐</span>Deep Network Forensics</div>
+      <div class="nav-item" data-section="cloud-forensics"><span class="nav-icon">☁️</span>Cloud Forensics (AWS/Azure)</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Vulnerability Research</div>
+      <div class="nav-item" data-section="vuln-research"><span class="nav-icon">🔍</span>Vulnerability Research</div>
+      <div class="nav-item" data-section="exploit-analysis"><span class="nav-icon">💥</span>Exploit Analysis</div>
+      <div class="nav-item" data-section="zeroday"><span class="nav-icon">0️⃣</span>Zero-Day Handling</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Intel-Led Operations</div>
+      <div class="nav-item" data-section="intelhunting"><span class="nav-icon">🏹</span>Intelligence-Led Hunting</div>
+      <div class="nav-item" data-section="redteam-ttp"><span class="nav-icon">🔴</span>Red Team TTP Emulation</div>
+      <div class="nav-item" data-section="deception"><span class="nav-icon">🍯</span>Deception & Honeypots</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Architecture & Strategy</div>
+      <div class="nav-item" data-section="detection-arch"><span class="nav-icon">🏗️</span>Detection Architecture</div>
+      <div class="nav-item" data-section="purple-team"><span class="nav-icon">🟣</span>Purple Teaming</div>
+      <div class="nav-item" data-section="soc-maturity"><span class="nav-icon">📈</span>SOC Maturity Model</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Reporting & Legal</div>
+      <div class="nav-item" data-section="strategic-report"><span class="nav-icon">📋</span>Strategic IR Reporting</div>
+      <div class="nav-item" data-section="legal-breach"><span class="nav-icon">⚖️</span>Legal & Breach Notification</div>
+      <div class="nav-item" data-section="toolbox"><span class="nav-icon">🧰</span>L3 Toolbox Reference</div>
+    </div>
+  </nav>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <div id="breadcrumb">SOC-L3 / <span id="bread-current">HOME</span></div>
+    <div id="topbar-right">
+      <span class="tier-badge">★ APEX TIER — L3</span>
+      <span style="color:var(--text-dim);font-size:10px" id="clock2"></span>
+      <span id="dl-btn">⬇ SAVE HTML</span>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- HOME -->
+    <div class="section active" id="s-home">
+      <h1><span class="h1-icon">🔥</span>SOC L3 PLAYBOOK<span class="h1-tag">APEX TIER</span></h1>
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+          <div class="terminal-title">soc-l3-analyst@secops ~ $</div>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">l3@soc:~$</span> <span class="t-cmd">cat mission.txt</span></div>
+          <div class="t-out">SOC L3 — Apex tier. Reverse engineering, APT intelligence, zero-day analysis.</div>
+          <div class="t-out">You are the final escalation. You solve what no one else can.</div>
+          <div class="t-out">Domain: RE · Advanced forensics · Threat intel · Detection architecture · Purple team.</div>
+          <div style="margin-top:6px"><span class="t-prompt">l3@soc:~$</span> <span class="t-cmd">cat apex_rules.txt</span></div>
+          <div class="t-warn">⚠  Every incident is a threat intelligence opportunity. Extract maximum signal.</div>
+          <div class="t-warn">⚠  Root cause is not enough — find the systemic gap that allowed it.</div>
+          <div class="t-purple">◈  You are responsible for the organization's detection capabilities.</div>
+          <div class="t-teal">◈  Share intelligence. Attribution without sharing is wasted.</div>
+        </div>
+      </div>
+      <div class="home-grid" id="home-grid"></div>
+    </div>
+
+    <!-- ROLES -->
+    <div class="section" id="s-roles">
+      <h1><span class="h1-icon">👑</span>L3 Roles & Authority<span class="h1-tag">APEX</span></h1>
+      <h2>L3 Unique Capabilities</h2>
+      <ul class="checklist">
+        <li>Reverse engineer malware at assembly level — IDA Pro, Ghidra, x64dbg</li>
+        <li>Perform advanced memory forensics including kernel-level analysis</li>
+        <li>Analyze sophisticated C2 frameworks and custom implants</li>
+        <li>Profile APT groups and track campaigns across incidents</li>
+        <li>Conduct zero-day vulnerability analysis and develop detection logic</li>
+        <li>Design and architect the organization's detection strategy</li>
+        <li>Lead purple team exercises — bridge red team TTPs to blue team detections</li>
+        <li>Perform intelligence-led threat hunting with operator-level OSINT</li>
+        <li>Manage threat intelligence platform (MISP, OpenCTI, TAXII/STIX)</li>
+        <li>Produce strategic threat intelligence reports for executive audience</li>
+        <li>Handle law enforcement interactions and forensic chain of custody</li>
+        <li>Deploy and manage deception technology (honeypots, honeytokens)</li>
+        <li>Mentor L1/L2 — build team capability through structured training</li>
+      </ul>
+      <h2>L3 Decision Authority</h2>
+      <div class="alert gold">★ L3 has authority to: declare major incidents, approve large-scale containment affecting business operations, recommend engagement of external IR firms, and make final attribution determinations.</div>
+      <table>
+        <tr><th>Decision</th><th>L3 Can Do</th><th>Requires CISO/Legal</th></tr>
+        <tr><td>Isolate single host</td><td>✅ Autonomous</td><td>—</td></tr>
+        <tr><td>Isolate network segment</td><td>✅ With IR Lead</td><td>Notify CISO</td></tr>
+        <tr><td>Shut down business-critical system</td><td>Recommend only</td><td>✅ CISO + Business Owner</td></tr>
+        <tr><td>Engage external IR firm</td><td>Recommend</td><td>✅ CISO + Legal</td></tr>
+        <tr><td>Breach notification (legal)</td><td>Input/assessment</td><td>✅ Legal + CISO + Compliance</td></tr>
+        <tr><td>Public attribution statement</td><td>Draft</td><td>✅ Legal + CISO + Comms</td></tr>
+        <tr><td>Law enforcement engagement</td><td>Prepare evidence</td><td>✅ Legal required first</td></tr>
+        <tr><td>Threat intel sharing (TLP:GREEN+)</td><td>✅ With CISO awareness</td><td>Notify for sensitive intel</td></tr>
+      </table>
+    </div>
+
+    <!-- L2 INTAKE -->
+    <div class="section" id="s-l2intake">
+      <h1><span class="h1-icon">📥</span>L2 Escalation Intake<span class="h1-tag">PROCESS</span></h1>
+      <div class="alert purple">When L2 escalates to L3, it means automated tools and standard analysis have hit their limit. Approach every L3 escalation as potentially significant.</div>
+      <h2>L3 Intake Assessment</h2>
+      <ul class="checklist">
+        <li>Read L2 handoff package in full — understand what was already tried</li>
+        <li>Identify why L2 couldn't resolve — what capability gap triggered escalation?</li>
+        <li>Assess evidence quality — is acquisition forensically sound?</li>
+        <li>Verify chain of custody for all collected evidence</li>
+        <li>Determine if external engagement (IR retainer firm) is needed</li>
+        <li>Assess legal/regulatory implications — breach notification timelines</li>
+        <li>Set expectations with L2 — timeline, what you'll produce, communication cadence</li>
+      </ul>
+      <h2>L3 Escalation Triggers</h2>
+      <table>
+        <tr><th>Trigger</th><th>L3 Action</th></tr>
+        <tr><td>APT indicators / suspected nation-state</td><td>Full RE, campaign tracking, threat intel, possible LE notification</td></tr>
+        <tr><td>Novel/unknown malware (no AV detections)</td><td>Full static + dynamic RE, YARA development, family profiling</td></tr>
+        <tr><td>Rootkit / bootkit suspected</td><td>Kernel-level memory analysis, offline disk analysis</td></tr>
+        <tr><td>Zero-day exploitation suspected</td><td>Vulnerability analysis, exploit RE, vendor notification</td></tr>
+        <tr><td>Supply chain compromise</td><td>Binary diffing of compromised vs clean versions, upstream notification</td></tr>
+        <tr><td>Long dwell time (&gt;30 days undetected)</td><td>Historical log analysis, full environment sweep, detection gap analysis</td></tr>
+        <tr><td>Destructive attack (wiper malware)</td><td>Data recovery assessment, full forensic imaging before anything else</td></tr>
+        <tr><td>Legal / law enforcement involvement</td><td>Evidence preservation, chain of custody, formal forensic report</td></tr>
+      </table>
+    </div>
+
+    <!-- RE FUNDAMENTALS -->
+    <div class="section" id="s-re-fundamentals">
+      <h1><span class="h1-icon">🔩</span>Reverse Engineering Fundamentals<span class="h1-tag">RE</span></h1>
+      <div class="tool-badges">
+        <span class="tool-badge tb-gold">IDA Pro</span><span class="tool-badge tb-purple">Ghidra</span>
+        <span class="tool-badge tb-red">x64dbg</span><span class="tool-badge tb-orange">WinDbg</span>
+        <span class="tool-badge tb-blue">Binary Ninja</span><span class="tool-badge tb-purple">Radare2</span>
+      </div>
+      <h2>RE Workflow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Triage (Static)</div><div class="step-desc">Hash, file type, strings, imports, exports, sections entropy. Build hypothesis about what the sample does before opening a disassembler.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Disassembly (Static)</div><div class="step-desc">Open in IDA/Ghidra. Identify main(), WinMain(), DllMain(). Rename functions as you understand them. Work top-down from entry point.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Behavioral (Dynamic)</div><div class="step-desc">Run in controlled sandbox with monitoring. Correlate dynamic behavior with static analysis. Resolve what static couldn't (dynamic code, packed sections).</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Debug (Dynamic)</div><div class="step-desc">Use x64dbg/WinDbg to step through critical functions. Decrypt config, extract hardcoded C2, understand algorithm behavior.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Document & Produce</div><div class="step-desc">Write RE report: capabilities, C2 protocol, encryption, config format, YARA rule, Sigma detections, IOCs. Update threat intel platform.</div></div></div>
+      </div>
+      <h2>PE File Structure Reference</h2>
+      <table>
+        <tr><th>Component</th><th>Offset/Location</th><th>RE Relevance</th></tr>
+        <tr><td>DOS Header (MZ)</td><td>0x0000</td><td>Magic bytes 4D 5A — always check</td></tr>
+        <tr><td>PE Signature</td><td>e_lfanew offset</td><td>50 45 00 00 — marks PE start</td></tr>
+        <tr><td>File Header</td><td>PE+4</td><td>TimeDateStamp — compile time (can be forged)</td></tr>
+        <tr><td>Optional Header</td><td>PE+24</td><td>ImageBase, EntryPoint, Subsystem, DLL characteristics</td></tr>
+        <tr><td>Import Directory</td><td>Data directory [1]</td><td>API imports — reveals capability fingerprint</td></tr>
+        <tr><td>Export Directory</td><td>Data directory [0]</td><td>Exported functions — for DLLs/backdoors</td></tr>
+        <tr><td>.text section</td><td>Executable code</td><td>Main code — disassemble here</td></tr>
+        <tr><td>.data section</td><td>Initialized data</td><td>Global variables, hardcoded strings/config</td></tr>
+        <tr><td>.rsrc section</td><td>Resources</td><td>Often contains embedded payloads, configs, icons</td></tr>
+        <tr><td>Overlay</td><td>After last section</td><td>Appended data — common in droppers</td></tr>
+      </table>
+      <h2>Key API Imports — Malware Capability Map</h2>
+      <table>
+        <tr><th>API / Import</th><th>Capability</th><th>Malware Use</th></tr>
+        <tr><td>VirtualAlloc / VirtualAllocEx</td><td>Memory allocation</td><td>Shellcode staging, injection</td></tr>
+        <tr><td>WriteProcessMemory</td><td>Write to remote process</td><td>Process injection</td></tr>
+        <tr><td>CreateRemoteThread</td><td>Remote thread creation</td><td>Classic DLL injection trigger</td></tr>
+        <tr><td>NtUnmapViewOfSection</td><td>Unmap PE sections</td><td>Process hollowing (RunPE)</td></tr>
+        <tr><td>SetWindowsHookEx</td><td>Hook Windows messages</td><td>Keylogger, DLL injection via hook</td></tr>
+        <tr><td>RegSetValueEx</td><td>Write registry value</td><td>Persistence via Run keys</td></tr>
+        <tr><td>WinExec / ShellExecute / CreateProcess</td><td>Execute programs</td><td>Dropper executing payload</td></tr>
+        <tr><td>InternetOpen / HttpSendRequest</td><td>HTTP networking</td><td>C2 communication (WinINet)</td></tr>
+        <tr><td>WSAStartup / connect / send / recv</td><td>Raw socket networking</td><td>C2 via raw sockets</td></tr>
+        <tr><td>CryptEncrypt / CryptDecrypt</td><td>Encryption</td><td>Ransomware, C2 traffic encryption</td></tr>
+        <tr><td>IsDebuggerPresent / NtQueryInformationProcess</td><td>Anti-debug</td><td>Sandbox/debugger detection</td></tr>
+        <tr><td>GetSystemTime / Sleep / NtDelayExecution</td><td>Time-based evasion</td><td>Delay execution to evade sandbox</td></tr>
+      </table>
+    </div>
+
+    <!-- IDA GHIDRA -->
+    <div class="section" id="s-ida-ghidra">
+      <h1><span class="h1-icon">🔬</span>IDA Pro & Ghidra<span class="h1-tag">RE TOOLS</span></h1>
+      <h2>IDA Pro — Essential Workflow</h2>
+      <div class="code-wrap"><div class="code-label ida">IDA PRO</div><pre><code>; Essential IDA keyboard shortcuts
+Space        → Toggle Graph / Text view
+N            → Rename identifier (function, variable, label)
+Y            → Change type (set function signature)
+;            → Add comment at cursor
+Alt+M        → Add bookmark
+Ctrl+X       → Cross-references (where is this called FROM?)
+Ctrl+J       → Jump to cross-reference
+X            → List all xrefs to current address
+G            → Jump to address
+F5           → Decompile (Hex-Rays — requires license)
+P            → Mark as function
+Alt+I        → Search for immediate value
+Alt+B        → Binary search (hex pattern)
+Ctrl+F       → Search text
+Escape       → Go back (navigation history)
+Tab          → Toggle between disasm and decompiler
+Ctrl+Shift+F → Find similar functions (FLIRT signatures)</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>IDA Python Scripting</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code">import idc, idaapi, idautils
+
+# Rename all functions matching a pattern
+for func_ea in idautils.Functions():
+    name = idc.get_func_name(func_ea)
+    if name.startswith("sub_"):
+        # Check size — small functions often wrappers
+        func = idaapi.get_func(func_ea)
+        if func and (func.size() < 20):
+            idc.set_name(func_ea, f"wrapper_{hex(func_ea)}", idc.SN_NOWARN)
+
+# Find all calls to a suspicious API (e.g., VirtualAllocEx)
+target = idc.get_name_ea_simple("VirtualAllocEx")
+for xref in idautils.XrefsTo(target, 0):
+    print(f"[*] VirtualAllocEx called from: {hex(xref.frm)} in {idc.get_func_name(xref.frm)}")
+
+# Decode XOR-encrypted strings
+def xor_decode(ea, length, key):
+    result = ""
+    for i in range(length):
+        b = idc.get_wide_byte(ea + i)
+        result += chr(b ^ key)
+    return result
+
+# Auto-comment decoded strings at usage sites
+decoded = xor_decode(0x402000, 32, 0x42)
+idc.set_cmt(0x402000, f"Decoded: {decoded}", 0)
+
+# Search for all PUSH instructions followed by CALL (common in shellcode)
+ea = idc.get_inf_attr(idc.INF_MIN_EA)
+while ea != idc.BADADDR:
+    if idc.print_insn_mnem(ea) == "push":
+        next_ea = idc.next_head(ea)
+        if idc.print_insn_mnem(next_ea) == "call":
+            print(f"PUSH-CALL at {hex(ea)}")
+    ea = idc.next_head(ea)</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Ghidra — Script & Automation</h2>
+      <div class="code-wrap"><div class="code-label python">GHIDRA PYTHON</div><pre><code># Ghidra script — find all XOR operations (common in decryption routines)
+from ghidra.app.script import GhidraScript
+from ghidra.program.model.listing import CodeUnit
+
+listing = currentProgram.getListing()
+instructions = listing.getInstructions(True)
+
+xor_sites = []
+for instr in instructions:
+    if instr.getMnemonicString() == "XOR":
+        ops = instr.getDefaultOperandRepresentations()
+        # Skip XOR reg,reg (zeroing idiom)
+        if len(ops) == 2 and ops[0] != ops[1]:
+            xor_sites.append(instr.getAddress())
+            print(f"XOR at {instr.getAddress()}: {instr}")
+
+print(f"\nTotal XOR operations (non-zeroing): {len(xor_sites)}")
+
+# Mark all as bookmarks for review
+for addr in xor_sites:
+    createBookmark(addr, "Crypto", "XOR operation - possible decryption")</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Ghidra Keyboard Shortcuts</h2>
+      <table>
+        <tr><th>Shortcut</th><th>Action</th></tr>
+        <tr><td>L</td><td>Rename symbol / label</td></tr>
+        <tr><td>T</td><td>Retype variable/function</td></tr>
+        <tr><td>;</td><td>Add comment (end of line)</td></tr>
+        <tr><td>Ctrl+Shift+F</td><td>Search for text in all fields</td></tr>
+        <tr><td>Ctrl+E</td><td>Edit function signature</td></tr>
+        <tr><td>Ctrl+Shift+E</td><td>Function call tree</td></tr>
+        <tr><td>Alt+←</td><td>Navigate back</td></tr>
+        <tr><td>Ctrl+F</td><td>Find (in listing)</td></tr>
+        <tr><td>Right-click → References</td><td>All cross-references</td></tr>
+        <tr><td>D</td><td>Disassemble at cursor</td></tr>
+      </table>
+    </div>
+
+    <!-- X86 ASSEMBLY -->
+    <div class="section" id="s-x86-assembly">
+      <h1><span class="h1-icon">⚙️</span>x86/x64 Assembly for RE<span class="h1-tag">RE</span></h1>
+      <h2>x86/x64 Register Reference</h2>
+      <table class="reg-table">
+        <tr><th>64-bit</th><th>32-bit</th><th>16-bit</th><th>Purpose / Convention</th></tr>
+        <tr><td>RAX</td><td>EAX</td><td>AX</td><td>Return value, accumulator</td></tr>
+        <tr><td>RBX</td><td>EBX</td><td>BX</td><td>Callee-saved, base pointer</td></tr>
+        <tr><td>RCX</td><td>ECX</td><td>CX</td><td>1st arg (Windows x64), counter</td></tr>
+        <tr><td>RDX</td><td>EDX</td><td>DX</td><td>2nd arg (Windows x64), data</td></tr>
+        <tr><td>RSI</td><td>ESI</td><td>SI</td><td>Source index (string ops)</td></tr>
+        <tr><td>RDI</td><td>EDI</td><td>DI</td><td>Destination index, 1st arg (Linux)</td></tr>
+        <tr><td>RSP</td><td>ESP</td><td>SP</td><td>Stack pointer (top of stack)</td></tr>
+        <tr><td>RBP</td><td>EBP</td><td>BP</td><td>Base pointer (stack frame)</td></tr>
+        <tr><td>R8</td><td>R8D</td><td>R8W</td><td>5th arg (Windows x64)</td></tr>
+        <tr><td>R9</td><td>R9D</td><td>R9W</td><td>6th arg (Windows x64)</td></tr>
+        <tr><td>RIP</td><td>EIP</td><td>IP</td><td>Instruction pointer (current PC)</td></tr>
+      </table>
+      <h2>Common Assembly Patterns</h2>
+      <div class="code-wrap"><div class="code-label asm">x86 ASM</div><pre><code>; === FUNCTION PROLOGUE / EPILOGUE ===
+push rbp              ; Save caller's base pointer
+mov rbp, rsp          ; Set base pointer to current stack
+sub rsp, 0x40         ; Allocate local variables (64 bytes)
+; ... function body ...
+mov rsp, rbp          ; Restore stack pointer
+pop rbp               ; Restore base pointer
+ret                   ; Return to caller
+
+; === CALLING CONVENTION (Windows x64) ===
+; Arguments: RCX, RDX, R8, R9, then stack
+; Return value: RAX
+; Callee-saved: RBX, RSI, RDI, RBP, R12-R15
+; Shadow space: 32 bytes (0x20) always allocated on stack
+
+; === XOR DECRYPT LOOP (common in malware) ===
+lea  rsi, [encrypted_data]  ; RSI = pointer to encrypted buffer
+mov  rcx, 0x100             ; RCX = loop counter (256 bytes)
+mov  bl, 0x42               ; BL  = XOR key
+decrypt_loop:
+  xor  byte ptr [rsi], bl   ; Decrypt byte
+  inc  rsi                  ; Advance pointer
+  loop decrypt_loop         ; Dec RCX, jump if not zero
+
+; === CONDITIONAL JUMP REFERENCE ===
+je  / jz   → Jump if Equal (ZF=1)
+jne / jnz  → Jump if Not Equal (ZF=0)
+jl  / jnge → Jump if Less (signed)
+jg  / jnle → Jump if Greater (signed)
+jb  / jnae → Jump if Below (unsigned)
+ja  / jnbe → Jump if Above (unsigned)
+jmp        → Unconditional jump
+call       → Push RIP, jump (CALL = PUSH+JMP)
+ret        → Pop RIP, jump back
+
+; === SUSPICIOUS SHELLCODE PATTERNS ===
+call $+5             ; Get EIP (position-independent code)
+pop  eax             ; EAX now = address of 'pop eax'
+
+; GetProcAddress dynamic API resolution pattern:
+mov  eax, [fs:0x30]  ; PEB (Process Environment Block)
+mov  eax, [eax+0x0C] ; PEB_LDR_DATA
+mov  eax, [eax+0x14] ; InMemoryOrderModuleList
+; ... walk module list to find kernel32.dll by hash</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Recognizing Common Code Constructs</h2>
+      <table>
+        <tr><th>Pattern</th><th>What It Is</th><th>RE Action</th></tr>
+        <tr><td>XOR reg, reg</td><td>Zero a register (not crypto)</td><td>Ignore — common compiler output</td></tr>
+        <tr><td>XOR [mem], const (non-zero key)</td><td>Decryption/obfuscation loop</td><td>Extract key + data, decode offline</td></tr>
+        <tr><td>call $+5; pop reg</td><td>Get EIP — shellcode trick</td><td>Position-independent shellcode</td></tr>
+        <tr><td>Tight loop with LFSR / SHR / ROL</td><td>Hash algorithm or RC4 KSA</td><td>Identify algorithm, search for hash values</td></tr>
+        <tr><td>Large array of bytes in .data + loop iterating it</td><td>Encoded payload / config</td><td>Extract bytes, try decode (XOR, RC4, AES)</td></tr>
+        <tr><td>fs:[0x30] or gs:[0x60] access</td><td>PEB access (API resolution)</td><td>Dynamic import resolution — log resolved APIs</td></tr>
+        <tr><td>NtQueryInformationProcess with class 7</td><td>Anti-debug check</td><td>Patch to always return FALSE for analysis</td></tr>
+      </table>
+    </div>
+
+    <!-- ANTI-ANALYSIS -->
+    <div class="section" id="s-anti-analysis">
+      <h1><span class="h1-icon">🛡️</span>Anti-Analysis Techniques<span class="h1-tag">RE</span></h1>
+      <h2>Anti-Debugging Techniques & Bypasses</h2>
+      <table>
+        <tr><th>Technique</th><th>How It Works</th><th>Bypass / Patch</th></tr>
+        <tr><td>IsDebuggerPresent</td><td>Checks PEB.BeingDebugged flag</td><td>Patch PEB byte at 0x2 to 0x00, or NOP the check</td></tr>
+        <tr><td>NtQueryInformationProcess (class 7)</td><td>ProcessDebugPort — 0 if no debugger</td><td>Hook NtQueryInformationProcess to return 0</td></tr>
+        <tr><td>CheckRemoteDebuggerPresent</td><td>Wrapper for NtQueryInformationProcess</td><td>Same as above</td></tr>
+        <tr><td>Timing checks (RDTSC / GetTickCount)</td><td>Measures time between ops — debugger slows execution</td><td>NOP the comparison or patch expected delta</td></tr>
+        <tr><td>Hardware breakpoint detection</td><td>Checks DR0-DR7 debug registers</td><td>Use software breakpoints (INT3) instead</td></tr>
+        <tr><td>OutputDebugString</td><td>Sets LastError — different with/without debugger</td><td>Patch/NOP the comparison</td></tr>
+        <tr><td>SEH anti-debug</td><td>Raises exception — debugger handles it differently</td><td>Pass exceptions to application in debugger settings</td></tr>
+        <tr><td>Parent process check</td><td>Expects explorer.exe parent, not debugger</td><td>Spoof parent PID with Process Hacker or ScyllaHide</td></tr>
+      </table>
+      <h2>Anti-VM / Sandbox Evasion & Bypasses</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># Common sandbox evasion checks malware makes — and how to defeat them:
+
+# 1. CPUID trick — check hypervisor bit
+# Defeat: Patch CPUID return in VM (VMware: change cpuid.1.ecx = "00000000...")
+
+# 2. Registry checks for VM artifacts
+vm_reg_keys = [
+    "HARDWARE\\DEVICEMAP\\Scsi\\Scsi Port 0\\Scsi Bus 0\\Target Id 0\\Logical Unit Id 0",  # VMware disk
+    "SOFTWARE\\VMware, Inc.\\VMware Tools",
+    "SOFTWARE\\Oracle\\VirtualBox Guest Additions",
+    "SYSTEM\\ControlSet001\\Services\\VBoxSF"
+]
+# Defeat: Delete or rename these registry keys in your analysis VM
+
+# 3. Process/file/mutex artifact checks
+vm_processes = ["vmtoolsd.exe","vmwaretray.exe","vboxservice.exe","sandboxie.exe"]
+# Defeat: Kill/rename VM tool processes, use VMware with tools uninstalled
+
+# 4. User interaction checks (mouse movement, click count)
+# Defeat: Use script to simulate mouse movement during analysis
+# AutoIt: MouseMove(random, random, 10) in a loop
+
+# 5. Sleep() calls to outlast sandbox timeout
+# Defeat: Patch Sleep() calls to return immediately
+# WinDbg: bp kernel32!Sleep ".printf \"Sleep called: %d ms\\n\", ecx; ed esp 0; g"
+
+# 6. Domain/username checks
+# Defeat: Rename VM hostname/username to realistic values (not "sandbox", "malware", "DESKTOP-ABCD")
+
+# 7. Screen resolution check (sandbox = small window)
+# Defeat: Set VM resolution to 1920x1080
+
+# 8. Disk size check (sandbox = small virtual disk)
+# Defeat: Set VM disk to 100GB+</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>ScyllaHide — Anti-Anti-Debug Plugin</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># ScyllaHide (x64dbg plugin) settings to enable for protected malware:
+# Options > ScyllaHide > Profiles > Select "Aggressive"
+# Key options to check:
+#   ✅ PEB (BeingDebugged, NtGlobalFlag, HeapFlags)
+#   ✅ NtQueryInformationProcess (ProcessDebugPort, ProcessDebugFlags)
+#   ✅ NtSetInformationThread (HideFromDebugger)
+#   ✅ BlockInput (prevent mouse/keyboard capture)
+#   ✅ GetTickCount / QueryPerformanceCounter (timing)
+#   ✅ NtQuerySystemInformation (KernelDebugger)
+
+# Also useful: Check "Kill Anti-Attach"
+# For stubborn protectors, enable "Remove EP Break" to avoid detection
+# at entry point breakpoint</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- UNPACKING -->
+    <div class="section" id="s-unpacking">
+      <h1><span class="h1-icon">📦</span>Unpacking & Deobfuscation<span class="h1-tag">RE</span></h1>
+      <h2>Generic Unpacking Methodology</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Identify Packer</div><div class="step-desc">Use Detect-It-Easy (DIE) or PEiD. High section entropy (&gt;7.0) = packed. Small import table = packed. Suspicious section names (.UPX0, .nsp0, CODE).</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Try Automatic Unpackers</div><div class="step-desc">UPX: <code>upx -d sample.exe</code>. For others: try UnpacMe (online), unipacker, or PE-bear. Many common packers have known unpackers.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Manual Unpack — OEP Hunt</div><div class="step-desc">Run in x64dbg. The packer stub decrypts/decompresses payload then jumps to Original Entry Point (OEP). Break on OEP, dump process.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Dump & Fix IAT</div><div class="step-desc">Use Scylla (in x64dbg) to dump process at OEP. Fix Import Address Table (IAT). Rebuild PE — now fully unpacked for static analysis.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Analyze Unpacked Binary</div><div class="step-desc">Load clean dump in IDA/Ghidra. Perform full static analysis on the deobfuscated payload.</div></div></div>
+      </div>
+      <h2>Finding OEP (Original Entry Point)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># x64dbg — OEP hunting techniques:
+
+# Method 1: Hardware breakpoint on memory write then execute
+# 1. Run to packed entry point (EP)
+# 2. Identify unpacking loop writing to memory region
+# 3. Set hardware BP on write to unpacking destination
+# 4. Run — breaks when packer writes to OEP region
+# 5. Set hardware BP on execute at that address → hit OEP
+
+# Method 2: ESP trick (works for many simple packers)
+# 1. Run to packed EP
+# 2. Execute PUSHAD (saves all registers to stack)
+# 3. Right-click ESP value → Follow in dump
+# 4. Set hardware BP on memory access at ESP address
+# 5. Run → packer runs → POPAD executes → your BP fires
+# 6. Single-step from there → usually 1-2 jumps to OEP
+
+# Method 3: Search for tail jump
+# Most packers end with: JMP dword ptr [reg] or JMP [reg+offset]
+# Set BP on all JMP instructions in packer code
+# The last JMP = jump to OEP
+
+# After finding OEP — dump with Scylla:
+# Plugins → Scylla → Current OEP filled in → IAT Autosearch → Get Imports → Dump → Fix Dump</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>String Deobfuscation Techniques</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code>import struct
+
+# XOR decode with rotating key
+def xor_rotating(data, key):
+    result = bytearray()
+    for i, byte in enumerate(data):
+        result.append(byte ^ key[i % len(key)])
+    return bytes(result)
+
+# RC4 stream cipher (common in malware configs)
+def rc4(key, data):
+    S = list(range(256))
+    j = 0
+    for i in range(256):
+        j = (j + S[i] + key[i % len(key)]) % 256
+        S[i], S[j] = S[j], S[i]
+    i = j = 0
+    result = bytearray()
+    for byte in data:
+        i = (i + 1) % 256
+        j = (j + S[i]) % 256
+        S[i], S[j] = S[j], S[i]
+        result.append(byte ^ S[(S[i] + S[j]) % 256])
+    return bytes(result)
+
+# Base64 variants (malware uses custom alphabets)
+import base64
+def custom_b64_decode(data, custom_alphabet):
+    standard = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    translation = str.maketrans(custom_alphabet, standard)
+    return base64.b64decode(data.translate(translation))
+
+# Find and decode all XOR-encoded strings in binary
+with open("sample.exe", "rb") as f:
+    binary = f.read()
+
+key = 0x42
+decoded_strings = []
+for i in range(len(binary) - 8):
+    chunk = bytes([b ^ key for b in binary[i:i+64]])
+    # Check if decoded bytes are printable ASCII
+    if all(32 <= b < 127 for b in chunk[:16]):
+        decoded_strings.append((hex(i), chunk.decode('ascii', errors='ignore').split('\x00')[0]))
+
+for addr, s in decoded_strings[:20]:
+    print(f"  {addr}: {s}")</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- MALWARE FAMILIES -->
+    <div class="section" id="s-malware-families">
+      <h1><span class="h1-icon">🦠</span>Malware Family Profiles<span class="h1-tag">INTEL</span></h1>
+      <div class="apt-grid">
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">COBALT STRIKE</div><div class="apt-origin">C2 Framework</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> Commercial C2 framework (widely abused)<br>
+            <strong>Delivery:</strong> Phishing, exploitation, lateral movement<br>
+            <strong>C2:</strong> HTTP/HTTPS malleable profiles, DNS, SMB named pipes<br>
+            <strong>Key TTPs:</strong> Process injection, OPSEC-safe loader, BOF (Beacon Object Files)<br>
+            <strong>Detection:</strong> JARM fingerprint, CS beacon config extractor, memory YARA<br>
+            <strong>Config Extract:</strong> 1768.py, cs-decrypt-traffic, CobaltStrikeParser
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">EMOTET</div><div class="apt-origin">Banking Trojan → Dropper</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> Modular malware, dropper for Ryuk/Conti<br>
+            <strong>Delivery:</strong> Spearphishing with malicious Office documents<br>
+            <strong>C2:</strong> HTTP, hardcoded IP list (RSA encrypted comms)<br>
+            <strong>Key TTPs:</strong> Email thread hijacking, LOLBAS execution, persistence via SChedTask/Registry<br>
+            <strong>Detection:</strong> Malpedia family signatures, Emotet YARA rules, C2 IP blocklists<br>
+            <strong>Config Extract:</strong> emba, emotet config extractor (abuse.ch)
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">QAKBOT (QBot)</div><div class="apt-origin">Banking Trojan → Loader</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> Info stealer + dropper (Black Basta, RansomHub delivery)<br>
+            <strong>Delivery:</strong> Phishing via email thread hijacking, OneNote, HTML smuggling<br>
+            <strong>C2:</strong> HTTPS with self-signed cert, proxy layer (victimsas C2)<br>
+            <strong>Key TTPs:</strong> DLL side-loading, process hollowing, credential theft, worm spreading<br>
+            <strong>Detection:</strong> QBot YARA, C2 network IOCs, specific process chain patterns<br>
+            <strong>Note:</strong> Infrastructure taken down Aug 2023, but resurfaced
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">LOCKBIT 3.0</div><div class="apt-origin">Ransomware-as-a-Service</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> RaaS — affiliate model<br>
+            <strong>Delivery:</strong> Broker access → Cobalt Strike / valid accounts<br>
+            <strong>Encryption:</strong> AES-256 + RSA-2048 hybrid, intermittent encryption<br>
+            <strong>Key TTPs:</strong> vssadmin shadow delete, LDAP enum, AD spray, exfil before encrypt<br>
+            <strong>Detection:</strong> Shadow copy deletion, mass file rename events, LockBit YARA<br>
+            <strong>Note:</strong> Leaked builder → many copycats with LockBit code base
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">SLIVER</div><div class="apt-origin">Open-Source C2 Framework</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> Open-source C2 (alternative to CS)<br>
+            <strong>Transport:</strong> mTLS, WireGuard, HTTP/S, DNS<br>
+            <strong>Key TTPs:</strong> Process injection (RWXRWX memory), BYOL (Bring Your Own Lolbin)<br>
+            <strong>Detection:</strong> Sliver implant YARA (Elastic), specific mTLS fingerprint, memory patterns<br>
+            <strong>Config Extract:</strong> Sliver implant config parser (GitHub: BishopFox/sliver-implant-parser)
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">BRUTE RATEL C4</div><div class="apt-origin">Commercial C2 (Adversary Sim)</div></div>
+          <div class="apt-body">
+            <strong>Type:</strong> Commercial adversary simulation tool (leaked)<br>
+            <strong>Transport:</strong> HTTP/S with custom profiles, DNS<br>
+            <strong>Key TTPs:</strong> AMSI bypass, ETW patching, PPID spoofing, direct syscalls<br>
+            <strong>Detection:</strong> BRC4 YARA (Elastic), specific ETW/AMSI patch patterns<br>
+            <strong>Note:</strong> Specifically designed to evade EDR — requires kernel-level detection
+          </div>
+        </div>
+      </div>
+      <h2>Malware Config Extraction Reference</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Cobalt Strike beacon config extraction
+python3 1768.py sample.bin          # from Didier Stevens
+python3 CobaltStrikeParser.py sample.bin
+
+# Emotet config (C2 list extraction)
+python3 emotet_config_extractor.py sample.exe
+
+# General config extraction with CAPE sandbox
+# Submit to: https://capesandbox.com
+# Look for "Config" in analysis results
+
+# Binary string carving for C2 IOCs
+floss --minimum-length 8 sample.exe | grep -E "([0-9]{1,3}\.){3}[0-9]{1,3}|[a-z0-9\-]+\.(com|net|org|io|ru|cn)"
+
+# MALPEDIA — family attribution reference
+# https://malpedia.caad.fkie.fraunhofer.de/
+# Search by YARA / hash / family name</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- ROOTKITS -->
+    <div class="section" id="s-rootkits">
+      <h1><span class="h1-icon">👻</span>Rootkits & Bootkits<span class="h1-tag">ADVANCED MALWARE</span></h1>
+      <div class="alert red">⚠ If rootkit/bootkit is confirmed: do NOT trust any data from the running OS. Acquire offline. Boot from trusted media for analysis.</div>
+      <h2>Rootkit Type Reference</h2>
+      <table>
+        <tr><th>Type</th><th>Hook Target</th><th>Persistence</th><th>Detection Approach</th></tr>
+        <tr><td>User-mode (DKOM)</td><td>DKOM — hide processes/files</td><td>User/SYSTEM process</td><td>Memory forensics — compare pslist vs psscan</td></tr>
+        <tr><td>Kernel-mode (SSDT hook)</td><td>SSDT — hook system calls</td><td>Driver (.sys file)</td><td>Check SSDT for non-Microsoft hooks (WinDbg: !ssdt)</td></tr>
+        <tr><td>Kernel-mode (filter driver)</td><td>IRP filter on FS/registry</td><td>Driver in HKLM\System\Services</td><td>List filter drivers: fltMC.exe</td></tr>
+        <tr><td>Bootkit</td><td>MBR/VBR/UEFI modification</td><td>Pre-OS, survives reinstall</td><td>Offline: compare MBR vs known good; check UEFI fw</td></tr>
+        <tr><td>Hypervisor rootkit</td><td>Runs below OS (VMM)</td><td>Boot chain</td><td>CPUID hypervisor flag, timing attacks, hardware analysis</td></tr>
+      </table>
+      <h2>Rootkit Detection — Memory Forensics</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Volatility 3 — Rootkit detection techniques
+
+# 1. Process hiding detection (psscan finds what pslist hides)
+vol.py -f memory.raw windows.pslist > pslist.txt
+vol.py -f memory.raw windows.psscan > psscan.txt
+# Diff: processes in psscan NOT in pslist = hidden (rootkit!)
+python3 -c "
+import re
+pslist = set(re.findall(r'\b(\d+)\b', open('pslist.txt').read()))
+psscan = set(re.findall(r'\b(\d+)\b', open('psscan.txt').read()))
+hidden = psscan - pslist
+print('Hidden PIDs:', hidden)
+"
+
+# 2. SSDT hook detection
+vol.py -f memory.raw windows.ssdt
+# Look for entries NOT pointing to ntoskrnl.exe or win32k.sys
+
+# 3. Kernel module listing (find injected drivers)
+vol.py -f memory.raw windows.modules
+vol.py -f memory.raw windows.modscan   # Scan-based (finds hidden drivers)
+# Compare: modules not in both = suspicious
+
+# 4. Callback detection (malicious driver hooks)
+vol.py -f memory.raw windows.callbacks
+# Legitimate: WdFilter, HTTP.SYS, etc.
+# Suspicious: Unknown, unsigned, or unusual module names
+
+# 5. MBR analysis
+vol.py -f memory.raw windows.mbrscan   # Detect MBR modifications</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>MBR / UEFI Bootkit Analysis</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Offline MBR analysis (boot from trusted Linux USB)
+dd if=/dev/sda bs=512 count=1 of=mbr.bin    # Acquire MBR
+
+# Check MBR signature
+xxd mbr.bin | tail -1    # Last 2 bytes should be 55 AA
+
+# Compare to known-good MBR
+md5sum mbr.bin
+# Compare hash against known clean MBR for that OS/version
+
+# Disassemble MBR code
+ndisasm -b16 mbr.bin    # 16-bit disassembly
+
+# Full disk forensic image
+dcfldd if=/dev/sda of=/mnt/usb/evidence.img hash=sha256 hashlog=/mnt/usb/evidence.sha256
+
+# UEFI firmware analysis
+chipsec_main.py -m tools.uefi.scan_image    # CHIPSEC — UEFI security scan
+UEFITool evidence.rom   # Parse and analyze UEFI image</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- RANSOMWARE RE -->
+    <div class="section" id="s-ransomware-re">
+      <h1><span class="h1-icon">💀</span>Ransomware Deep Dive<span class="h1-tag">RE</span></h1>
+      <h2>Ransomware RE Objectives</h2>
+      <ul>
+        <li>Identify encryption algorithm (AES-128/256, ChaCha20, custom) and key derivation</li>
+        <li>Determine if key is hardcoded, generated locally, or fetched from C2</li>
+        <li>Find if private key/IV is stored locally (potential for decryption without paying)</li>
+        <li>Map all persistence and lateral movement capabilities</li>
+        <li>Extract full C2 infrastructure (URLs, IPs, onion addresses)</li>
+        <li>Identify affiliate markers / version information for attribution</li>
+        <li>Determine if data exfiltration occurred before encryption</li>
+      </ul>
+      <h2>Encryption Analysis</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># Identify encryption algorithm from binary patterns
+# AES S-box detection (constant bytes in .data section)
+AES_SBOX = bytes([
+    0x63,0x7c,0x77,0x7b,0xf2,0x6b,0x6f,0xc5,0x30,0x01,0x67,0x2b,0xfe,0xd7,0xab,0x76
+])  # first 16 bytes of AES S-box
+
+with open("ransomware.exe", "rb") as f:
+    data = f.read()
+
+if AES_SBOX in data:
+    print("[+] AES S-box found — likely uses AES encryption")
+    idx = data.index(AES_SBOX)
+    print(f"    S-box at offset: {hex(idx)}")
+
+# ChaCha20 constant detection
+CHACHA20_CONST = b"expand 32-byte k"
+if CHACHA20_CONST in data:
+    print("[+] ChaCha20 constant found")
+
+# Check for Windows CNG / CryptoAPI patterns
+crypto_imports = [b"BCryptGenRandom", b"BCryptEncrypt", b"CryptEncrypt",
+                  b"CryptGenKey", b"NCryptEncrypt"]
+for api in crypto_imports:
+    if api in data:
+        print(f"[+] Crypto API found: {api.decode()}")
+
+# Key storage analysis — search for private key export before process exit
+# In IDA: search for CryptExportKey, BCryptExportKey
+# If key is exported to file → possible recovery
+# If key is sent to C2 and deleted → recovery requires C2 cooperation</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Ransomware Incident — L3 Specific Actions</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Acquire Before Anything Else</div><div class="step-desc">Forensic image all affected systems and memory dumps BEFORE any remediation. Encrypted data + keys in memory may allow recovery.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Identify Ransomware Family</div><div class="step-desc">Submit ransom note + encrypted file sample to ID Ransomware (id-ransomware.malwarehunterteam.com). Check NoMoreRansom.org for available decryptors.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Memory Analysis for Keys</div><div class="step-desc">If system still running: memory dump immediately. Search for AES/ChaCha keys in memory before process termination. Some ransomware leaves keys in memory post-encryption.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">RE the Binary</div><div class="step-desc">Disassemble encryption routine. Determine key source. If hardcoded or predictably generated — potential recovery without paying ransom.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Attribution & Intelligence</div><div class="step-desc">Identify affiliate group, version, and RaaS platform. This drives law enforcement engagement and informs recovery/negotiation decisions.</div></div></div>
+      </div>
+    </div>
+
+    <!-- C2 FRAMEWORKS RE -->
+    <div class="section" id="s-c2-frameworks">
+      <h1><span class="h1-icon">📡</span>C2 Framework RE<span class="h1-tag">RE</span></h1>
+      <h2>Cobalt Strike — Deep Technical Analysis</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># Extract Cobalt Strike beacon configuration
+# Using 1768.py (Didier Stevens) or CobaltStrikeParser
+
+import struct, re, json
+
+def decode_cs_config(data):
+    """Simplified CS config parser — extracts key fields"""
+    # CS beacon config is XOR encrypted then stored in beacon
+    # Key: look for config block starting with 0x0001 0x0001 patterns
+
+    # Common CS config fields (type codes)
+    field_map = {
+        1:  "BeaconType",        # 0=HTTP, 1=Hybrid HTTP+DNS, 2=SMB
+        2:  "Port",
+        3:  "SleepTime",
+        5:  "MaxGetSize",
+        7:  "PublicKey",
+        8:  "C2Server",          # C2 hostname:port,URI
+        9:  "UserAgent",
+        10: "HTTPRequestHeader",
+        12: "HTTPResponseHeader",
+        13: "SleepmaskFlag",
+        14: "GetURI",
+        26: "HttpPostURI",
+        27: "SpawnTo_x86",
+        28: "SpawnTo_x64",
+        29: "PipeName",
+        37: "DNS_Idle",
+        38: "DNS_Sleep",
+        50: "Killdate",
+    }
+    return field_map
+
+# Run: python3 1768.py --raw beacon.bin
+# Key fields to extract for incident response:
+# C2Server → block these IPs/domains
+# BeaconType → understand communication method
+# UserAgent → create detection rule
+# SpawnTo → what process beacon injects into</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Custom C2 Protocol RE</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Capture C2 Traffic</div><div class="step-desc">Run sample with FakeNet-NG or INetSim. Capture all traffic in PCAP. Force HTTPS to use self-signed cert to decrypt TLS.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Protocol Fingerprinting</div><div class="step-desc">Identify protocol: HTTP/S, raw TCP, UDP, DNS, custom binary. Look for magic bytes, framing, length fields.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Find Encode/Decode Functions</div><div class="step-desc">In IDA: trace from send()/WSASend() call backwards. Find encoding (Base64 variant, XOR, custom cipher) applied before transmission.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Implement Protocol Parser</div><div class="step-desc">Write Python parser for the C2 protocol. This enables: decrypting captured traffic, writing NIDS/Suricata rules, creating specific YARA rules.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Create Detection Artifacts</div><div class="step-desc">Network YARA for PCAP, Suricata rule for live detection, JA3/JARM fingerprint, HTTP header patterns.</div></div></div>
+      </div>
+    </div>
+
+    <!-- APT PROFILES -->
+    <div class="section" id="s-apt-profiles">
+      <h1><span class="h1-icon">🌍</span>APT Group Profiles<span class="h1-tag">THREAT INTEL</span></h1>
+      <div class="alert gold">★ Attribution requires multiple corroborating data points. Never attribute based on a single indicator. Infrastructure, TTPs, tooling, victimology, and timing all matter.</div>
+      <div class="apt-grid">
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">APT29 / Cozy Bear / Midnight Blizzard</div><div class="apt-origin">Russia — SVR</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> Governments, think tanks, IT supply chain, healthcare<br>
+            <strong>Signature TTPs:</strong> Supply chain attacks, OAuth/cloud abuse, WELLMESS, BEATDROP, stealthy long-term access<br>
+            <strong>Notable:</strong> SolarWinds (2020), Microsoft Exchange (2021), HPE/Microsoft (2023)<br>
+            <strong>Detection:</strong> Unusual OAuth app consents, service principal abuse, anomalous cloud API activity<br>
+            <strong>MITRE Group:</strong> G0016
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">APT28 / Fancy Bear / Forest Blizzard</div><div class="apt-origin">Russia — GRU</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> Military, government, political organizations, NATO<br>
+            <strong>Signature TTPs:</strong> LOOKINGGLASS, X-Agent, X-Tunnel, credential phishing, VPN exploitation<br>
+            <strong>Notable:</strong> DNC hack (2016), NotPetya (attributed), WADA breach<br>
+            <strong>Detection:</strong> X-Agent memory patterns, specific phishing kit indicators<br>
+            <strong>MITRE Group:</strong> G0007
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">LAZARUS GROUP / Hidden Cobra</div><div class="apt-origin">North Korea — RGB</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> Financial (SWIFT), crypto exchanges, defense, media<br>
+            <strong>Signature TTPs:</strong> BLINDINGCAN, MATA, HOPLIGHT, watering hole, fake job postings<br>
+            <strong>Notable:</strong> Bangladesh Bank SWIFT heist, WannaCry, 3CX supply chain<br>
+            <strong>Detection:</strong> LAZARUS YARA rules, specific C2 patterns, fake Zoom/Teams lure docs<br>
+            <strong>MITRE Group:</strong> G0032
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">APT41 / Double Dragon / Wicked Panda</div><div class="apt-origin">China — MSS (dual espionage+crime)</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> Healthcare, telecom, tech, gaming, supply chain<br>
+            <strong>Signature TTPs:</strong> MESSAGETAP, DUSTPAN, DEADEYE, supply chain, LoLBAS persistence<br>
+            <strong>Notable:</strong> Citrix/Pulse VPN exploitation (2020), healthcare during COVID<br>
+            <strong>Detection:</strong> MESSAGETAP network indicators, specific web shell patterns<br>
+            <strong>MITRE Group:</strong> G0096
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">SCATTERED SPIDER / UNC3944</div><div class="apt-origin">English-speaking cybercrime group</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> Large enterprises, casinos, telecoms<br>
+            <strong>Signature TTPs:</strong> SIM swapping, help desk social engineering, OKTA/Azure abuse, ALPHV affiliate<br>
+            <strong>Notable:</strong> MGM Resorts (2023), Caesars Entertainment (2023), Twilio<br>
+            <strong>Detection:</strong> Unusual MFA push activity, help desk ticket spike, new device enrollments<br>
+            <strong>MITRE Group:</strong> G1015
+          </div>
+        </div>
+        <div class="apt-card">
+          <div class="apt-header"><div class="apt-name">VOLT TYPHOON</div><div class="apt-origin">China — PLA pre-positioning</div></div>
+          <div class="apt-body">
+            <strong>Targets:</strong> US critical infrastructure (energy, water, comms)<br>
+            <strong>Signature TTPs:</strong> Living off the land exclusively, SOHO router compromise, no custom malware<br>
+            <strong>Notable:</strong> Long-term pre-positioning in US critical infrastructure (disclosed 2023-2024)<br>
+            <strong>Detection:</strong> Unusual wmic/netsh/certutil use, SOHO router traffic anomalies<br>
+            <strong>MITRE Group:</strong> G1017
+          </div>
+        </div>
+      </div>
+      <h2>APT Attribution Evidence Requirements</h2>
+      <table>
+        <tr><th>Evidence Category</th><th>Examples</th><th>Confidence Level</th></tr>
+        <tr><td>Malware code similarity</td><td>Shared functions, compiler artifacts, PDB paths</td><td>Medium (can be false flag)</td></tr>
+        <tr><td>Unique TTPs</td><td>Highly specific techniques documented for one group</td><td>Medium-High</td></tr>
+        <tr><td>Infrastructure overlap</td><td>Same ASN, IP ranges, domain registrar patterns</td><td>Medium (shared infra possible)</td></tr>
+        <tr><td>Victimology match</td><td>Target sector/geography matches group's known focus</td><td>Supporting only</td></tr>
+        <tr><td>Timestamps / language artifacts</td><td>Compile times, PE strings in specific language</td><td>Low-Medium (easily forged)</td></tr>
+        <tr><td>HUMINT / partner intel</td><td>Government attribution, SIGINT corroboration</td><td>High (but rarely available)</td></tr>
+        <tr><td>Multiple corroborating factors</td><td>Combination of above 3+ categories</td><td>High confidence</td></tr>
+      </table>
+    </div>
+
+    <!-- TTP ANALYSIS -->
+    <div class="section" id="s-ttp-analysis">
+      <h1><span class="h1-icon">🧩</span>TTP Deep Analysis<span class="h1-tag">MITRE</span></h1>
+      <h2>Advanced TTP Analysis Techniques</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># MITRE ATT&CK Navigator — programmatic layer creation
+# Install: pip install mitreattack-python
+
+from mitreattack.stix20 import MitreAttackData
+
+attack_data = MitreAttackData("enterprise-attack.json")
+
+# Get all techniques for a specific group (e.g., APT29)
+apt29 = attack_data.get_group_by_name("APT29")
+techniques = attack_data.get_techniques_used_by_group(apt29.id)
+
+print(f"APT29 uses {len(techniques)} techniques:")
+for technique, usage in techniques[:10]:
+    print(f"  {technique.external_id} — {technique.name}")
+    if usage.description:
+        print(f"    Usage: {usage.description[:100]}...")
+
+# Find groups that use a specific technique
+lolbas = attack_data.get_technique_by_name("Mshta")
+groups = attack_data.get_groups_using_technique(lolbas.id)
+print(f"\nGroups using Mshta ({lolbas.external_id}):")
+for group, _ in groups:
+    print(f"  {group.name}")</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Pyramid of Pain — Detection Prioritization</h2>
+      <table>
+        <tr><th>Level</th><th>Indicator Type</th><th>Attacker Cost to Change</th><th>Detection Value</th></tr>
+        <tr><td>⬆ 6 — TTPs</td><td>Behaviors and techniques</td><td>Very Hard (requires skill change)</td><td>★★★★★ Highest</td></tr>
+        <tr><td>5 — Tools</td><td>Malware, exploits, utilities</td><td>Hard (must retool)</td><td>★★★★☆</td></tr>
+        <tr><td>4 — Network/Host Artifacts</td><td>User-agents, mutex names, registry keys</td><td>Moderate</td><td>★★★☆☆</td></tr>
+        <tr><td>3 — Domain Names</td><td>C2 domains, phishing domains</td><td>Easy (new domain $1)</td><td>★★☆☆☆</td></tr>
+        <tr><td>2 — IP Addresses</td><td>C2 IPs, staging servers</td><td>Trivial (new VPS)</td><td>★★☆☆☆</td></tr>
+        <tr><td>⬇ 1 — Hash Values</td><td>MD5/SHA file hashes</td><td>Trivial (recompile)</td><td>★☆☆☆☆ Lowest</td></tr>
+      </table>
+      <div class="alert purple">◈ Focus detection engineering effort on TTPs (top of pyramid). Hash-based blocking is necessary but has low long-term value. Behavioral detection is attacker-resistant.</div>
+    </div>
+
+    <!-- DIAMOND MODEL -->
+    <div class="section" id="s-diamond-model">
+      <h1><span class="h1-icon">💎</span>Diamond Model & F3EAD<span class="h1-tag">INTEL FRAMEWORK</span></h1>
+      <h2>Diamond Model of Intrusion Analysis</h2>
+      <div class="matrix-2">
+        <div class="m-card"><div class="m-title">Adversary</div><div class="m-body">Who conducted the intrusion? Attribution — APT group, nation-state, cybercrime. Motivation: espionage, financial, disruption. Capability level: commodity tools vs custom.</div></div>
+        <div class="m-card"><div class="m-title">Infrastructure</div><div class="m-body">Type 1 (attacker-owned): VPS, bulletproof hosting, onion services. Type 2 (victim-owned): compromised hosts used as C2 relays, SOHO routers. Registrar, ASN, hosting patterns.</div></div>
+        <div class="m-card"><div class="m-title">Capability</div><div class="m-body">Malware used, exploits, C2 framework, tools. Sophistication level. Novel techniques vs commodity. Custom vs modified-public vs public-unmodified.</div></div>
+        <div class="m-card"><div class="m-title">Victim</div><div class="m-body">Infrastructure targeted, personas, data. Why this victim? Industry, geography, size. Is this targeted or opportunistic? What data/access was sought?</div></div>
+      </div>
+      <h2>F3EAD Threat Intel Cycle</h2>
+      <div class="matrix-3">
+        <div class="m-card"><div class="m-title">Find</div><div class="m-body">Identify adversary activity through detection, hunting, or partner sharing. The starting point of the cycle.</div></div>
+        <div class="m-card"><div class="m-title">Fix</div><div class="m-body">Geolocate and confirm the adversary's position in your environment. Full scope, blast radius, all infrastructure.</div></div>
+        <div class="m-card"><div class="m-title">Finish</div><div class="m-body">Execute — containment, eradication. Coordinate timing to remove adversary access completely and simultaneously.</div></div>
+        <div class="m-card"><div class="m-title">Exploit</div><div class="m-body">Extract maximum intelligence from artifacts before finishing. What can we learn about their TTPs, infrastructure, goals?</div></div>
+        <div class="m-card"><div class="m-title">Analyze</div><div class="m-body">Process collected intelligence. Produce finished intel products. Update threat models, detection rules, defenses.</div></div>
+        <div class="m-card"><div class="m-title">Disseminate</div><div class="m-body">Share intelligence appropriately. Update MISP, share with ISACs, inform partner organizations, update internal teams.</div></div>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN TRACKING -->
+    <div class="section" id="s-campaign-tracking">
+      <h1><span class="h1-icon">🗺️</span>Campaign Tracking<span class="h1-tag">INTEL</span></h1>
+      <h2>Campaign Infrastructure Tracking</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># Shodan — find all hosts on same C2 infrastructure
+import shodan
+api = shodan.Shodan('YOUR_API_KEY')
+
+# Find hosts with same TLS certificate subject
+results = api.search('ssl.cert.subject.cn:"evil-c2.com"')
+for host in results['matches']:
+    print(f"  IP: {host['ip_str']} | Port: {host['port']} | Org: {host.get('org','unknown')}")
+
+# Find hosts with same favicon hash (common C2 panel fingerprint)
+results = api.search('http.favicon.hash:1163647852')
+for host in results['matches']:
+    print(f"  IP: {host['ip_str']} | Title: {host.get('http',{}).get('title','')}")
+
+# Censys — pivot on TLS certificate fingerprint
+import requests
+headers = {"Accept": "application/json"}
+auth = ("API_ID", "API_SECRET")
+
+# Find hosts sharing same TLS cert
+resp = requests.get(
+    "https://search.censys.io/api/v2/hosts/search",
+    params={"q": f'services.tls.certificates.leaf_data.fingerprint="{cert_fp}"'},
+    headers=headers, auth=auth
+)
+for host in resp.json().get('result', {}).get('hits', []):
+    print(f"  {host['ip']} — {[s.get('service_name') for s in host.get('services',[])]}")</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>RiskIQ / Threat Infrastructure Pivoting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># PassiveDNS — find all domains resolving to C2 IP (historical)
+# Free sources: SecurityTrails, CIRCL pDNS, RiskIQ Community
+
+# WHOIS history — find registrant patterns
+# Tool: DomainTools (commercial) or whois-history lookups
+
+# TLS certificate pivoting (free — crt.sh)
+curl "https://crt.sh/?q=%.evil-c2.com&output=json" | jq '.[].name_value' | sort -u
+
+# JARM fingerprinting for C2 server identification
+# Same JARM = likely same C2 software/config
+python3 jarm.py -t 1.2.3.4 443
+python3 jarm.py -t 5.6.7.8 443
+# Compare JARM hashes — match = same C2 infrastructure
+
+# ASN tracking — find other hosts on same ASN/hosting provider
+# Many APTs use specific bulletproof hosters (ASN: M247, Frantech, etc.)
+curl "https://api.abuseipdb.com/api/v2/check?ipAddress=1.2.3.4" \
+  -H "Key: YOUR_KEY" | jq '.data.isp, .data.abuseConfidenceScore'</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DISK FORENSICS -->
+    <div class="section" id="s-disk-forensics">
+      <h1><span class="h1-icon">💽</span>Disk & Image Forensics<span class="h1-tag">DFIR</span></h1>
+      <h2>Forensic Acquisition</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Full disk forensic image (write-blocked)
+dcfldd if=/dev/sda of=/mnt/evidence/disk.img \
+  hash=sha256 hashlog=/mnt/evidence/disk.sha256 \
+  bs=512 conv=noerror,sync
+
+# E01 (EnCase) format — includes metadata + hash
+ewfacquire -t /mnt/evidence/disk.E01 /dev/sda
+
+# Verify image integrity
+sha256sum disk.img
+# Must match hash taken at acquisition
+
+# Mount image read-only for analysis
+sudo losetup -f --show disk.img   # Creates /dev/loop0
+sudo mount -o ro,noexec /dev/loop0p2 /mnt/analysis   # Mount specific partition
+
+# Extract file system artifacts without mounting
+icat -o 2048 disk.img 0 > mft.raw   # Extract $MFT (partition starts at sector 2048)
+icat -o 2048 disk.img 4 > logfile.raw   # $LogFile
+icat -o 2048 disk.img 6 > usnjrnl.raw   # $UsnJrnl</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Autopsy / Sleuth Kit — Advanced Analysis</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Sleuth Kit CLI — filesystem analysis
+mmls disk.img             # Partition table
+fsstat -o 2048 disk.img   # Filesystem statistics
+
+# Find deleted files
+fls -r -d -o 2048 disk.img | head -50   # Deleted files (marked with *)
+
+# Recover deleted file by inode
+icat -o 2048 disk.img 12345 > recovered_file
+
+# Timeline creation from disk
+fls -m C: -r -o 2048 disk.img > bodyfile.txt
+mactime -b bodyfile.txt -d > timeline.csv
+
+# Find files by extension (including deleted)
+fls -r -o 2048 disk.img | grep -i "\.exe\|\.ps1\|\.bat\|\.vbs"
+
+# Hash all executable files for VT lookup
+fls -r -o 2048 disk.img | grep -i "\.exe" | awk '{print $2}' | while read inode; do
+  icat -o 2048 disk.img ${inode%:} 2>/dev/null | sha256sum | awk "{print \"$inode\", \$1}"
+done</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Windows Artifacts — Advanced Analysis</h2>
+      <table>
+        <tr><th>Artifact</th><th>Tool</th><th>Intelligence Extracted</th></tr>
+        <tr><td>$MFT</td><td>MFTECmd, Autopsy</td><td>All files ever on system incl. deleted — timestamps, sizes, paths</td></tr>
+        <tr><td>$UsnJrnl</td><td>MFTECmd -f $J</td><td>File operations log — create, modify, delete, rename with timestamps</td></tr>
+        <tr><td>Registry hives (offline)</td><td>RegRipper, RECmd</td><td>User activity, installed software, autorun, network history</td></tr>
+        <tr><td>Prefetch (.pf files)</td><td>PECmd</td><td>Every program executed — last 8 run times, files loaded</td></tr>
+        <tr><td>SRUM database</td><td>SrumECmd</td><td>Per-process network usage, CPU/memory — last 30-60 days</td></tr>
+        <tr><td>Shellbags</td><td>ShellBagsExplorer</td><td>Folders accessed even if deleted — attacker navigation path</td></tr>
+        <tr><td>LNK files + JumpLists</td><td>LECmd, JLECmd</td><td>Files opened — even from USB/network shares</td></tr>
+        <tr><td>Amcache.hve</td><td>AmcacheParser</td><td>Programs executed — persists after binary deletion</td></tr>
+        <tr><td>VSS (Shadow Copies)</td><td>vshadow, Autopsy</td><td>Historical snapshots — recover deleted artifacts, older versions</td></tr>
+        <tr><td>Windows.edb (Search index)</td><td>WinSearchDBAnalyzer</td><td>Documents indexed — content of deleted files sometimes retained</td></tr>
+      </table>
+    </div>
+
+    <!-- ADVANCED MEMORY -->
+    <div class="section" id="s-advanced-memory">
+      <h1><span class="h1-icon">🧠</span>Advanced Memory Analysis<span class="h1-tag">DFIR</span></h1>
+      <h2>Volatility 3 — Advanced Techniques</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Detect process injection techniques
+# Classic injection: RWX memory + PE header in foreign process
+vol.py -f memory.raw windows.malfind --dump    # Dump injected regions
+
+# Process hollowing detection: unmapped legitimate executable
+# Check: legitimate process (e.g., svchost.exe) with private working set
+vol.py -f memory.raw windows.vadinfo --pid 1234    # Virtual Address Descriptor
+# Look for: MEM_PRIVATE regions where MEM_IMAGE is expected
+
+# Detect kernel-mode rootkit (DKOM)
+vol.py -f memory.raw windows.psscan > psscan.txt
+vol.py -f memory.raw windows.pslist > pslist.txt
+# Diff — processes in psscan not pslist = hidden by rootkit
+
+# WinDbg kernel debugging symbols — for driver analysis
+vol.py -f memory.raw windows.modules --dump
+# Dump suspicious driver, then analyze in IDA
+
+# Extract clipboard (may contain stolen credentials/data)
+vol.py -f memory.raw windows.clipboard
+
+# Browser credential extraction from memory
+vol.py -f memory.raw windows.handles --pid 1234    # Chrome/Firefox PID
+# Strings on browser process memory region → look for password patterns
+
+# Reconstruct command history from memory
+vol.py -f memory.raw windows.consoles    # Console history
+vol.py -f memory.raw windows.cmdline     # Per-process command lines
+vol.py -f memory.raw windows.envars     # Environment variables (may contain keys)</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>WinDbg — Kernel-Level Analysis</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># WinDbg commands for kernel analysis (kernel dump or live kernel debug)
+
+# Load crash dump or live kernel
+.opendump C:\memory.dmp
+.sympath srv*C:\symbols*https://msdl.microsoft.com/download/symbols
+.reload /f
+
+# Check SSDT for hooks (rootkit indicator)
+!ssdt              # Shows all SSDT entries
+# Any entries NOT from ntoskrnl.exe or win32k.sys = hooked (rootkit!)
+
+# List loaded drivers
+lm m *             # List all modules
+!devobj            # Device objects
+
+# Process investigation
+!process 0 0       # List all processes
+!process 0 7       # Full process info including threads
+
+# Find hidden processes (DKOM rootkit)
+# Cross-reference EPROCESS list vs pool scanner
+!pool 0xe153fce0 process    # Check specific EPROCESS entry
+
+# Kernel memory search for shellcode
+s -b 0 L?0x7fffffff 4d 5a   # Search for MZ header in kernel space
+
+# Check for inline hooks in ntoskrnl
+u nt!NtOpenProcess L10      # Disassemble — check first bytes for JMP/CALL hooks</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- NETWORK FORENSICS -->
+    <div class="section" id="s-network-forensics">
+      <h1><span class="h1-icon">🌐</span>Deep Network Forensics<span class="h1-tag">DFIR</span></h1>
+      <h2>JA3/JA3S TLS Fingerprinting</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># JA3 fingerprints TLS ClientHello — identifies client (malware C2 pattern)
+# JA3S fingerprints TLS ServerHello — identifies server configuration
+# Even with encryption, the TLS handshake fingerprint reveals tool identity
+
+# Zeek (Bro) — extract JA3 from network traffic
+zeek -r capture.pcap ssl
+
+# ja3 Python tool — from PCAP
+python3 ja3.py capture.pcap
+# Output: IP, JA3, JA3S, UserAgent
+
+# Known malicious JA3 hashes:
+# Emotet: 51c64c77e60f3980eea90869b68c58a8
+# Cobalt Strike (default): 72a589da586844d7f0818ce684948eea
+# TrickBot: a0e9f5d64349fb13191bc781f81f42e1
+
+# JARM fingerprinting (server-side)
+# Same JARM hash = same C2 software + config on server side
+python3 jarm.py -t suspicious-ip.com 443
+
+# Known C2 JARM fingerprints (check against database):
+# https://github.com/cedowens/C2-JARM
+
+# Suricata JA3 detection rule
+cat > /etc/suricata/rules/c2_ja3.rules << 'EOF'
+alert tls any any -> any any (
+    msg:"MALWARE Cobalt Strike Default JA3 Fingerprint";
+    ja3.hash; content:"72a589da586844d7f0818ce684948eea";
+    classtype:trojan-activity;
+    sid:9000001; rev:1;
+)
+EOF</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Zeek (Bro) — Advanced Network Analysis</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Run Zeek against PCAP to generate structured logs
+zeek -r capture.pcap local
+
+# Generated log files:
+# conn.log     — all connections (duration, bytes, state)
+# dns.log      — DNS queries and responses
+# http.log     — HTTP requests and responses
+# ssl.log      — TLS connections + certificates
+# files.log    — Files transferred
+# notice.log   — Security notices from detection scripts
+
+# Analyze conn.log for beaconing (zeek-cut for field extraction)
+zeek-cut ts id.orig_h id.resp_h id.resp_p duration < conn.log |
+  awk '{printf "%s %s %s %s %.2f\n",$1,$2,$3,$4,$5}' |
+  sort -k2,4 > sorted_conns.txt
+
+# Long-duration connections (C2 keep-alive)
+zeek-cut ts id.orig_h id.resp_h duration < conn.log | awk '$4 > 3600' | head -20
+
+# DNS tunneling detection
+zeek-cut ts id.orig_h query qtype_name < dns.log |
+  awk 'length($3) > 50' | sort -k3 -u | head -20
+
+# Extract all TLS certificates (find suspicious self-signed)
+zeek-cut ts id.orig_h id.resp_h server_name < ssl.log |
+  awk '{print $4}' | sort | uniq -c | sort -rn | head -20</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- CLOUD FORENSICS -->
+    <div class="section" id="s-cloud-forensics">
+      <h1><span class="h1-icon">☁️</span>Cloud Forensics — AWS & Azure<span class="h1-tag">DFIR</span></h1>
+      <h2>AWS Incident Response</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># AWS CloudTrail — key events to investigate
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=Username,AttributeValue=suspect_user \
+  --start-time 2024-01-15T00:00:00Z \
+  --end-time 2024-01-16T00:00:00Z \
+  --output json | jq '.Events[] | {time:.EventTime, name:.EventName, source:.EventSource}'
+
+# Critical CloudTrail event categories:
+# IAM changes: CreateUser, AttachUserPolicy, CreateAccessKey
+# EC2: RunInstances, AuthorizeSecurityGroupIngress
+# S3 exfiltration: GetObject (high volume), PutBucketPolicy
+# Credential: AssumeRole (from unexpected region/IP), GetSessionToken
+# Escalation: CreateLoginProfile, UpdateAccessKey, PutUserPolicy
+
+# Find all actions by compromised credential
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE \
+  --query 'Events[*].{Time:EventTime,Event:EventName,IP:CloudTrailEvent}' | jq .
+
+# Check for persistence mechanisms
+aws iam list-users --query 'Users[*].{User:UserName,Created:CreateDate}'
+aws iam list-access-keys --query 'AccessKeyMetadata[*]'
+aws lambda list-functions   # Backdoor Lambda functions
+aws events list-rules       # EventBridge scheduled rules
+
+# GuardDuty findings
+aws guardduty list-detectors --query 'DetectorIds'
+aws guardduty list-findings --detector-id $DETECTOR_ID \
+  --finding-criteria '{"Criterion":{"severity":{"Gte":7}}}' | jq .
+
+# Isolate compromised EC2 instance
+# 1. Create isolation security group (no inbound, no outbound except forensics)
+aws ec2 create-security-group --group-name ISOLATED --description "Forensic Isolation" --vpc-id vpc-xxxx
+# 2. Apply to instance
+aws ec2 modify-instance-attribute --instance-id i-xxxx --groups sg-isolation
+# 3. Take memory + disk snapshot before anything
+aws ec2 create-snapshot --volume-id vol-xxxx --description "IR-Forensic-$(date +%Y%m%d)"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Azure Incident Response</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code"># Azure — Full user activity investigation
+Connect-AzureAD
+Connect-ExchangeOnline -UseModernAuth
+
+# Get all sign-ins for compromised user (Azure AD Logs)
+Get-AzureADAuditSignInLogs -Filter "userPrincipalName eq 'victim@company.com'" |
+  Select-Object createdDateTime, ipAddress, location, appDisplayName, status |
+  Export-Csv signinlogs.csv
+
+# Get all actions performed (Unified Audit Log)
+Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-30) -EndDate (Get-Date) \
+  -UserIds "victim@company.com" -RecordType AzureActiveDirectory |
+  Select-Object CreationDate, UserIds, Operations, AuditData | Export-Csv audit.csv
+
+# Check for new OAuth app consents (common in APT29 TTPs)
+Get-AzureADServicePrincipal -All $true |
+  Where-Object {$_.Tags -contains "WindowsAzureActiveDirectoryIntegratedApp"} |
+  Select-Object DisplayName, AppId, ReplyUrls | Where-Object {$_.ReplyUrls -like "*ngrok*"}
+
+# Check for Conditional Access bypass
+Get-AzureADAuditSignInLogs -Filter "conditionalAccessStatus eq 'notApplied'" |
+  Where-Object {$_.userPrincipalName -like "*admin*"} | Select-Object createdDateTime, ipAddress
+
+# Revoke all active sessions
+Revoke-AzureADUserAllRefreshToken -ObjectId (Get-AzureADUser -SearchString "victim@company.com").ObjectId
+
+# Check for new/modified service principals (persistence)
+Get-AzureADAuditDirectoryLogs -Filter "activityDisplayName eq 'Add service principal credentials'" |
+  Select-Object activityDateTime, initiatedBy, targetResources</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- VULN RESEARCH -->
+    <div class="section" id="s-vuln-research">
+      <h1><span class="h1-icon">🔍</span>Vulnerability Research<span class="h1-tag">RE</span></h1>
+      <h2>Binary Diffing — Finding Vulnerability Patches</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># BinDiff (Zynamics/Google) — compare two binaries to find changes
+# Use case: patch Tuesday analysis — find what vulnerability was fixed
+
+# 1. Export IDB files from both binaries in IDA Pro:
+#    File → Export to BinExport → vulnerable_version.BinExport
+#    File → Export to BinExport → patched_version.BinExport
+
+# 2. Run BinDiff:
+bindiff vulnerable_version.BinExport patched_version.BinExport
+
+# 3. Open result .BinDiff in BinDiff viewer
+# Look for functions with low similarity scores (<0.9) — these were changed
+
+# DIFuzzing approach — automated diff analysis
+# Install: pip install bindiff-python
+python3 -c "
+from bindiff import BinDiff
+bd = BinDiff('old.BinExport', 'new.BinExport')
+changed = [(f.name, f.similarity) for f in bd.functions if f.similarity < 0.9]
+for name, sim in sorted(changed, key=lambda x: x[1]):
+    print(f'{sim:.3f}: {name}')
+"
+
+# radare2 — quick function-level diff
+r2 -c 'aaa; aflj' old.exe | jq '.[] | .name' > old_funcs.txt
+r2 -c 'aaa; aflj' new.exe | jq '.[] | .name' > new_funcs.txt
+comm -23 <(sort old_funcs.txt) <(sort new_funcs.txt)  # Functions only in old (removed)</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>CVE Triage & Impact Assessment</h2>
+      <table>
+        <tr><th>CVE Priority Factor</th><th>Higher Priority If...</th></tr>
+        <tr><td>CVSS Score</td><td>&gt; 9.0 (Critical) — but score alone is insufficient</td></tr>
+        <tr><td>Exploitability</td><td>Public PoC exists (check ExploitDB, GitHub, packetstorm)</td></tr>
+        <tr><td>Active exploitation</td><td>On CISA KEV (Known Exploited Vulnerabilities) list</td></tr>
+        <tr><td>Asset criticality</td><td>Affects internet-facing or business-critical system</td></tr>
+        <tr><td>Authentication required</td><td>No auth needed (pre-auth RCE = critical)</td></tr>
+        <tr><td>EPSS score</td><td>&gt; 0.5 = 50%+ probability of exploitation in 30 days</td></tr>
+        <tr><td>Threat actor use</td><td>APT group or ransomware affiliate using it (check CISA advisories)</td></tr>
+      </table>
+    </div>
+
+    <!-- EXPLOIT ANALYSIS -->
+    <div class="section" id="s-exploit-analysis">
+      <h1><span class="h1-icon">💥</span>Exploit Analysis<span class="h1-tag">RE</span></h1>
+      <h2>Memory Corruption Exploit Classes</h2>
+      <table>
+        <tr><th>Exploit Type</th><th>Mechanism</th><th>Detection in RE</th></tr>
+        <tr><td>Stack Buffer Overflow</td><td>Overflow stack buffer → overwrite return address</td><td>Look for memcpy/strcpy without bounds check before return</td></tr>
+        <tr><td>Heap Overflow</td><td>Overflow heap chunk → corrupt adjacent heap metadata</td><td>Heap allocation size vs input size mismatch</td></tr>
+        <tr><td>Use-After-Free (UAF)</td><td>Access freed memory after it's reallocated</td><td>Object freed → pointer not nulled → later dereference</td></tr>
+        <tr><td>Type Confusion</td><td>Object treated as different type than allocated</td><td>Virtual dispatch on mistyped object</td></tr>
+        <tr><td>Integer Overflow</td><td>Arithmetic overflow → allocation too small</td><td>size_t / int arithmetic before allocation</td></tr>
+        <tr><td>Format String</td><td>printf(user_input) → read/write arbitrary memory</td><td>printf/sprintf with non-literal format string</td></tr>
+        <tr><td>TOCTOU</td><td>Check-then-use race condition</td><td>File permission check separate from use</td></tr>
+      </table>
+      <h2>Exploit RE with x64dbg</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># Analyzing a weaponized exploit document:
+# 1. Enable all logging in x64dbg before opening document
+# 2. Key breakpoints to set:
+#    bp VirtualAlloc      — catch shellcode staging
+#    bp VirtualProtect    — catch RWX permission change (shellcode prep)
+#    bp CreateProcess     — catch execution of dropped payload
+#    bp URLDownloadToFile — catch dropper downloading second stage
+#    bp WinExec           — catch command execution
+
+# Heap spray detection:
+# Look for large allocation (>1MB) of uniform byte patterns
+# Common spray values: 0x0c0c0c0c, 0x41414141, NOP sled + shellcode
+
+# ROP chain analysis:
+# If DEP bypass: look for series of ret instructions to controlled stack
+# Each 'gadget' = useful instruction sequence ending in ret
+# Tool: rop-tool, ROPgadget, ropper
+ROPgadget --binary vulnerable.exe --rop --badbytes "0a0d" > gadgets.txt
+
+# ASLR bypass analysis:
+# Look for: hardcoded addresses (no ASLR module), info leak vulnerability,
+#           JIT spraying, ROP chain using non-ASLR module</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- ZERO DAY -->
+    <div class="section" id="s-zeroday">
+      <h1><span class="h1-icon">0️⃣</span>Zero-Day Handling<span class="h1-tag">CRITICAL</span></h1>
+      <div class="alert red">🔴 Zero-day handling requires extreme operational security. Limit knowledge to essential personnel only until vendor patch is available.</div>
+      <h2>Zero-Day Response Protocol</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Confirm Zero-Day Status</div><div class="step-desc">Verify: no CVE assigned, no public PoC, no vendor acknowledgment. Check NVD, vendor security advisories, ExploitDB, FullDisclosure, and researcher Twitter/X. Is this truly novel?</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Characterize the Vulnerability</div><div class="step-desc">RE the exploit. Identify: affected component, vulnerability class, authentication requirement, exploit reliability, scope (local/remote). Write technical description.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Assess Immediate Risk</div><div class="step-desc">Is this actively being exploited against you? Against others? What is blast radius if exploited? Apply emergency mitigations: disable affected service, WAF rule, network segmentation.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Responsible Disclosure</div><div class="step-desc">Notify vendor via their security disclosure process (security@vendor.com or HackerOne/Bugcrowd). Include: full technical details, PoC (if you have one), your timeline. Standard disclosure window: 90 days (Google Project Zero policy).</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Create Proprietary Detection</div><div class="step-desc">Write YARA/Sigma/SIEM rules to detect exploitation attempts. Keep rules internal until patch available to avoid tipping off attackers about detection capability.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><div class="step-title">Post-Patch: Public Disclosure</div><div class="step-desc">After vendor patches: coordinate public disclosure. Share IOCs, detection rules with community. Write blog/report to improve industry-wide detection.</div></div></div>
+      </div>
+      <h2>CVE Submission Process</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># CVE Request Process:
+# 1. Contact vendor directly (security@vendor.com)
+# 2. If no response in 7 days: contact CERT/CC (coordination)
+# 3. Request CVE from MITRE or CNA (CVE Numbering Authority)
+#    → cve.mitre.org/cve/request_id.html
+
+# CVE writeup template:
+# Title: [Vendor] [Product] [Version] [Vuln Type] ([CVSSv3 Score])
+# Description: A [vuln type] vulnerability in [product] [version] allows
+#   [attacker type] to [impact] via [attack vector].
+# CVSS v3.1: [calculate at nvd.nist.gov/vuln-metrics/cvss/v3-calculator]
+# CWE: [CWE-119 = buffer overflow, CWE-79 = XSS, etc.]
+# Affected Versions: [list]
+# Fixed Version: [if available]
+# PoC: [if public after coordinated disclosure]
+# Credit: [your name/org]
+# Timeline:
+#   YYYY-MM-DD: Vulnerability discovered
+#   YYYY-MM-DD: Vendor notified
+#   YYYY-MM-DD: Vendor acknowledged
+#   YYYY-MM-DD: Patch released
+#   YYYY-MM-DD: Public disclosure</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- INTELLIGENCE HUNTING -->
+    <div class="section" id="s-intelhunting">
+      <h1><span class="h1-icon">🏹</span>Intelligence-Led Hunting<span class="h1-tag">HUNTING</span></h1>
+      <h2>Intelligence Requirement Framework</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># Build hunt from external threat intel:
+# Step 1: Consume intel (ISAC reports, vendor bulletins, CISA advisories)
+# Step 2: Extract TTPs and IOCs relevant to your industry/environment
+# Step 3: Map to your data sources — do you have visibility?
+# Step 4: Write hunt queries targeting those specific TTPs
+# Step 5: Execute, analyze, create detections
+
+# Example: CISA Advisory on Volt Typhoon
+# Intel says: uses wmic, netsh, certutil, living off the land
+# Hunt queries:
+
+# Unusual WMIC usage
+index=windows EventCode=4688
+| search NewProcessName="*wmic.exe*"
+| where NOT (CommandLine IN (known_admin_wmic_patterns))
+| stats count by host, user, CommandLine | where count < 3
+
+# Certutil download (LOLBin abuse)
+index=windows EventCode=4688
+| search NewProcessName="*certutil*"
+| where CommandLine LIKE "%-urlcache%"
+    OR CommandLine LIKE "%-decode%"
+| table _time, host, user, CommandLine
+
+# Netsh port proxy creation (tunneling)
+index=windows EventCode=4688
+| search NewProcessName="*netsh.exe*" CommandLine="*portproxy*"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>OSINT for Threat Hunting</h2>
+      <table>
+        <tr><th>OSINT Source</th><th>Hunt Use Case</th><th>How to Use</th></tr>
+        <tr><td>Shodan / Censys</td><td>Find internal assets exposed to internet</td><td>Search org name/ASN — find unexpected exposures</td></tr>
+        <tr><td>Have I Been Pwned / DeHashed</td><td>Find leaked credentials for your domain</td><td>Search @yourdomain.com — check for active employee creds</td></tr>
+        <tr><td>crt.sh</td><td>Find all subdomains via TLS certs</td><td>Discover shadow IT / forgotten internet assets</td></tr>
+        <tr><td>pastebin / GitHub</td><td>Find leaked API keys, credentials, code</td><td>Search "yourdomain.com" — check for leaked secrets</td></tr>
+        <tr><td>Maltego</td><td>Visual entity relationship mapping</td><td>Map connections between domains, IPs, persons</td></tr>
+        <tr><td>SpiderFoot</td><td>Automated OSINT collection</td><td>spiderfoot -s target.com -t ALL -o output.html</td></tr>
+        <tr><td>theHarvester</td><td>Email, subdomain, employee discovery</td><td>theHarvester -d target.com -b all</td></tr>
+      </table>
+    </div>
+
+    <!-- RED TEAM TTP EMULATION -->
+    <div class="section" id="s-redteam-ttp">
+      <h1><span class="h1-icon">🔴</span>Red Team TTP Emulation<span class="h1-tag">PURPLE TEAM</span></h1>
+      <h2>Atomic Red Team — Detection Validation</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code"># Install Atomic Red Team
+Install-Module -Name invoke-atomicredteam -Force
+Install-Module -Name powershell-yaml -Force
+Import-Module invoke-atomicredteam
+
+# List all tests for a technique
+Invoke-AtomicTest T1059.001 -ShowDetails    # PowerShell execution
+
+# Run specific test (in isolated lab only!)
+Invoke-AtomicTest T1059.001 -TestNumbers 1
+
+# Run test and check for detection
+Invoke-AtomicTest T1053.005 -TestNumbers 1    # Scheduled task persistence
+
+# Run cleanup after test
+Invoke-AtomicTest T1059.001 -TestNumbers 1 -Cleanup
+
+# Full APT29 emulation (CISA advisory mapped)
+$apt29_ttps = @("T1566.001","T1059.001","T1053.005","T1003.001","T1021.002","T1078")
+foreach ($ttp in $apt29_ttps) {
+    Write-Host "Testing $ttp..."
+    Invoke-AtomicTest $ttp -TestNumbers 1 -GetPreReqs
+    Invoke-AtomicTest $ttp -TestNumbers 1
+    Start-Sleep 60    # Wait for detection
+    Invoke-AtomicTest $ttp -TestNumbers 1 -Cleanup
+}</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Detection Gap Matrix — Purple Team Output</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code"># After running Atomic Red Team tests, create detection gap matrix:
+
+# For each TTP tested:
+# 1. Was it detected? (SIEM alert fired?)
+# 2. Was it blocked? (EDR prevented execution?)
+# 3. Was it logged? (Are the log sources present?)
+
+# Priority matrix:
+# Detected + Blocked = ✅ Optimal
+# Detected + Not Blocked = ⚠ Alert exists but no prevention
+# Not Detected + Logged = 🔶 Log data exists but no rule — create Sigma rule
+# Not Detected + Not Logged = 🔴 Visibility gap — fix logging first
+
+# Output format for gap report:
+cat << 'EOF'
+TTP         | Blocked | Detected | Logged | Priority | Action
+------------|---------|----------|--------|----------|-------
+T1059.001   |   ✅   |    ✅   |  ✅   | Low      | Tune FP rate
+T1003.001   |   ❌   |    ✅   |  ✅   | Med      | Add EDR block rule
+T1547.001   |   ❌   |    ❌   |  ✅   | High     | Write detection rule
+T1070.001   |   ❌   |    ❌   |  ❌   | Critical | Fix audit policy first
+EOF</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DECEPTION -->
+    <div class="section" id="s-deception">
+      <h1><span class="h1-icon">🍯</span>Deception & Honeypots<span class="h1-tag">DETECTION</span></h1>
+      <h2>Deception Technology Types</h2>
+      <table>
+        <tr><th>Type</th><th>What It Is</th><th>What It Detects</th></tr>
+        <tr><td>Honeypot (full)</td><td>Full fake system designed to attract attackers</td><td>External recon, scanning, exploitation attempts</td></tr>
+        <tr><td>Honeytoken (file)</td><td>Fake file with unique name — access triggers alert</td><td>Unauthorized file access, insider threat</td></tr>
+        <tr><td>Honey credentials</td><td>Fake AD accounts or API keys — any use = attacker</td><td>Credential theft, lateral movement using stolen creds</td></tr>
+        <tr><td>Honey shares</td><td>SMB shares with enticing names + no legit use</td><td>Ransomware encryption spread, lateral movement</td></tr>
+        <tr><td>Canary tokens</td><td>URL/DNS/file tokens that beacon on access</td><td>Document exfiltration, phishing kit reuse, insider</td></tr>
+        <tr><td>Honey endpoints</td><td>Fake endpoints in AD — no legit user should touch them</td><td>Network enumeration, lateral movement attempts</td></tr>
+      </table>
+      <h2>Canary Tokens — Deploy & Monitor</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code"># Create Canary Tokens via canarytokens.org API
+# Types: DNS, HTTP, Word doc, Excel, PDF, AWS API key, Windows folder
+
+import requests, json
+
+# Create DNS canary (any DNS lookup = alert)
+resp = requests.post("https://canarytokens.org/generate", data={
+    "type": "dns",
+    "email": "soc-alerts@company.com",
+    "memo": "Placed in /etc/hosts on server01 - unauthorized access indicator"
+})
+
+# Deploy honeytokens strategically:
+# 1. Fake AWS credentials in ~/.aws/credentials (detects credential theft)
+fake_aws_creds = """
+[default]
+aws_access_key_id = AKIAIOSFODNN7EXAMPLE
+aws_secret_access_key = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+"""
+# Any API call with these creds = attacker found and used them
+
+# 2. Canary Word doc in shared drive "Q4_Financials_DRAFT.docx"
+# Document opens → HTTP request → SOC alert
+
+# 3. Honey AD account: "svc-monitoring" with long complex password
+# Any login attempt to this account = lateral movement / password spray
+
+# 4. Honey share: \\DC01\FINANCE_BACKUP
+# Any connection to this share = unauthorized recon/ransomware
+
+# High-confidence alert: canary token trigger = attacker activity
+# No false positives (zero legitimate use by design)</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DETECTION ARCHITECTURE -->
+    <div class="section" id="s-detection-arch">
+      <h1><span class="h1-icon">🏗️</span>Detection Architecture<span class="h1-tag">STRATEGY</span></h1>
+      <h2>Detection Coverage Framework</h2>
+      <div class="alert purple">◈ Goal: Detect every significant attacker technique at multiple layers. Defense in depth applies to detection, not just prevention.</div>
+      <table>
+        <tr><th>Detection Layer</th><th>Technology</th><th>Coverage</th></tr>
+        <tr><td>Network (perimeter)</td><td>NGFW, IDS/IPS, DNS Sinkhhole</td><td>C2 communication, known malware traffic, DGA</td></tr>
+        <tr><td>Network (internal)</td><td>NDR (Darktrace, ExtraHop), NetFlow, Zeek</td><td>Lateral movement, internal scanning, anomaly</td></tr>
+        <tr><td>Endpoint (prevention)</td><td>EDR (CrowdStrike, Defender, SentinelOne)</td><td>Malware execution, injection, ransomware</td></tr>
+        <tr><td>Endpoint (detection)</td><td>Sysmon, AV, EDR telemetry → SIEM</td><td>Process creation, persistence, credential access</td></tr>
+        <tr><td>Identity</td><td>Azure AD, Okta, MFA, UEBA</td><td>Credential theft, MFA bypass, impossible travel</td></tr>
+        <tr><td>Cloud</td><td>CloudTrail, Azure Monitor, CSPM</td><td>Cloud resource abuse, IAM escalation, data exfil</td></tr>
+        <tr><td>Application</td><td>WAF, SAST/DAST, app logs → SIEM</td><td>Web attacks, SSRF, SQLi, API abuse</td></tr>
+        <tr><td>Email</td><td>Secure Email Gateway, ATP, sandboxing</td><td>Phishing, malicious attachments, BEC</td></tr>
+        <tr><td>Deception</td><td>Honeypots, canary tokens, honey creds</td><td>Internal reconnaissance, credential reuse</td></tr>
+      </table>
+      <h2>Detection Engineering Maturity Levels</h2>
+      <div class="matrix-3">
+        <div class="m-card"><div class="m-title">Level 1 — Reactive</div><div class="m-body">IOC-based detections only. Known malware hashes, IP blocklists. High FP rate. Completely blind to novel threats.</div></div>
+        <div class="m-card"><div class="m-title">Level 2 — Behavioral</div><div class="m-body">TTP-based detection. SIGMA rules, anomaly detection, UEBA. Catches novel malware using known techniques.</div></div>
+        <div class="m-card"><div class="m-title">Level 3 — Predictive</div><div class="m-body">ML-based anomaly + threat modeling. Hunting program. Detection coverage mapped to ATT&CK. Purple team validation.</div></div>
+      </div>
+      <h2>SIEM Architecture Principles</h2>
+      <ul>
+        <li><strong>Log everything that matters:</strong> Endpoint (Sysmon), network (NetFlow/PCAP), auth (Windows Sec/Linux syslog), cloud (CloudTrail/Azure Monitor), email, proxy/DNS</li>
+        <li><strong>Centralize, don't silo:</strong> All logs to one SIEM for correlation. Cross-source correlation = detection capability</li>
+        <li><strong>Retention:</strong> Hot storage 90 days minimum. Cold/archive 1-3 years (compliance + breach investigation)</li>
+        <li><strong>Coverage gaps:</strong> Regularly audit what is NOT being logged. Attacker-blind-spots = detection-blind-spots</li>
+        <li><strong>Alert quality over quantity:</strong> 95%+ true positive rate target. Tune aggressively. Analyst fatigue = missed incidents</li>
+      </ul>
+    </div>
+
+    <!-- PURPLE TEAM -->
+    <div class="section" id="s-purple-team">
+      <h1><span class="h1-icon">🟣</span>Purple Teaming<span class="h1-tag">STRATEGY</span></h1>
+      <h2>Purple Team Exercise Structure</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Scoping & Intelligence</div><div class="step-desc">Select target adversary based on threat intel. Use MITRE ATT&CK Navigator to scope TTPs. Align with business risk.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Emulation Plan</div><div class="step-desc">Create step-by-step emulation plan mapped to ATT&CK techniques. Agree on rules of engagement with Red Team. Define success criteria.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Execute — One TTP at a Time</div><div class="step-desc">Red executes technique. Blue immediately checks: Did it alert? Did it log? Pause after each TTP to assess before proceeding.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Gap Documentation</div><div class="step-desc">Document every gap: Missing log source, missing detection rule, rule exists but misconfigured. Priority matrix per TTP.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Remediation Sprint</div><div class="step-desc">L3/Detection Engineering fixes gaps from exercise. New SIEM rules, Sysmon config updates, EDR policy changes.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><div class="step-title">Validation Re-run</div><div class="step-desc">Re-run failed TTPs to verify fixes. Produce final coverage report. Update ATT&CK Navigator layer with coverage status.</div></div></div>
+      </div>
+      <h2>Purple Team Report Template</h2>
+      <div class="code-wrap"><div class="code-label">TEMPLATE</div><pre><code>PURPLE TEAM EXERCISE REPORT
+============================
+Exercise: [Name — e.g., "APT29 Simulation Q1 2024"]
+Date: [YYYY-MM-DD]
+Red Team: [Team/Vendor]
+Blue Team Lead: [SOC L3 Name]
+
+EXECUTIVE SUMMARY:
+[3-4 sentences: what was tested, overall detection rate, key gaps]
+
+DETECTION COVERAGE RESULTS:
+  Total TTPs Tested:     [N]
+  Detected + Blocked:    [N] ([%])
+  Detected Only:         [N] ([%])
+  Logged, Not Detected:  [N] ([%])  ← Need detection rules
+  No Visibility:         [N] ([%])  ← Need log sources
+
+TOP 5 CRITICAL GAPS:
+1. [TTP ID + Name] — Root cause: [missing log / no rule / FP noise]
+   Action: [specific fix] | Owner: [team] | Due: [date]
+...
+
+DETECTION IMPROVEMENTS IMPLEMENTED DURING EXERCISE:
+- [Rule/fix 1] — detects [TTP] — deployed [date]
+- [Rule/fix 2]
+
+RECOMMENDATIONS (30/60/90 day):
+30 days: [Quick wins — new SIGMA rules, Sysmon config]
+60 days: [Medium effort — new log sources, EDR policy]
+90 days: [Strategic — architecture changes, tooling]</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- SOC MATURITY -->
+    <div class="section" id="s-soc-maturity">
+      <h1><span class="h1-icon">📈</span>SOC Maturity Model<span class="h1-tag">STRATEGY</span></h1>
+      <h2>SOC Capability Maturity Levels</h2>
+      <table>
+        <tr><th>Level</th><th>Name</th><th>Capabilities</th><th>Key Gap to Next Level</th></tr>
+        <tr><td style="color:var(--accent)">1</td><td>Reactive</td><td>Alert triage only, IOC-based detection, reactive IR</td><td>Need: Proactive monitoring, improved detection logic</td></tr>
+        <tr><td style="color:var(--accent2)">2</td><td>Defined</td><td>Defined processes, documented runbooks, L1/L2/L3 tiers, SIEM in use</td><td>Need: Threat hunting, YARA/Sigma, malware analysis</td></tr>
+        <tr><td style="color:var(--accent3)">3</td><td>Proactive</td><td>Threat hunting, behavioral detection, threat intel consumption, purple team</td><td>Need: Intel production, adversary emulation, KPIs</td></tr>
+        <tr><td style="color:var(--gold)">4</td><td>Intelligence-Led</td><td>Threat intel production, APT attribution, predictive hunting, full MITRE coverage</td><td>Need: Deception tech, full ATT&CK coverage, automation</td></tr>
+        <tr><td style="color:var(--accent4)">5</td><td>Optimized</td><td>Automated response, deception fabric, continuous purple team, contributes to community intel</td><td>Maintain and continuously improve</td></tr>
+      </table>
+      <h2>Key SOC KPIs</h2>
+      <table>
+        <tr><th>KPI</th><th>Formula</th><th>World-Class Target</th></tr>
+        <tr><td>MTTD (Mean Time to Detect)</td><td>Time from initial attack to first detection</td><td>&lt; 1 hour (industry avg: 21 days)</td></tr>
+        <tr><td>MTTR (Mean Time to Respond)</td><td>Time from detection to containment</td><td>&lt; 4 hours for P1</td></tr>
+        <tr><td>MTTC (Mean Time to Contain)</td><td>Time from detection to full containment</td><td>&lt; 24 hours for P1</td></tr>
+        <tr><td>False Positive Rate</td><td>FPs / Total Alerts × 100</td><td>&lt; 5%</td></tr>
+        <tr><td>ATT&CK Coverage</td><td>Detected TTPs / Total TTPs × 100</td><td>&gt; 70% Enterprise TTPs</td></tr>
+        <tr><td>SLA Compliance</td><td>Alerts acknowledged within SLA / Total</td><td>&gt; 99%</td></tr>
+        <tr><td>Dwell Time</td><td>Time attacker in environment before detection</td><td>&lt; 24 hours (industry avg: weeks)</td></tr>
+      </table>
+    </div>
+
+    <!-- STRATEGIC REPORTING -->
+    <div class="section" id="s-strategic-report">
+      <h1><span class="h1-icon">📋</span>Strategic IR Reporting<span class="h1-tag">EXECUTIVE</span></h1>
+      <h2>Executive Briefing Structure</h2>
+      <div class="code-wrap"><div class="code-label">EXECUTIVE BRIEF</div><pre><code">INCIDENT EXECUTIVE BRIEFING
+============================
+Classification: [TLP:RED / AMBER / GREEN]
+Incident ID: [INC-XXXXX]
+Date: [YYYY-MM-DD]
+Prepared By: [SOC L3 Lead]
+For: [CISO / CEO / Board]
+
+BOTTOM LINE UP FRONT (BLUF):
+[2-3 sentences. What happened, impact, current status.]
+Example: "On [date], a sophisticated threat actor gained initial access
+via spearphishing and maintained persistent access for approximately 14 days.
+The incident has been contained. No customer data was exfiltrated.
+Estimated cleanup cost: $X. Attribution: likely [group]."
+
+WHAT HAPPENED (Non-technical):
+[Narrative explanation without jargon. Analogies welcome.]
+
+BUSINESS IMPACT:
+  Data at Risk:        [None confirmed / X records / PII / PHI / PCI]
+  Systems Affected:    [X systems out of Y total]
+  Business Disruption: [Downtime / degraded / none]
+  Financial Impact:    [Estimate if available]
+
+WHAT WE DID:
+[Simple action list. Contained on [date]. Cleaned up on [date].]
+
+HOW THIS HAPPENED (Root Cause):
+[Simple explanation. E.g., "An employee received a convincing email
+and entered their password on a fake login page."]
+
+WHAT WE'RE DOING TO PREVENT RECURRENCE:
+  Immediate:  [e.g., MFA enforced for all users by [date]]
+  30 days:    [e.g., Security awareness training rolled out]
+  90 days:    [e.g., Zero Trust architecture deployment begins]
+
+REGULATORY / LEGAL OBLIGATIONS:
+  Breach Notification Required: [Yes / No / Under Assessment]
+  Regulator: [GDPR/HIPAA/PCI/state law — as applicable]
+  Notification Deadline: [XX hours/days from discovery]
+
+RECOMMENDATIONS REQUIRING EXECUTIVE DECISION:
+  1. [Decision needed + options + recommendation]
+  2. [e.g., Engage external IR firm — estimated cost $X]</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Threat Intelligence Report — External Sharing</h2>
+      <div class="code-wrap"><div class="code-label">TI REPORT</div><pre><code">THREAT INTELLIGENCE REPORT
+===========================
+Title: [Campaign/Malware Name + Date]
+TLP: AMBER (Share with sector peers, not publicly)
+Author: [Your Organization] SOC L3
+Date: [YYYY-MM-DD]
+Confidence: [High / Medium / Low] — [rationale]
+
+SUMMARY:
+[3-5 sentence executive summary of the threat]
+
+THREAT ACTOR ASSESSMENT:
+  Attribution: [APT group / Cybercrime / Unknown]
+  Confidence:  [Low / Medium / High]
+  Motivation:  [Financial / Espionage / Disruption]
+  Targeting:   [Sectors / Geographies affected]
+
+TECHNICAL DETAILS:
+  Initial Access:    [Method]
+  Execution:         [Techniques]
+  Persistence:       [Mechanisms]
+  C2:                [Protocol, infrastructure]
+  Exfiltration:      [If observed]
+
+INDICATORS OF COMPROMISE (IOCs):
+  [All IOCs in structured format: type, value, context, confidence]
+
+MITRE ATT&CK TECHNIQUES:
+  [Technique ID] — [Name] — [How observed]
+
+DETECTION GUIDANCE:
+  SIEM: [Query]
+  YARA: [Rule snippet]
+  Network: [Suricata rule]
+
+RECOMMENDED MITIGATIONS:
+  [Prioritized list]
+
+REFERENCES:
+  [Internal incident IDs, external reports, CVE numbers]</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- LEGAL & BREACH -->
+    <div class="section" id="s-legal-breach">
+      <h1><span class="h1-icon">⚖️</span>Legal & Breach Notification<span class="h1-tag">COMPLIANCE</span></h1>
+      <div class="alert red">🔴 ALWAYS involve Legal before making any breach notification. Incorrect or premature notification can create liability.</div>
+      <h2>Breach Notification Timelines (Key Regulations)</h2>
+      <table>
+        <tr><th>Regulation</th><th>Notification Timeline</th><th>Threshold</th><th>Notify Who</th></tr>
+        <tr><td>GDPR (EU)</td><td>72 hours from awareness</td><td>Risk to individual rights</td><td>Lead supervisory authority</td></tr>
+        <tr><td>HIPAA (US Healthcare)</td><td>60 days from discovery</td><td>PHI of 500+ individuals</td><td>HHS + affected individuals + media</td></tr>
+        <tr><td>PCI DSS</td><td>Immediately upon suspicion</td><td>Any card data breach</td><td>Payment brands + acquiring bank</td></tr>
+        <tr><td>SEC (US Public Co.)</td><td>4 business days (material)</td><td>Material cybersecurity incident</td><td>SEC Form 8-K</td></tr>
+        <tr><td>NIS2 (EU)</td><td>24hr early warning, 72hr full notif</td><td>Significant incident</td><td>National CSIRT + regulator</td></tr>
+        <tr><td>US State Laws (avg)</td><td>30-90 days (varies by state)</td><td>PII of state residents</td><td>AG + affected individuals</td></tr>
+      </table>
+      <h2>L3 Evidence Preservation for Legal</h2>
+      <ul class="checklist">
+        <li>All forensic images acquired before remediation — SHA256 hashes documented</li>
+        <li>Chain of custody log: who, what, when, where for every evidence item</li>
+        <li>Original evidence untouched — work from verified copies only</li>
+        <li>All SIEM/log exports preserved in original format with timestamps</li>
+        <li>Written documentation of all investigative actions with timestamps</li>
+        <li>No evidence modified, deleted, or altered after collection</li>
+        <li>Storage in access-controlled, tamper-evident location</li>
+        <li>Maintain evidence for minimum: 3-7 years (varies by regulation)</li>
+      </ul>
+      <h2>Law Enforcement Engagement</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Legal Counsel First</div><div class="step-desc">Never engage law enforcement without legal counsel approval. This protects privilege and manages disclosure risk.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Preserve Evidence</div><div class="step-desc">Full forensic images with chain of custody. Law enforcement may require court-admissible evidence.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Contact</div><div class="step-desc">US: FBI IC3 (ic3.gov) or local FBI field office. UK: NCA, NCSC. EU: national CERT + Europol EC3. For critical infra: CISA (US).</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Coordinate Active Monitoring</div><div class="step-desc">If LE requests: do NOT kick out attacker yet — they may want to monitor for attribution/arrest. This requires executive + legal approval.</div></div></div>
+      </div>
+    </div>
+
+    <!-- TOOLBOX -->
+    <div class="section" id="s-toolbox">
+      <h1><span class="h1-icon">🧰</span>L3 Toolbox Reference<span class="h1-tag">TOOLS</span></h1>
+      <h2>Reverse Engineering</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-gold">IDA Pro</span><span class="tool-badge tb-purple">Ghidra (free)</span>
+        <span class="tool-badge tb-red">x64dbg (free)</span><span class="tool-badge tb-orange">WinDbg</span>
+        <span class="tool-badge tb-blue">Binary Ninja</span><span class="tool-badge tb-purple">Radare2 (free)</span>
+        <span class="tool-badge tb-red">FLOSS (free)</span><span class="tool-badge tb-orange">Detect-It-Easy (free)</span>
+        <span class="tool-badge tb-blue">PEStudio (free)</span><span class="tool-badge tb-gold">Cutter (free)</span>
+      </div>
+      <h2>Malware Analysis</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">Any.Run</span><span class="tool-badge tb-orange">Hybrid Analysis (free)</span>
+        <span class="tool-badge tb-purple">CAPE Sandbox (free)</span><span class="tool-badge tb-blue">Joe Sandbox</span>
+        <span class="tool-badge tb-gold">Cuckoo (free, self-host)</span><span class="tool-badge tb-red">FakeNet-NG (free)</span>
+        <span class="tool-badge tb-orange">INetSim (free)</span><span class="tool-badge tb-purple">Procmon (free)</span>
+      </div>
+      <h2>Memory Forensics</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">Volatility 3 (free)</span><span class="tool-badge tb-orange">Rekall</span>
+        <span class="tool-badge tb-purple">WinPmem (free)</span><span class="tool-badge tb-blue">DumpIt (free)</span>
+        <span class="tool-badge tb-gold">LiME (free)</span><span class="tool-badge tb-red">Magnet RAM Capture (free)</span>
+      </div>
+      <h2>Disk Forensics</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">Autopsy (free)</span><span class="tool-badge tb-orange">EnCase</span>
+        <span class="tool-badge tb-purple">FTK</span><span class="tool-badge tb-blue">Sleuth Kit (free)</span>
+        <span class="tool-badge tb-gold">Plaso / log2timeline (free)</span><span class="tool-badge tb-red">Eric Zimmermann Tools (free)</span>
+        <span class="tool-badge tb-orange">KAPE (free)</span>
+      </div>
+      <h2>Network Forensics</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">Wireshark (free)</span><span class="tool-badge tb-orange">Zeek / Bro (free)</span>
+        <span class="tool-badge tb-purple">NetworkMiner (free)</span><span class="tool-badge tb-blue">Suricata (free)</span>
+        <span class="tool-badge tb-gold">Snort (free)</span><span class="tool-badge tb-red">tshark (free)</span>
+        <span class="tool-badge tb-orange">Arkime (free)</span>
+      </div>
+      <h2>Threat Intelligence</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">MISP (free)</span><span class="tool-badge tb-orange">OpenCTI (free)</span>
+        <span class="tool-badge tb-purple">MITRE ATT&CK Navigator (free)</span><span class="tool-badge tb-blue">Shodan</span>
+        <span class="tool-badge tb-gold">Censys</span><span class="tool-badge tb-red">VirusTotal</span>
+        <span class="tool-badge tb-orange">Maltego</span><span class="tool-badge tb-purple">SpiderFoot (free)</span>
+        <span class="tool-badge tb-blue">Recorded Future</span><span class="tool-badge tb-gold">Mandiant Advantage</span>
+      </div>
+      <h2>Detection Engineering</h2>
+      <div class="tool-badges">
+        <span class="tool-badge tb-red">YARA (free)</span><span class="tool-badge tb-orange">Sigma (free)</span>
+        <span class="tool-badge tb-purple">Atomic Red Team (free)</span><span class="tool-badge tb-blue">CALDERA (free)</span>
+        <span class="tool-badge tb-gold">ATT&CK Workbench (free)</span><span class="tool-badge tb-red">Uncoder.io (free)</span>
+      </div>
+      <h2>L3 Learning Resources</h2>
+      <table>
+        <tr><th>Resource</th><th>Topic</th><th>Where</th></tr>
+        <tr><td>Practical Malware Analysis (book)</td><td>RE fundamentals</td><td>No Starch Press</td></tr>
+        <tr><td>The Art of Memory Forensics (book)</td><td>Memory forensics</td><td>Wiley</td></tr>
+        <tr><td>SANS FOR610</td><td>Malware RE certification</td><td>sans.org</td></tr>
+        <tr><td>SANS FOR508</td><td>DFIR certification</td><td>sans.org</td></tr>
+        <tr><td>OpenSecurityTraining2</td><td>Free RE courses</td><td>p.ost2.fyi</td></tr>
+        <tr><td>MalwareTech blog</td><td>RE, botnet tracking</td><td>malwaretech.com</td></tr>
+        <tr><td>Hex-Rays blog</td><td>IDA Pro techniques</td><td>hex-rays.com/blog</td></tr>
+        <tr><td>VX-Underground</td><td>Malware samples + papers</td><td>vx-underground.org</td></tr>
+        <tr><td>Malpedia</td><td>Malware family DB</td><td>malpedia.caad.fkie.fraunhofer.de</td></tr>
+        <tr><td>ANY.RUN public submissions</td><td>Live malware behavior</td><td>any.run</td></tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function updateClock(){
+  const t=new Date().toUTCString().slice(17,25)+' UTC';
+  document.getElementById('clock').textContent=t;
+  const c2=document.getElementById('clock2');
+  if(c2) c2.textContent=t;
+}
+updateClock(); setInterval(updateClock,1000);
+
+const sections=[
+  {id:'home',label:'Home'},{id:'roles',label:'L3 Roles & Authority'},
+  {id:'l2intake',label:'L2 Escalation Intake'},
+  {id:'re-fundamentals',label:'RE Fundamentals'},
+  {id:'ida-ghidra',label:'IDA Pro & Ghidra'},
+  {id:'x86-assembly',label:'x86/x64 Assembly'},
+  {id:'anti-analysis',label:'Anti-Analysis Techniques'},
+  {id:'unpacking',label:'Unpacking & Deobfuscation'},
+  {id:'malware-families',label:'Malware Family Profiles'},
+  {id:'rootkits',label:'Rootkits & Bootkits'},
+  {id:'ransomware-re',label:'Ransomware Deep Dive'},
+  {id:'c2-frameworks',label:'C2 Framework RE'},
+  {id:'apt-profiles',label:'APT Group Profiles'},
+  {id:'ttp-analysis',label:'TTP Deep Analysis'},
+  {id:'diamond-model',label:'Diamond Model & F3EAD'},
+  {id:'campaign-tracking',label:'Campaign Tracking'},
+  {id:'disk-forensics',label:'Disk & Image Forensics'},
+  {id:'advanced-memory',label:'Advanced Memory Analysis'},
+  {id:'network-forensics',label:'Deep Network Forensics'},
+  {id:'cloud-forensics',label:'Cloud Forensics'},
+  {id:'vuln-research',label:'Vulnerability Research'},
+  {id:'exploit-analysis',label:'Exploit Analysis'},
+  {id:'zeroday',label:'Zero-Day Handling'},
+  {id:'intelhunting',label:'Intelligence-Led Hunting'},
+  {id:'redteam-ttp',label:'Red Team TTP Emulation'},
+  {id:'deception',label:'Deception & Honeypots'},
+  {id:'detection-arch',label:'Detection Architecture'},
+  {id:'purple-team',label:'Purple Teaming'},
+  {id:'soc-maturity',label:'SOC Maturity Model'},
+  {id:'strategic-report',label:'Strategic IR Reporting'},
+  {id:'legal-breach',label:'Legal & Breach Notification'},
+  {id:'toolbox',label:'L3 Toolbox Reference'}
+];
+
+const cardDescs={
+  home:'L3 mission & apex rules',
+  roles:'Authority, scope, and decisions',
+  l2intake:'Escalation validation process',
+  're-fundamentals':'PE structure, API map, RE workflow',
+  'ida-ghidra':'Shortcuts, scripting, automation',
+  'x86-assembly':'Registers, patterns, shellcode',
+  'anti-analysis':'Anti-debug + anti-VM bypasses',
+  unpacking:'OEP hunting, IAT fixing, deobfuscation',
+  'malware-families':'CS, Emotet, QBot, LockBit, Sliver',
+  rootkits:'SSDT hooks, DKOM, bootkit analysis',
+  'ransomware-re':'Encryption RE, key recovery, response',
+  'c2-frameworks':'Cobalt Strike config extraction, protocol RE',
+  'apt-profiles':'APT29, APT28, Lazarus, APT41, Volt Typhoon',
+  'ttp-analysis':'Pyramid of Pain, ATT&CK deep dive',
+  'diamond-model':'Diamond Model + F3EAD cycle',
+  'campaign-tracking':'Infrastructure pivoting, JARM, Shodan',
+  'disk-forensics':'Forensic acquisition, Autopsy, artifacts',
+  'advanced-memory':'Volatility 3 advanced, WinDbg kernel',
+  'network-forensics':'JA3/JARM, Zeek, TLS fingerprinting',
+  'cloud-forensics':'AWS CloudTrail, Azure AD IR',
+  'vuln-research':'Binary diffing, CVE triage, EPSS',
+  'exploit-analysis':'Exploit classes, ROP, heap spray',
+  zeroday:'Zero-day protocol + responsible disclosure',
+  intelhunting:'Intel-led hunting, OSINT techniques',
+  'redteam-ttp':'Atomic Red Team, detection gap matrix',
+  deception:'Honeypots, canary tokens, honey creds',
+  'detection-arch':'Detection layers, SIEM architecture',
+  'purple-team':'Purple team exercise structure + report',
+  'soc-maturity':'Maturity levels + SOC KPIs',
+  'strategic-report':'Executive brief + TI report templates',
+  'legal-breach':'GDPR/HIPAA/PCI timelines, LE engagement',
+  toolbox:'Full L3 tool reference + learning resources'
+};
+
+const grid=document.getElementById('home-grid');
+sections.slice(1).forEach(s=>{
+  const c=document.createElement('div');
+  c.className='home-card';
+  c.innerHTML=`<div class="card-title">${s.label}</div><div class="card-desc">${cardDescs[s.id]||''}</div>`;
+  c.addEventListener('click',()=>nav(s.id));
+  grid.appendChild(c);
+});
+
+function nav(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const sec=document.getElementById('s-'+id);
+  const navEl=document.querySelector(`.nav-item[data-section="${id}"]`);
+  if(sec) sec.classList.add('active');
+  if(navEl){navEl.classList.add('active');navEl.scrollIntoView({block:'nearest'});}
+  const lbl=sections.find(s=>s.id===id);
+  document.getElementById('bread-current').textContent=lbl?lbl.label.toUpperCase():id.toUpperCase();
+  document.getElementById('content').scrollTop=0;
+}
+
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>nav(item.dataset.section));
+});
+
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const pre=btn.closest('.code-wrap').querySelector('pre');
+    const text=pre?pre.innerText.replace(/COPY$/,'').trim():'';
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='COPIED!';btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},1500);
+    });
+  });
+});
+
+const si=document.getElementById('search');
+si.addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase();
+  if(!q){document.querySelectorAll('.nav-item,.nav-section-label,.nav-section').forEach(n=>n.style.display='');return;}
+  document.querySelectorAll('.nav-item').forEach(n=>{n.style.display=n.textContent.toLowerCase().includes(q)?'':'none';});
+  document.querySelectorAll('.nav-section').forEach(g=>{
+    g.style.display=Array.from(g.querySelectorAll('.nav-item')).some(n=>n.style.display!=='none')?'':'none';
+  });
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='/'&&document.activeElement!==si){e.preventDefault();si.focus();}
+  if(e.key==='Escape') si.blur();
+});
+
+document.getElementById('dl-btn').addEventListener('click',()=>{
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='SOC-L3-Playbook.html';
+  a.click();
+});
+</script>
+</body>
+</html>

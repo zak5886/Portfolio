@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC L2 PLAYBOOK</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07080f;
+  --bg2:#0d0f1e;
+  --bg3:#131526;
+  --border:#1e2140;
+  --accent:#9b72ff;
+  --accent2:#ff6b9d;
+  --accent3:#00e5c0;
+  --accent4:#ffd166;
+  --blue:#4da6ff;
+  --text:#cdd0e8;
+  --text-dim:#4a5070;
+  --code-bg:#060810;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;display:flex;height:100vh;overflow:hidden;}
+body::before{
+  content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 20% 50%, rgba(155,114,255,0.04) 0%, transparent 60%),
+             radial-gradient(ellipse at 80% 20%, rgba(255,107,157,0.03) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* SIDEBAR */
+#sidebar{width:265px;min-width:265px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+#logo{padding:18px 16px 12px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(155,114,255,0.1),transparent);}
+#logo .badge{display:inline-block;background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:2px;padding:2px 8px;border-radius:2px;margin-bottom:6px;}
+#logo .title{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;color:#fff;letter-spacing:2px;}
+#logo .title span{color:var(--accent);}
+#logo .sub{font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:0.5px;}
+#status-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;background:rgba(155,114,255,0.05);border-bottom:1px solid var(--border);font-size:11px;font-family:'JetBrains Mono',monospace;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent3);box-shadow:0 0 8px var(--accent3);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+#search-wrap{padding:10px 12px;border-bottom:1px solid var(--border);}
+#search{width:100%;background:var(--code-bg);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;padding:8px 10px;outline:none;border-radius:4px;transition:border-color .2s;}
+#search:focus{border-color:var(--accent);}
+#search::placeholder{color:var(--text-dim);}
+#nav{flex:1;overflow-y:auto;padding:6px 0;}
+#nav::-webkit-scrollbar{width:3px;}
+#nav::-webkit-scrollbar-thumb{background:var(--border);}
+.nav-section{margin-bottom:2px;}
+.nav-section-label{font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:8px 16px 3px;font-family:'JetBrains Mono',monospace;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:7px 16px;cursor:pointer;font-size:12px;font-weight:500;color:var(--text-dim);border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.02);}
+.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(155,114,255,0.07);}
+.nav-icon{font-size:14px;flex-shrink:0;}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;z-index:1;}
+#topbar{height:46px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:12px;}
+#breadcrumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);}
+#breadcrumb span{color:var(--accent);}
+#topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:10px;}
+.tier-badge{padding:3px 10px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:1px;border:1px solid rgba(155,114,255,0.4);background:rgba(155,114,255,0.1);color:var(--accent);}
+#dl-btn{cursor:pointer;color:var(--accent3);border:1px solid var(--accent3);padding:3px 10px;border-radius:3px;font-size:10px;transition:all .2s;}
+#dl-btn:hover{background:var(--accent3);color:#000;}
+#content{flex:1;overflow-y:auto;padding:24px 30px;}
+#content::-webkit-scrollbar{width:4px;}
+#content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.section{display:none;animation:fadeIn .2s ease;}
+.section.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* TYPOGRAPHY */
+h1{font-family:'Orbitron',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+h1 .h1-icon{font-size:20px;}
+h1 .h1-tag{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(155,114,255,0.1);color:var(--accent);border:1px solid rgba(155,114,255,0.2);padding:2px 8px;border-radius:3px;letter-spacing:1px;margin-left:auto;}
+h2{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px;display:flex;align-items:center;gap:8px;}
+h2::before{content:'▸';opacity:0.6;}
+h3{font-size:12px;font-weight:600;color:var(--accent4);margin:14px 0 8px;}
+p{line-height:1.7;margin-bottom:10px;color:var(--text);font-size:13px;}
+
+/* CODE */
+.code-wrap{position:relative;margin:8px 0;}
+.code-label{background:var(--bg3);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 10px;display:inline-block;letter-spacing:1px;border-radius:3px 3px 0 0;border:1px solid var(--border);border-bottom:none;}
+.code-label.bash{color:var(--accent3);}
+.code-label.ps{color:var(--blue);}
+.code-label.python{color:var(--accent4);}
+.code-label.yara{color:var(--accent2);}
+.code-label.sigma{color:var(--accent);}
+.code-label.splunk{color:#ff8c00;}
+.code-label.kql{color:var(--blue);}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:0 3px 3px 3px;padding:14px 16px;overflow-x:auto;position:relative;}
+pre::-webkit-scrollbar{height:3px;}
+pre::-webkit-scrollbar-thumb{background:var(--border);}
+code{font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.8;color:#aab4d4;}
+:not(pre)>code{background:var(--bg3);color:var(--accent4);padding:1px 5px;border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;cursor:pointer;border-radius:3px;transition:all .2s;letter-spacing:1px;}
+.copy-btn:hover,.copy-btn.copied{background:var(--accent3);color:#000;border-color:var(--accent3);}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+th{background:var(--bg3);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:8px 12px;text-align:left;border:1px solid var(--border);text-transform:uppercase;}
+td{padding:7px 12px;border:1px solid var(--border);color:var(--text);vertical-align:top;font-size:12px;}
+tr:hover td{background:rgba(155,114,255,0.03);}
+
+/* ALERTS */
+.alert{border-left:3px solid;padding:10px 14px;margin:10px 0;background:rgba(255,255,255,0.02);font-size:12px;border-radius:0 4px 4px 0;line-height:1.6;}
+.alert.red{border-color:var(--accent2);color:var(--accent2);}
+.alert.green{border-color:var(--accent3);}
+.alert.yellow{border-color:var(--accent4);color:var(--accent4);}
+.alert.blue{border-color:var(--blue);color:var(--blue);}
+.alert.purple{border-color:var(--accent);color:var(--accent);}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+.step{display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border:1px solid var(--border);padding:12px 14px;border-radius:4px;transition:border-color .2s;}
+.step:hover{border-color:var(--accent);}
+.step-num{width:26px;height:26px;border-radius:50%;background:rgba(155,114,255,0.1);border:1px solid var(--accent);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-content{flex:1;}
+.step-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:4px;}
+.step-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+
+/* HOME GRID */
+.home-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:16px;}
+.home-card{background:var(--bg2);border:1px solid var(--border);padding:16px;cursor:pointer;border-radius:4px;transition:all .2s;position:relative;overflow:hidden;}
+.home-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:0;transition:opacity .2s;}
+.home-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.home-card:hover::before{opacity:1;}
+.card-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.card-desc{font-size:11px;color:var(--text-dim);line-height:1.4;}
+
+/* TERMINAL */
+.terminal{background:var(--code-bg);border:1px solid var(--border);border-radius:4px;overflow:hidden;margin:12px 0;}
+.terminal-header{background:var(--bg3);padding:8px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border);}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-dot.red{background:#ff5f57;}
+.t-dot.yellow{background:#febc2e;}
+.t-dot.green{background:#28c840;}
+.terminal-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);margin:0 auto;}
+.terminal-body{padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.9;}
+.t-prompt{color:var(--accent);}
+.t-cmd{color:var(--text);}
+.t-out{color:var(--text-dim);}
+.t-warn{color:var(--accent4);}
+.t-green{color:var(--accent3);}
+
+/* CHECKLIST */
+.checklist{list-style:none;margin:10px 0;}
+.checklist li{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:12px;line-height:1.6;}
+.checklist li::before{content:'◦';color:var(--accent);flex-shrink:0;margin-top:1px;}
+
+ul{padding-left:20px;margin:8px 0;}
+ul li{margin:5px 0;line-height:1.6;font-size:12px;}
+strong{color:var(--accent4);}
+
+/* TOOL BADGES */
+.tool-badges{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+.tool-badge{padding:3px 10px;border-radius:3px;font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;border:1px solid;}
+.tb-purple{color:var(--accent);border-color:rgba(155,114,255,0.3);background:rgba(155,114,255,0.08);}
+.tb-pink{color:var(--accent2);border-color:rgba(255,107,157,0.3);background:rgba(255,107,157,0.08);}
+.tb-teal{color:var(--accent3);border-color:rgba(0,229,192,0.3);background:rgba(0,229,192,0.08);}
+.tb-blue{color:var(--blue);border-color:rgba(77,166,255,0.3);background:rgba(77,166,255,0.08);}
+.tb-yellow{color:var(--accent4);border-color:rgba(255,209,102,0.3);background:rgba(255,209,102,0.08);}
+
+/* MATRIX GRID */
+.matrix-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}
+.matrix-card{background:var(--bg2);border:1px solid var(--border);padding:14px;border-radius:4px;border-top:2px solid var(--accent);}
+.matrix-card.pink{border-top-color:var(--accent2);}
+.matrix-card.teal{border-top-color:var(--accent3);}
+.matrix-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.matrix-card.pink .matrix-title{color:var(--accent2);}
+.matrix-card.teal .matrix-title{color:var(--accent3);}
+.matrix-body{font-size:11px;color:var(--text-dim);line-height:1.8;}
+
+/* FLOW DIAGRAM */
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:14px 0;}
+.flow-box{background:var(--bg2);border:1px solid var(--border);padding:8px 14px;border-radius:4px;text-align:center;}
+.flow-box .fl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;}
+.flow-box .fr{font-size:12px;font-weight:600;color:#fff;margin-top:2px;}
+.flow-arrow{color:var(--accent);font-size:16px;padding:0 4px;}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:24px;margin:12px 0;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:1px;background:var(--border);}
+.tl-item{position:relative;margin-bottom:14px;}
+.tl-item::before{content:'';position:absolute;left:-20px;top:6px;width:8px;height:8px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);}
+.tl-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:1px;margin-bottom:3px;}
+.tl-title{font-size:12px;font-weight:600;color:#fff;margin-bottom:3px;}
+.tl-desc{font-size:11px;color:var(--text-dim);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="logo">
+    <div class="badge">SOC LEVEL 2</div>
+    <div class="title">SOC<span>L2</span> PLAYBOOK</div>
+    <div class="sub">Security Operations Center — Tier 2</div>
+  </div>
+  <div id="status-bar">
+    <div class="status-dot"></div>
+    <span style="color:var(--accent3)">ANALYSIS ACTIVE</span>
+    <span style="margin-left:auto;color:var(--text-dim)" id="clock"></span>
+  </div>
+  <div id="search-wrap">
+    <input type="text" id="search" placeholder="🔍  search playbook..." autocomplete="off" spellcheck="false">
+  </div>
+  <nav id="nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" data-section="home"><span class="nav-icon">🏠</span>Home</div>
+      <div class="nav-item" data-section="roles"><span class="nav-icon">🎯</span>L2 Roles & Scope</div>
+      <div class="nav-item" data-section="l1handoff"><span class="nav-icon">📥</span>L1 Escalation Intake</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Deep Investigation</div>
+      <div class="nav-item" data-section="investigation"><span class="nav-icon">🔬</span>Investigation Methodology</div>
+      <div class="nav-item" data-section="loganalysis"><span class="nav-icon">📊</span>Deep Log Analysis</div>
+      <div class="nav-item" data-section="correlation"><span class="nav-icon">🔗</span>Event Correlation</div>
+      <div class="nav-item" data-section="attackchain"><span class="nav-icon">⛓️</span>Attack Chain Analysis</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Malware Analysis</div>
+      <div class="nav-item" data-section="staticanalysis"><span class="nav-icon">🧬</span>Static Analysis</div>
+      <div class="nav-item" data-section="dynamicanalysis"><span class="nav-icon">⚡</span>Dynamic / Behavioral</div>
+      <div class="nav-item" data-section="yara"><span class="nav-icon">🎯</span>YARA Rules</div>
+      <div class="nav-item" data-section="memoryforensics"><span class="nav-icon">🧠</span>Memory Forensics</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Network Forensics</div>
+      <div class="nav-item" data-section="pcap"><span class="nav-icon">📦</span>PCAP Analysis</div>
+      <div class="nav-item" data-section="c2analysis"><span class="nav-icon">📡</span>C2 Detection & Analysis</div>
+      <div class="nav-item" data-section="netforensics"><span class="nav-icon">🌐</span>Network Forensics</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Endpoint Forensics</div>
+      <div class="nav-item" data-section="dfir"><span class="nav-icon">💾</span>DFIR — Windows</div>
+      <div class="nav-item" data-section="linuxforensics"><span class="nav-icon">🐧</span>DFIR — Linux</div>
+      <div class="nav-item" data-section="artifacts"><span class="nav-icon">🗂️</span>Forensic Artifacts</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Threat Hunting</div>
+      <div class="nav-item" data-section="hunting"><span class="nav-icon">🏹</span>Threat Hunting</div>
+      <div class="nav-item" data-section="hypotheses"><span class="nav-icon">💡</span>Hunt Hypotheses</div>
+      <div class="nav-item" data-section="sigma"><span class="nav-icon">Σ</span>Sigma Rules</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Incident Response</div>
+      <div class="nav-item" data-section="ir-lead"><span class="nav-icon">🚨</span>IR Lead Responsibilities</div>
+      <div class="nav-item" data-section="containment"><span class="nav-icon">🛑</span>Advanced Containment</div>
+      <div class="nav-item" data-section="eradication"><span class="nav-icon">🧹</span>Eradication & Recovery</div>
+      <div class="nav-item" data-section="ioc-sharing"><span class="nav-icon">🔄</span>IOC Sharing & MISP</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Detection Engineering</div>
+      <div class="nav-item" data-section="tuning"><span class="nav-icon">⚙️</span>Alert Tuning & FP Reduction</div>
+      <div class="nav-item" data-section="usecase"><span class="nav-icon">📐</span>Use Case Development</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Reporting</div>
+      <div class="nav-item" data-section="reporting"><span class="nav-icon">📝</span>IR Report Writing</div>
+      <div class="nav-item" data-section="l3escalation"><span class="nav-icon">⬆️</span>Escalation to L3</div>
+    </div>
+  </nav>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div id="breadcrumb">SOC-L2 / <span id="bread-current">HOME</span></div>
+    <div id="topbar-right">
+      <span class="tier-badge">TIER 2 — ANALYST</span>
+      <span style="color:var(--text-dim);font-size:10px" id="clock2"></span>
+      <span id="dl-btn">⬇ SAVE HTML</span>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- HOME -->
+    <div class="section active" id="s-home">
+      <h1><span class="h1-icon">🛡️</span>SOC L2 PLAYBOOK<span class="h1-tag">TIER 2</span></h1>
+      <div class="terminal">
+        <div class="terminal-header">
+          <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+          <div class="terminal-title">soc-l2-analyst@secops ~ $</div>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-prompt">l2@soc:~$</span> <span class="t-cmd">cat mission.txt</span></div>
+          <div class="t-out">SOC L2 — Deep investigation, threat hunting, incident ownership, detection engineering.</div>
+          <div class="t-out">You validate L1 escalations, lead incident response, analyze malware, hunt threats.</div>
+          <div class="t-out">You own incidents from intake through eradication. You mentor and guide L1.</div>
+          <div style="margin-top:6px"><span class="t-prompt">l2@soc:~$</span> <span class="t-cmd">cat l2_rules.txt</span></div>
+          <div class="t-warn">⚠  Assume breach — always look for what L1 may have missed.</div>
+          <div class="t-warn">⚠  Document root cause — not just what happened, but HOW and WHY.</div>
+          <div class="t-warn">⚠  Every incident is a detection engineering opportunity.</div>
+          <div class="t-green">✓  You are the last line of analyst defense before L3 and IR Lead.</div>
+        </div>
+      </div>
+      <div class="home-grid" id="home-grid"></div>
+    </div>
+
+    <!-- ROLES -->
+    <div class="section" id="s-roles">
+      <h1><span class="h1-icon">🎯</span>L2 Roles & Scope<span class="h1-tag">SCOPE</span></h1>
+      <h2>L2 Owns These Responsibilities</h2>
+      <ul class="checklist">
+        <li>Validate and take ownership of all L1-escalated incidents</li>
+        <li>Perform deep-dive investigation: full attack chain reconstruction</li>
+        <li>Lead active incident response for P1/P2 incidents</li>
+        <li>Conduct malware static and dynamic analysis</li>
+        <li>Perform memory and disk forensics on compromised hosts</li>
+        <li>Analyze PCAP files and network forensics</li>
+        <li>Perform proactive threat hunting using hypotheses-driven approach</li>
+        <li>Write and tune SIEM detection rules and YARA/Sigma signatures</li>
+        <li>Manage and update IOC feeds, blocklists, and threat intel platforms (MISP)</li>
+        <li>Write detailed incident reports with root cause analysis</li>
+        <li>Mentor L1 analysts — provide feedback, runbooks, and training</li>
+        <li>Escalate to L3 when advanced forensics or zero-day analysis is required</li>
+      </ul>
+      <h2>L2 vs L1 vs L3 — Clear Boundaries</h2>
+      <table>
+        <tr><th>Capability</th><th>L1</th><th>L2</th><th>L3</th></tr>
+        <tr><td>Alert triage & classification</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>IOC lookup & enrichment</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>SIEM query writing</td><td>Basic</td><td>Advanced</td><td>Expert</td></tr>
+        <tr><td>Malware analysis (static)</td><td>Hash check</td><td>✅ Full</td><td>✅ Full</td></tr>
+        <tr><td>Malware analysis (dynamic)</td><td>Sandbox only</td><td>✅ Full</td><td>✅ Reverse Eng.</td></tr>
+        <tr><td>Memory forensics (Volatility)</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>PCAP/network forensics</td><td>Basic</td><td>✅ Full</td><td>✅ Full</td></tr>
+        <tr><td>Threat hunting</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>YARA / Sigma rule writing</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>IR lead (P1/P2)</td><td>Support</td><td>✅ Lead</td><td>✅ Lead</td></tr>
+        <tr><td>Reverse engineering</td><td>❌</td><td>Basic</td><td>✅ Advanced</td></tr>
+        <tr><td>Zero-day / APT research</td><td>❌</td><td>Escalate</td><td>✅</td></tr>
+      </table>
+    </div>
+
+    <!-- L1 HANDOFF -->
+    <div class="section" id="s-l1handoff">
+      <h1><span class="h1-icon">📥</span>L1 Escalation Intake<span class="h1-tag">PROCESS</span></h1>
+      <div class="alert purple">When L1 escalates, your first job is to validate their assessment — not just accept it. Re-examine the evidence independently.</div>
+      <h2>Intake Checklist</h2>
+      <ul class="checklist">
+        <li>Read full L1 ticket — understand what they found and their conclusion</li>
+        <li>Verify the SIEM alert independently — pull raw logs yourself</li>
+        <li>Confirm IOC enrichment is accurate and complete</li>
+        <li>Check for correlated events L1 may have missed (±6 hours, same user/host)</li>
+        <li>Re-assess severity — do you agree with L1's classification?</li>
+        <li>Identify any gaps in L1's investigation</li>
+        <li>Acknowledge receipt to L1 — give estimated response timeline</li>
+        <li>Assign ticket to yourself and update status</li>
+      </ul>
+      <h2>L1 Intake Questions</h2>
+      <table>
+        <tr><th>Question</th><th>Why It Matters</th></tr>
+        <tr><td>Is this actually malicious or could it be authorized activity?</td><td>L1 may misclassify authorized pen test / red team / admin tasks</td></tr>
+        <tr><td>What is the blast radius? How many assets are affected?</td><td>L1 often focuses on the single alerted asset</td></tr>
+        <tr><td>Has this user/host been involved in prior incidents?</td><td>Repeat compromises suggest incomplete remediation</td></tr>
+        <tr><td>What is the full timeline — first event, not just alert trigger?</td><td>Alert fires after attacker is already active</td></tr>
+        <tr><td>Is there evidence of lateral movement to other hosts?</td><td>Critical for blast radius assessment</td></tr>
+        <tr><td>Was any data accessed or exfiltrated?</td><td>Changes incident severity and legal obligations</td></tr>
+      </table>
+      <h2>Escalation Validation Workflow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Read L1 Ticket</div><div class="step-desc">Understand their findings. Note what they checked and what they missed. Do not just inherit their conclusion.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Independent SIEM Query</div><div class="step-desc">Re-run your own search. Expand time window. Look for precursor events (recon, delivery, initial access before L1's alert time).</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Full IOC Expansion</div><div class="step-desc">From L1's IOCs, pivot: find more related IPs, domains, hashes using threat intel. Expand the scope of known bad indicators.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Blast Radius Assessment</div><div class="step-desc">Search all internal assets for connections to/from the identified IOCs. How many hosts were exposed? Who else logged in from the same compromised account?</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Severity Confirmation or Upgrade</div><div class="step-desc">Confirm L1's severity or upgrade it. Update ticket. If P1 — activate IR immediately.</div></div></div>
+      </div>
+    </div>
+
+    <!-- INVESTIGATION METHODOLOGY -->
+    <div class="section" id="s-investigation">
+      <h1><span class="h1-icon">🔬</span>Investigation Methodology<span class="h1-tag">L2 CORE</span></h1>
+      <h2>L2 Investigation Framework: PICERL</h2>
+      <div class="matrix-grid">
+        <div class="matrix-card"><div class="matrix-title">Preparation</div><div class="matrix-body">Tools ready, runbooks current, comms channels open, access verified</div></div>
+        <div class="matrix-card pink"><div class="matrix-title">Identification</div><div class="matrix-body">Confirm true positive, scope blast radius, identify attack type</div></div>
+        <div class="matrix-card teal"><div class="matrix-title">Containment</div><div class="matrix-body">Short-term isolation + long-term containment strategy</div></div>
+        <div class="matrix-card"><div class="matrix-title">Eradication</div><div class="matrix-body">Remove malware, close access paths, patch vulnerabilities</div></div>
+        <div class="matrix-card pink"><div class="matrix-title">Recovery</div><div class="matrix-body">Restore systems, verify clean state, monitor closely</div></div>
+        <div class="matrix-card teal"><div class="matrix-title">Lessons Learned</div><div class="matrix-body">Root cause analysis, detection gaps, playbook improvements</div></div>
+      </div>
+      <h2>Attack Reconstruction Approach</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Establish the Timeline</div><div class="step-desc">Work backwards from the alert. Find the earliest attacker footprint. Build chronological timeline of all attacker actions.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Map to MITRE ATT&CK</div><div class="step-desc">Identify every TTP observed. Map each observed behavior to a technique ID. This drives detection gap analysis.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Pivot on Every IOC</div><div class="step-desc">Each IOC is a pivot point. From a malicious IP → find all hosts that connected to it. From a hash → find all hosts with that file. From a user → find all systems accessed.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Determine Initial Access Vector</div><div class="step-desc">How did the attacker get in? Phishing? Exposed service? Credential reuse? Supply chain? This is critical for prevention.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Identify Persistence Mechanisms</div><div class="step-desc">What did the attacker do to maintain access? All persistence mechanisms must be identified and removed.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><div class="step-title">Data Impact Assessment</div><div class="step-desc">What data was accessed, modified, or exfiltrated? Required for legal, compliance, and breach notification.</div></div></div>
+      </div>
+      <h2>Investigation Pivoting</h2>
+      <table>
+        <tr><th>Start With</th><th>Pivot To</th><th>Tool / Method</th></tr>
+        <tr><td>Malicious IP</td><td>All hosts that connected to it</td><td>SIEM: search dest_ip / src_ip</td></tr>
+        <tr><td>Compromised user</td><td>All systems they authenticated to</td><td>SIEM: auth logs by username</td></tr>
+        <tr><td>Malware hash</td><td>All hosts with that file</td><td>EDR: file search by hash</td></tr>
+        <tr><td>Malicious domain</td><td>All DNS queries for it</td><td>SIEM: DNS logs</td></tr>
+        <tr><td>Process name</td><td>All instances across fleet</td><td>EDR: process search</td></tr>
+        <tr><td>C2 IP</td><td>Other IPs on same ASN / infrastructure</td><td>Shodan, Censys, VirusTotal graph</td></tr>
+        <tr><td>Attacker TTP</td><td>Other hosts showing same behavior</td><td>SIEM threat hunt query</td></tr>
+      </table>
+    </div>
+
+    <!-- DEEP LOG ANALYSIS -->
+    <div class="section" id="s-loganalysis">
+      <h1><span class="h1-icon">📊</span>Deep Log Analysis<span class="h1-tag">FORENSICS</span></h1>
+      <h2>Windows Security Event Deep Dive</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code># Export specific event IDs from Windows event log
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4624,4625,4648,4688,4698,4702,4720,4728,4732,4769; StartTime=(Get-Date).AddDays(-7)} |
+  Select-Object TimeCreated, Id, Message | Export-Csv events.csv -NoTypeInformation
+
+# Find logon events from specific IP
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4624} |
+  Where-Object {$_.Message -like "*192.168.1.100*"} |
+  Format-List TimeCreated, Message
+
+# Extract process creation events with command line (requires audit policy)
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4688; StartTime=(Get-Date).AddHours(-24)} |
+  ForEach-Object {
+    $xml = [xml]$_.ToXml()
+    [PSCustomObject]@{
+      Time = $_.TimeCreated
+      User = $xml.Event.EventData.Data | Where-Object{$_.Name -eq 'SubjectUserName'} | Select-Object -Exp '#text'
+      Process = $xml.Event.EventData.Data | Where-Object{$_.Name -eq 'NewProcessName'} | Select-Object -Exp '#text'
+      CommandLine = $xml.Event.EventData.Data | Where-Object{$_.Name -eq 'CommandLine'} | Select-Object -Exp '#text'
+    }
+  } | Export-Csv processes.csv -NoTypeInformation</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Sysmon Log Analysis</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code># Sysmon Event IDs reference:
+# 1  = Process Create
+# 2  = File creation time changed
+# 3  = Network connection
+# 7  = Image loaded (DLL)
+# 8  = CreateRemoteThread (process injection!)
+# 10 = ProcessAccess (LSASS dumps)
+# 11 = FileCreate
+# 12/13 = Registry events
+# 15 = FileCreateStreamHash (ADS)
+# 22 = DNS query
+# 23 = File Delete
+
+# Find process injections (CreateRemoteThread)
+Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational'; Id=8} |
+  Select-Object TimeCreated,
+    @{N='SourceImage';E={([xml]$_.ToXml()).Event.EventData.Data | Where-Object{$_.Name -eq 'SourceImage'} | Select-Object -Exp '#text'}},
+    @{N='TargetImage';E={([xml]$_.ToXml()).Event.EventData.Data | Where-Object{$_.Name -eq 'TargetImage'} | Select-Object -Exp '#text'}}
+
+# DNS queries by process (detect DNS tunneling or malware C2)
+Get-WinEvent -FilterHashtable @{LogName='Microsoft-Windows-Sysmon/Operational'; Id=22} |
+  ForEach-Object {
+    $xml = [xml]$_.ToXml()
+    [PSCustomObject]@{
+      Time    = $_.TimeCreated
+      Process = $xml.Event.EventData.Data | Where-Object{$_.Name -eq 'Image'} | Select-Object -Exp '#text'
+      Query   = $xml.Event.EventData.Data | Where-Object{$_.Name -eq 'QueryName'} | Select-Object -Exp '#text'
+    }
+  } | Where-Object { $_.Process -notlike "*svchost*" }</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Linux Log Deep Dive</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Auth log analysis — failed then successful login
+grep "Failed password" /var/log/auth.log | awk '{print $9}' | sort | uniq -c | sort -rn
+
+# Find successful SSH logins after failures
+awk '/Failed password/{ip=$11; fails[ip]++} /Accepted/{if(fails[$11]>3) print "SUSPICIOUS: "$11" succeeded after "fails[$11]" failures"}' /var/log/auth.log
+
+# Crontab modifications
+grep "CRON" /var/log/syslog | grep -v "session"
+find /var/spool/cron /etc/cron* -newer /etc/passwd 2>/dev/null
+
+# New SUID files (compare to baseline)
+find / -perm -4000 -type f 2>/dev/null > /tmp/current_suid.txt
+# Compare: diff /tmp/baseline_suid.txt /tmp/current_suid.txt
+
+# Recently modified system files
+find /etc /bin /sbin /usr/bin /usr/sbin -newer /var/log/dpkg.log -type f 2>/dev/null
+
+# Bash history reconstruction
+cat /home/*/.bash_history /root/.bash_history 2>/dev/null | grep -v "^$" | sort | uniq
+
+# Check for hidden files/directories (rootkit indicator)
+find / -name ".*" -type f -size +1k 2>/dev/null | grep -v ".cache\|.config\|.local\|.mozilla"</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- CORRELATION -->
+    <div class="section" id="s-correlation">
+      <h1><span class="h1-icon">🔗</span>Event Correlation<span class="h1-tag">ANALYSIS</span></h1>
+      <h2>Correlation Techniques</h2>
+      <div class="alert blue">Correlation is about connecting seemingly unrelated events to reveal an attack chain. Never analyze events in isolation.</div>
+      <h2>Temporal Correlation</h2>
+      <div class="code-wrap"><div class="code-label splunk">SPLUNK SPL</div><pre><code># Find all events involving a user within ±30 min of a suspicious event
+index=* user="jsmith"
+| where _time >= (relative_time(strptime("2024-01-15 14:30:00","%Y-%m-%d %H:%M:%S"),"-30m"))
+  AND _time <= (relative_time(strptime("2024-01-15 14:30:00","%Y-%m-%d %H:%M:%S"),"+30m"))
+| table _time, index, sourcetype, host, src_ip, dest_ip, process, command, action
+| sort _time
+
+# Cross-source correlation: same IP in firewall + auth + proxy logs
+index=firewall OR index=auth OR index=proxy src_ip="192.168.1.50"
+| eval source_type=case(index="firewall","FW",index="auth","AUTH",index="proxy","PROXY",1=1,"OTHER")
+| table _time, source_type, src_ip, dest_ip, user, action, url
+| sort _time</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Entity-Based Correlation</h2>
+      <div class="code-wrap"><div class="code-label kql">SENTINEL KQL</div><pre><code>// Full user activity timeline — correlate across all tables
+let TargetUser = "jsmith@company.com";
+let TimeRange = 24h;
+union
+(SigninLogs | where TimeGenerated > ago(TimeRange) | where UserPrincipalName =~ TargetUser
+ | project TimeGenerated, Activity="SignIn", Details=strcat(IPAddress," - ",AppDisplayName," - ",ResultDescription)),
+(AuditLogs | where TimeGenerated > ago(TimeRange) | where InitiatedBy has TargetUser
+ | project TimeGenerated, Activity="AuditAction", Details=OperationName),
+(DeviceProcessEvents | where TimeGenerated > ago(TimeRange) | where AccountName =~ split(TargetUser,"@")[0]
+ | project TimeGenerated, Activity="ProcessExec", Details=strcat(DeviceName," - ",FileName," - ",ProcessCommandLine)),
+(DeviceNetworkEvents | where TimeGenerated > ago(TimeRange) | where InitiatingProcessAccountName =~ split(TargetUser,"@")[0]
+ | project TimeGenerated, Activity="NetworkConn", Details=strcat(DeviceName," - ",RemoteIP,":",RemotePort))
+| order by TimeGenerated asc</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>IOC-Based Correlation</h2>
+      <div class="code-wrap"><div class="code-label splunk">SPLUNK SPL</div><pre><code># Search ALL indexes for a list of known bad IPs
+index=* [inputlookup malicious_ips.csv | rename ip as src_ip | fields src_ip]
+  OR [inputlookup malicious_ips.csv | rename ip as dest_ip | fields dest_ip]
+| table _time, index, sourcetype, host, user, src_ip, dest_ip, action
+| sort _time
+
+# Find all hosts that communicated with C2 infrastructure
+index=network (dest_ip="10.0.0.1" OR dest_ip="185.234.1.1" OR dest_domain="evil-c2.com")
+| stats values(src_ip) as affected_hosts, count by dest_ip
+| eval affected_count = mvcount(affected_hosts)</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- ATTACK CHAIN -->
+    <div class="section" id="s-attackchain">
+      <h1><span class="h1-icon">⛓️</span>Attack Chain Analysis<span class="h1-tag">MITRE</span></h1>
+      <h2>Attack Chain Reconstruction Template</h2>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-time">T+0:00 — INITIAL ACCESS</div><div class="tl-title">How did attacker get in?</div><div class="tl-desc">Phishing email / exploit / valid credentials / supply chain. Check email logs, VPN logs, web access logs.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — EXECUTION</div><div class="tl-title">What ran on the victim host?</div><div class="tl-desc">PowerShell, VBScript, Office macro, compiled binary. Check process creation logs, Sysmon event 1.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — PERSISTENCE</div><div class="tl-title">How did attacker ensure return access?</div><div class="tl-desc">Scheduled task, registry run key, new service, WMI subscription, startup folder, modified SSH keys.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — PRIVILEGE ESCALATION</div><div class="tl-title">How did attacker gain higher privileges?</div><div class="tl-desc">Token impersonation, exploit, UAC bypass, sudo abuse. Check for admin/SYSTEM processes spawned from low-priv context.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — DEFENSE EVASION</div><div class="tl-title">How did attacker avoid detection?</div><div class="tl-desc">Log clearing (Event 1102), AV disabling, LOLBAS, DLL side-loading, process hollowing, timestomping.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — CREDENTIAL ACCESS</div><div class="tl-title">What credentials were stolen?</div><div class="tl-desc">LSASS dump, SAM/NTDS.dit, keylogger, browser credentials, credential vaults.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — LATERAL MOVEMENT</div><div class="tl-title">Where did attacker spread?</div><div class="tl-desc">PsExec, WMI, RDP, Pass-the-Hash, Pass-the-Ticket. Check auth logs from compromised host to others.</div></div>
+        <div class="tl-item"><div class="tl-time">T+0:xx — EXFILTRATION / IMPACT</div><div class="tl-title">What was the attacker's goal?</div><div class="tl-desc">Data theft (check DLP/proxy), ransomware (file encryption events), destructive action (file deletion, wiper).</div></div>
+      </div>
+      <h2>MITRE ATT&CK Technique Deep Reference</h2>
+      <table>
+        <tr><th>Technique ID</th><th>Name</th><th>Key Artifacts / Evidence</th></tr>
+        <tr><td>T1566.001</td><td>Spearphishing Attachment</td><td>Email logs, attachment hash, MailItemsAccessed, user-agent</td></tr>
+        <tr><td>T1059.001</td><td>PowerShell</td><td>Event 4104 script block, Event 4688, -EncodedCommand flag</td></tr>
+        <tr><td>T1053.005</td><td>Scheduled Task</td><td>Event 4698/4702, Task Scheduler log, schtasks.exe in 4688</td></tr>
+        <tr><td>T1003.001</td><td>LSASS Memory Dump</td><td>Sysmon Event 10, WinEvent 4656 on lsass.exe, procdump in 4688</td></tr>
+        <tr><td>T1550.002</td><td>Pass-the-Hash</td><td>Event 4648, Event 4624 LogonType 3 with NTLMv2</td></tr>
+        <tr><td>T1047</td><td>WMI Execution</td><td>WMI Activity log, wmic.exe in 4688, Event 4688+5857</td></tr>
+        <tr><td>T1070.001</td><td>Clear Windows Event Logs</td><td>Event 1102 (audit log cleared), Event 104 (system log cleared)</td></tr>
+        <tr><td>T1055</td><td>Process Injection</td><td>Sysmon Event 8 (CreateRemoteThread), unusual memory allocations</td></tr>
+        <tr><td>T1486</td><td>Data Encrypted for Impact</td><td>High rate of file renames/modifications, shadow copy deletion</td></tr>
+        <tr><td>T1490</td><td>Inhibit System Recovery</td><td>vssadmin delete shadows, bcdedit /set recoveryenabled No</td></tr>
+      </table>
+    </div>
+
+    <!-- STATIC ANALYSIS -->
+    <div class="section" id="s-staticanalysis">
+      <h1><span class="h1-icon">🧬</span>Static Malware Analysis<span class="h1-tag">MALWARE</span></h1>
+      <div class="alert purple">Static analysis = examining the file without executing it. Safe to do on your analysis workstation.</div>
+      <h2>File Identification & Hashing</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Hash the sample
+md5sum sample.exe
+sha1sum sample.exe
+sha256sum sample.exe
+
+# File type identification
+file sample.exe
+exiftool sample.exe       # Metadata: compile time, author, version info
+TrID sample.exe           # Deeper file type analysis
+
+# PE header analysis
+pestudio sample.exe       # GUI — comprehensive PE analysis
+pecheck sample.exe        # CLI PE inspection
+
+# Check for packers / obfuscation
+peid sample.exe           # Packer detection
+Detect-It-Easy (DIE)      # Modern packer/crypter detection
+
+# Strings extraction
+strings sample.exe > strings.txt
+strings -el sample.exe >> strings.txt    # Unicode strings
+floss sample.exe > floss_output.txt      # FLOSS: deobfuscates stacked strings</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Strings Analysis — What to Look For</h2>
+      <table>
+        <tr><th>String Pattern</th><th>Indicates</th></tr>
+        <tr><td>http:// https:// ftp://</td><td>C2 communication, download URLs</td></tr>
+        <tr><td>IP addresses (regex: \d{1,3}\.\d{1,3}...)</td><td>Hardcoded C2 server</td></tr>
+        <tr><td>HKEY_*, SOFTWARE\, Run</td><td>Registry persistence</td></tr>
+        <tr><td>cmd.exe, powershell.exe, wscript</td><td>Shell execution</td></tr>
+        <tr><td>CreateRemoteThread, VirtualAlloc, WriteProcessMemory</td><td>Process injection APIs</td></tr>
+        <tr><td>WinCrypt, CryptEncrypt, AES, RC4</td><td>Encryption (ransomware / C2 comms)</td></tr>
+        <tr><td>IsDebuggerPresent, NtQueryInformationProcess</td><td>Anti-analysis / anti-sandbox</td></tr>
+        <tr><td>DeleteShadowCopies, vssadmin</td><td>Ransomware recovery prevention</td></tr>
+        <tr><td>Base64 encoded strings</td><td>Obfuscated payload/config</td></tr>
+        <tr><td>User-Agent strings, Accept:, Content-Type:</td><td>HTTP C2 communication</td></tr>
+      </table>
+      <h2>PE Analysis with Python</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code>import pefile
+import hashlib
+
+pe = pefile.PE("sample.exe")
+
+# Compile timestamp
+import datetime
+print("Compile time:", datetime.datetime.fromtimestamp(pe.FILE_HEADER.TimeDateStamp))
+
+# Imported functions (suspicious imports)
+suspicious_imports = [
+    'CreateRemoteThread','VirtualAllocEx','WriteProcessMemory',  # Injection
+    'CryptEncrypt','CryptDecrypt',                                # Encryption
+    'RegSetValueEx','RegCreateKeyEx',                            # Persistence
+    'InternetOpen','HttpSendRequest','URLDownloadToFile',        # Network
+    'IsDebuggerPresent','CheckRemoteDebuggerPresent',            # Anti-debug
+]
+
+print("\n[!] Suspicious Imports Found:")
+for entry in pe.DIRECTORY_ENTRY_IMPORT:
+    for imp in entry.imports:
+        if imp.name and imp.name.decode() in suspicious_imports:
+            print(f"  {entry.dll.decode()} -> {imp.name.decode()}")
+
+# Sections entropy (high entropy = packed/encrypted)
+print("\n[*] Section Entropy:")
+for section in pe.sections:
+    entropy = section.get_entropy()
+    flag = " ← HIGH (packed?)" if entropy > 7.0 else ""
+    print(f"  {section.Name.decode().strip(chr(0))}: {entropy:.2f}{flag}")</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>VirusTotal Intelligence (Beyond Basic Check)</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Full VT report via API
+curl "https://www.virustotal.com/api/v3/files/{sha256}" \
+  -H "x-apikey: YOUR_KEY" | jq '{
+    names: .data.attributes.names,
+    family: .data.attributes.popular_threat_classification,
+    sandbox: .data.attributes.sandbox_verdicts,
+    network: .data.attributes.network_infrastructure,
+    tags: .data.attributes.tags
+  }'
+
+# VT Graph — pivot to related infrastructure
+# https://www.virustotal.com/graph/  → search hash → expand network nodes
+
+# Check for related files by same signer / same imphash
+curl "https://www.virustotal.com/api/v3/files/{sha256}/similar_files" \
+  -H "x-apikey: YOUR_KEY"</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DYNAMIC ANALYSIS -->
+    <div class="section" id="s-dynamicanalysis">
+      <h1><span class="h1-icon">⚡</span>Dynamic / Behavioral Analysis<span class="h1-tag">MALWARE</span></h1>
+      <div class="alert red">⚠ Always run dynamic analysis in an ISOLATED sandbox VM. NEVER on production or connected systems.</div>
+      <h2>Sandbox Setup Checklist</h2>
+      <ul class="checklist">
+        <li>Isolated VM with no network access to production (host-only or isolated VLAN)</li>
+        <li>Snapshot taken BEFORE execution — roll back after each sample</li>
+        <li>Process Monitor (ProcMon), Process Hacker, Wireshark running before execution</li>
+        <li>Fake internet services: INetSim or FakeNet-NG to simulate C2 responses</li>
+        <li>Sysmon installed in VM for detailed telemetry</li>
+        <li>Disable Windows Defender (may quarantine before you capture behavior)</li>
+        <li>Set realistic computer/username (not "sandbox", "malware", "analysis")</li>
+      </ul>
+      <h2>Manual Dynamic Analysis Workflow</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Tools to run BEFORE executing the sample:
+procmon.exe /BackingFile C:\analysis\procmon.pml /Quiet /Minimized
+Start-Process wireshark -ArgumentList '-k -i Ethernet -w C:\analysis\capture.pcap'
+Start-Process "Process Hacker"
+
+# AFTER execution — collect artifacts:
+# 1. ProcMon: filter by process name → look for:
+#    - File system: new files, dropped payloads, config files
+#    - Registry: Run keys, service keys, AppInit
+#    - Network: TCP/UDP connections and DNS
+
+# 2. Process Hacker: note:
+#    - Injected processes (yellow highlight)
+#    - New network connections
+#    - Loaded DLLs vs baseline
+
+# 3. Wireshark: filter for malware traffic:
+wireshark_filter = "not arp and not icmp and not broadcast"
+# Look for: HTTP POST (exfil/C2), DNS lookups, TLS to unknown IPs</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Key Behavioral Indicators to Document</h2>
+      <table>
+        <tr><th>Category</th><th>What to Look For</th><th>Significance</th></tr>
+        <tr><td>Process Activity</td><td>New processes spawned, injection into legit processes</td><td>Execution chain, defense evasion</td></tr>
+        <tr><td>File Activity</td><td>Files dropped in Temp, AppData, System32</td><td>Dropped payloads, persistence</td></tr>
+        <tr><td>Registry Activity</td><td>Run keys, services, AppInit, browser extensions</td><td>Persistence mechanisms</td></tr>
+        <tr><td>Network Activity</td><td>DNS queries, HTTP/S connections, protocols used</td><td>C2 infrastructure</td></tr>
+        <tr><td>Anti-analysis</td><td>Sleep calls, VM checks, debugger checks, delay</td><td>Sandbox evasion techniques</td></tr>
+        <tr><td>Credential Access</td><td>LSASS access, registry access (SAM), browser data access</td><td>Credential theft</td></tr>
+      </table>
+      <h2>INetSim / FakeNet-NG — Simulate Network</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># INetSim — simulate all common internet services
+sudo inetsim --log-dir /var/log/inetsim/
+
+# FakeNet-NG (Windows-based, recommended for Windows malware)
+python FakeNet.py -l output_log.txt
+
+# After running: check logs for:
+# - C2 domains queried (DNS log)
+# - C2 URLs requested (HTTP log)
+# - Data sent by malware (POST body in HTTP log)
+# - Any custom protocol on non-standard ports (PCAP)</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- YARA -->
+    <div class="section" id="s-yara">
+      <h1><span class="h1-icon">🎯</span>YARA Rules<span class="h1-tag">DETECTION</span></h1>
+      <h2>YARA Rule Structure</h2>
+      <div class="code-wrap"><div class="code-label yara">YARA</div><pre><code>rule Detect_Emotet_Dropper {
+    meta:
+        author      = "SOC L2 - Your Name"
+        date        = "2024-01-15"
+        description = "Detects Emotet dropper based on string patterns and PE characteristics"
+        reference   = "INC-XXXXX"
+        severity    = "high"
+        tlp         = "amber"
+
+    strings:
+        // C2 communication strings
+        $s1 = "Content-Type: application/x-www-form-urlencoded" ascii
+        $s2 = "/wp-admin/" ascii wide
+        $s3 = "SoftwareUpdate" ascii wide nocase
+
+        // Suspicious API imports
+        $api1 = "VirtualAlloc" ascii
+        $api2 = "CreateRemoteThread" ascii
+        $api3 = "WriteProcessMemory" ascii
+
+        // Hex pattern: XOR decryption loop
+        $hex1 = { 8B 45 ?? 33 45 ?? 89 45 ?? 40 89 45 ?? }
+
+        // Base64 encoded string (partial)
+        $b64 = /[A-Za-z0-9+\/]{40,}={0,2}/
+
+    condition:
+        uint16(0) == 0x5A4D        // MZ header (PE file)
+        and filesize < 5MB
+        and (
+            (2 of ($s*) and 2 of ($api*))
+            or $hex1
+            or (all of ($api*))
+        )
+}</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Running YARA</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Scan single file
+yara rule.yar sample.exe
+
+# Scan directory recursively
+yara -r rules/ /path/to/scan/
+
+# Multiple rule files
+yara rule1.yar rule2.yar sample.exe
+
+# Scan running processes
+yara -p 8 rules/ $(ls /proc/*/exe 2>/dev/null)
+
+# Scan memory dump
+yara rules/ memory.dmp
+
+# With verbose output + all matches
+yara -s rules/ sample.exe     # Show matched strings
+
+# Compile rules for faster scanning
+yarac rules/*.yar compiled.rules
+yara compiled.rules /suspicious/</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>YARA Rule Best Practices</h2>
+      <ul>
+        <li>Use <code>nocase</code> for string matching where casing may vary</li>
+        <li>Use <code>wide</code> for Unicode strings in Windows binaries</li>
+        <li>Combine multiple weak indicators with <code>and</code> / <code>2 of</code> to reduce false positives</li>
+        <li>Always test against clean file sets before deploying</li>
+        <li>Include <code>filesize</code> constraints to limit scan scope</li>
+        <li>Include magic bytes check: <code>uint16(0) == 0x5A4D</code> for PE files</li>
+        <li>Version and document all rules in meta section</li>
+        <li>Link rules to incident ticket and MITRE technique IDs in meta</li>
+      </ul>
+    </div>
+
+    <!-- MEMORY FORENSICS -->
+    <div class="section" id="s-memoryforensics">
+      <h1><span class="h1-icon">🧠</span>Memory Forensics<span class="h1-tag">DFIR</span></h1>
+      <div class="alert blue">Memory forensics captures volatile data: running processes, network connections, encryption keys, injected code that leaves NO disk artifacts.</div>
+      <h2>Memory Acquisition</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Windows — Acquire memory with WinPmem
+winpmem_mini_x64_rc2.exe memory.raw
+
+# Windows — DumpIt (simple, fast)
+DumpIt.exe /O memory.raw
+
+# Windows — via WMI (remote acquisition)
+Invoke-Command -ComputerName TARGET -ScriptBlock { 
+  .\winpmem.exe C:\Temp\memory.raw 
+} -Credential $cred
+
+# Linux — LiME (Loadable Kernel Module)
+insmod lime-$(uname -r).ko "path=/tmp/memory.lime format=lime"
+
+# AWS EC2 — take snapshot then analyze
+aws ec2 create-snapshot --volume-id vol-xxx --description "IR Acquisition"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Volatility 3 — Core Commands</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Process list (compare to normal baseline)
+vol.py -f memory.raw windows.pslist
+
+# Process tree (spot suspicious parent-child)
+vol.py -f memory.raw windows.pstree
+
+# Hidden/injected processes (detects rootkit hiding)
+vol.py -f memory.raw windows.psscan      # Scan pool tags (bypasses EPROCESS hiding)
+
+# Network connections (find C2 connections in memory)
+vol.py -f memory.raw windows.netstat
+vol.py -f memory.raw windows.netscan
+
+# Injected code detection
+vol.py -f memory.raw windows.malfind     # Find injected memory regions
+
+# DLL list per process
+vol.py -f memory.raw windows.dlllist --pid 1234
+
+# Dump suspicious process to disk
+vol.py -f memory.raw windows.dumpfiles --pid 1234
+
+# Command history (find attacker commands)
+vol.py -f memory.raw windows.cmdline
+vol.py -f memory.raw windows.consoles    # Full console history
+
+# Registry hives in memory
+vol.py -f memory.raw windows.registry.hivelist
+vol.py -f memory.raw windows.registry.printkey --key "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
+
+# Extract credentials from LSASS
+vol.py -f memory.raw windows.lsadump
+# OR: use Mimikatz offline on LSASS dump:
+sekurlsa::minidump lsass.dmp
+sekurlsa::logonpasswords</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Malware in Memory — What to Look For</h2>
+      <table>
+        <tr><th>Finding</th><th>Tool/Plugin</th><th>Significance</th></tr>
+        <tr><td>RWX memory regions in process</td><td>malfind</td><td>Classic shellcode injection indicator</td></tr>
+        <tr><td>Process with no parent (PPID spoofing)</td><td>pstree</td><td>Parent process ID spoofing technique</td></tr>
+        <tr><td>Process in psscan but NOT pslist</td><td>psscan vs pslist diff</td><td>Rootkit hiding running process</td></tr>
+        <tr><td>svchost with no parent svchost/services.exe</td><td>pstree</td><td>Malware masquerading as svchost</td></tr>
+        <tr><td>Unexpected network conn from system process</td><td>netscan</td><td>Process hollowing / injection</td></tr>
+        <tr><td>Injected PE in process memory</td><td>malfind → dump → analyze</td><td>Reflective DLL injection</td></tr>
+      </table>
+    </div>
+
+    <!-- PCAP ANALYSIS -->
+    <div class="section" id="s-pcap">
+      <h1><span class="h1-icon">📦</span>PCAP Analysis<span class="h1-tag">NETWORK FORENSICS</span></h1>
+      <h2>Wireshark — Key Filters</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Basic filters
+ip.addr == 1.2.3.4                    # All traffic to/from IP
+ip.src == 1.2.3.4 && ip.dst == 5.6.7.8  # Between two IPs
+tcp.port == 4444                      # Specific port
+http                                  # HTTP only
+dns                                   # DNS only
+ssl || tls                            # Encrypted traffic
+
+# Find POST requests (exfiltration / C2 check-in)
+http.request.method == "POST"
+
+# Large data transfers (exfiltration)
+tcp.len > 10000
+
+# Detect beaconing (regular interval connections)
+# Use Statistics → Conversations → sort by bytes
+
+# DNS with very long names (DNS tunneling)
+dns.qry.name.len > 50
+
+# Non-standard SSL ports (C2 over HTTPS)
+ssl && not (tcp.port == 443 || tcp.port == 8443)
+
+# Follow TCP stream: right-click packet → Follow → TCP Stream
+# Look at stream content for: credentials, C2 commands, exfil data</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>tshark — CLI PCAP Analysis</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Extract all HTTP hosts
+tshark -r capture.pcap -Y "http" -T fields -e http.host | sort | uniq -c | sort -rn
+
+# Extract all DNS queries
+tshark -r capture.pcap -Y "dns.flags.response == 0" -T fields -e dns.qry.name | sort | uniq
+
+# Extract all IPs with connection count
+tshark -r capture.pcap -T fields -e ip.dst | sort | uniq -c | sort -rn | head -20
+
+# Extract HTTP POST data
+tshark -r capture.pcap -Y "http.request.method==POST" -T fields \
+  -e ip.src -e ip.dst -e http.host -e http.request.uri -e http.file_data
+
+# Detect beaconing — connections to same IP at regular intervals
+tshark -r capture.pcap -T fields -e frame.time_epoch -e ip.dst -e tcp.dstport \
+  -Y "ip.dst == 1.2.3.4" | awk '{print $1}' | awk 'NR>1{printf "%.2f\n",$1-prev} {prev=$1}'
+
+# Extract files from PCAP
+tshark -r capture.pcap --export-objects http,extracted_files/
+# For SMB: tshark -r capture.pcap --export-objects smb,extracted_files/</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>NetworkMiner — Passive Forensics</h2>
+      <div class="alert green">NetworkMiner automatically extracts files, images, credentials, and host information from PCAP files. Great for quick triage.</div>
+      <table>
+        <tr><th>Tab</th><th>What You Find</th></tr>
+        <tr><td>Hosts</td><td>All IPs, OS fingerprint, open ports seen</td></tr>
+        <tr><td>Files</td><td>All files extracted (executables, documents, images)</td></tr>
+        <tr><td>Images</td><td>All images transferred — useful for spotting steganography</td></tr>
+        <tr><td>Credentials</td><td>Cleartext credentials (HTTP Basic, FTP, Telnet)</td></tr>
+        <tr><td>DNS</td><td>All DNS lookups and responses</td></tr>
+        <tr><td>Parameters</td><td>HTTP POST parameters — form submissions, login attempts</td></tr>
+      </table>
+    </div>
+
+    <!-- C2 ANALYSIS -->
+    <div class="section" id="s-c2analysis">
+      <h1><span class="h1-icon">📡</span>C2 Detection & Analysis<span class="h1-tag">ADVANCED</span></h1>
+      <h2>Common C2 Frameworks — Detection Signatures</h2>
+      <table>
+        <tr><th>Framework</th><th>Default Indicators</th><th>Detection Method</th></tr>
+        <tr><td>Cobalt Strike</td><td>Default beacon ports (80,443), malleable C2 profiles, JARM fingerprint, x64 shellcode patterns</td><td>JARM scan, CS beacon YARA, network flow analysis</td></tr>
+        <tr><td>Metasploit</td><td>Ports 4444/443/8443, Meterpreter HTTPS cert (self-signed), staged payloads</td><td>TLS cert fingerprint, Meterpreter YARA, default user-agent</td></tr>
+        <tr><td>Sliver</td><td>mTLS/WireGuard/HTTP transport, implant naming patterns</td><td>TLS fingerprint, Sliver implant YARA</td></tr>
+        <tr><td>Brute Ratel</td><td>HTTPS with custom profiles, process injection techniques</td><td>Memory YARA, behavioral analysis</td></tr>
+        <tr><td>Havoc</td><td>Custom HTTP/HTTPS C2, agent-specific patterns</td><td>Memory forensics, network anomaly</td></tr>
+        <tr><td>Empire / Starkiller</td><td>PowerShell agents, HTTP/HTTPS communication, specific user-agents</td><td>PS script block logging, network anomaly</td></tr>
+      </table>
+      <h2>Cobalt Strike Detection</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># JARM fingerprinting — CS has known JARM hashes
+# Tool: https://github.com/salesforce/jarm
+python3 jarm.py suspicious-ip.com:443
+
+# Known CS JARM fingerprints:
+# 07d14d16d21d21d07c42d41d00041d24a458a375eef0c576d23a7bab9a9fb1
+
+# Check for CS default HTTP indicators
+# CS default malleable C2 profile sends:
+#   GET /ca → beacon check-in
+#   POST /submit.php → data submission
+# Look in proxy/HTTP logs for these patterns
+
+# CS beacon config extraction (from memory dump)
+# https://github.com/Te-k/cobaltstrike
+python cs-decrypt-traffic.py --key keyfile.pem --pcap capture.pcap
+
+# Beacon config extraction via YARA
+yara cs_beacon_config.yar memory_dump.bin</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Beaconing Detection — Statistical Approach</h2>
+      <div class="code-wrap"><div class="code-label splunk">SPLUNK SPL</div><pre><code># Detect beaconing using standard deviation of connection intervals
+index=network
+| sort src_ip, dest_ip, _time
+| streamstats window=20 range(_time) as time_range, stdev(_time) as time_stdev by src_ip, dest_ip
+| eval jitter_ratio = time_stdev / (time_range/20)
+| where jitter_ratio < 0.1 AND mvcount(split(dest_ip,",")) < 2
+| stats count, avg(time_range) as avg_interval, avg(jitter_ratio) as avg_jitter by src_ip, dest_ip
+| where count > 10
+| sort avg_jitter</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- DFIR WINDOWS -->
+    <div class="section" id="s-dfir">
+      <h1><span class="h1-icon">💾</span>DFIR — Windows<span class="h1-tag">FORENSICS</span></h1>
+      <h2>Live Response Collection</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code># Collect volatile data FIRST (before any other action)
+$output = "C:\IR\$(hostname)_$(Get-Date -f 'yyyyMMdd_HHmmss')"
+New-Item -ItemType Directory -Path $output -Force
+
+# System info
+systeminfo > "$output\systeminfo.txt"
+Get-Date >> "$output\systeminfo.txt"
+
+# Running processes with full paths
+Get-Process | Select-Object Name,Id,Path,CPU,WorkingSet,StartTime |
+  Export-Csv "$output\processes.csv" -NoTypeInformation
+
+# Network connections
+netstat -anob > "$output\netstat.txt"
+Get-NetTCPConnection | Export-Csv "$output\tcp_connections.csv" -NoTypeInformation
+
+# Autorun / persistence locations
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run > "$output\run_keys.txt"
+reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run >> "$output\run_keys.txt"
+Get-ScheduledTask | Where-Object State -ne 'Disabled' |
+  Export-Csv "$output\scheduled_tasks.csv" -NoTypeInformation
+
+# Logged-in users and recent logins
+query user > "$output\logged_in_users.txt"
+Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4624; StartTime=(Get-Date).AddDays(-1)} |
+  Export-Csv "$output\recent_logins.csv" -NoTypeInformation
+
+# Loaded drivers (rootkit check)
+Get-WmiObject Win32_SystemDriver | Where-Object State -eq 'Running' |
+  Export-Csv "$output\drivers.csv" -NoTypeInformation</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Disk Forensics — Key Locations</h2>
+      <table>
+        <tr><th>Location</th><th>Artifact</th><th>Significance</th></tr>
+        <tr><td>C:\Windows\Prefetch\</td><td>Prefetch files (.pf)</td><td>Programs executed — even if deleted</td></tr>
+        <tr><td>C:\Windows\System32\winevt\Logs\</td><td>Event log files (.evtx)</td><td>Full Windows event history</td></tr>
+        <tr><td>%APPDATA%\Microsoft\Windows\Recent\</td><td>LNK shortcut files</td><td>Recently opened files/folders</td></tr>
+        <tr><td>C:\Users\*\NTUSER.DAT</td><td>User registry hive</td><td>User activity, application usage, MRU lists</td></tr>
+        <tr><td>C:\Windows\System32\config\</td><td>SAM, SYSTEM, SECURITY hives</td><td>Credentials, configuration, security policy</td></tr>
+        <tr><td>%TEMP%, %APPDATA%</td><td>Dropped malware files</td><td>Malware staging location</td></tr>
+        <tr><td>$MFT (Master File Table)</td><td>All file metadata</td><td>File creation/modification times, deleted files</td></tr>
+        <tr><td>$LogFile, $UsnJrnl</td><td>File system journal</td><td>Detailed file activity history</td></tr>
+        <tr><td>C:\Windows\System32\Tasks\</td><td>Scheduled task XML files</td><td>Persistence — task definitions</td></tr>
+        <tr><td>C:\Users\*\AppData\Local\Google\Chrome\User Data\Default\</td><td>Browser history, credentials</td><td>User activity, stolen credentials</td></tr>
+      </table>
+      <h2>Timeline Analysis with Plaso</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Collect and parse all artifacts into a super timeline
+log2timeline.py plaso.db /evidence/
+
+# Filter and export to CSV
+psort.py -o l2tcsv -w timeline.csv plaso.db
+
+# Filter by time range
+psort.py -o l2tcsv -w timeline.csv plaso.db \
+  "date > '2024-01-15 12:00:00' AND date < '2024-01-15 18:00:00'"
+
+# Filter for specific artifacts
+psort.py -o l2tcsv -w timeline.csv plaso.db \
+  "source_short CONTAINS 'EVTX' OR source_short CONTAINS 'PREFETCH'"</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- LINUX FORENSICS -->
+    <div class="section" id="s-linuxforensics">
+      <h1><span class="h1-icon">🐧</span>DFIR — Linux<span class="h1-tag">FORENSICS</span></h1>
+      <h2>Linux Live Response</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code">#!/bin/bash
+OUTPUT="/tmp/ir_$(hostname)_$(date +%Y%m%d_%H%M%S)"
+mkdir -p $OUTPUT
+
+# System info
+date > $OUTPUT/timestamp.txt
+uname -a > $OUTPUT/system_info.txt
+uptime >> $OUTPUT/system_info.txt
+who >> $OUTPUT/system_info.txt
+
+# Running processes (full command lines)
+ps auxwwf > $OUTPUT/processes.txt
+ls -la /proc/*/exe 2>/dev/null > $OUTPUT/proc_exe.txt
+
+# Network connections
+netstat -antp > $OUTPUT/netstat.txt
+ss -tulpn > $OUTPUT/ss_output.txt
+ip route > $OUTPUT/routes.txt
+
+# Cron jobs
+crontab -l > $OUTPUT/crontab_root.txt 2>/dev/null
+cat /etc/crontab >> $OUTPUT/crontab_root.txt
+ls -la /etc/cron* >> $OUTPUT/crontab_root.txt
+
+# Persistence locations
+systemctl list-units --type=service --state=running > $OUTPUT/services.txt
+ls -la /etc/systemd/system/ >> $OUTPUT/services.txt
+
+# Auth logs
+cp /var/log/auth.log $OUTPUT/ 2>/dev/null
+cp /var/log/secure $OUTPUT/ 2>/dev/null
+
+# Recently modified files (last 24h)
+find /etc /bin /sbin /usr/bin /usr/sbin /tmp /var/tmp -newer /tmp/timestamp.txt \
+  -type f 2>/dev/null > $OUTPUT/recently_modified.txt
+
+# SUID files
+find / -perm -4000 -type f 2>/dev/null > $OUTPUT/suid_files.txt
+
+# Network listening services
+ss -tlnp > $OUTPUT/listening_ports.txt
+
+# Bash history for all users
+for user in $(cut -d: -f1 /etc/passwd); do
+  histfile=$(eval echo ~$user/.bash_history)
+  [ -f "$histfile" ] && echo "=== $user ===" >> $OUTPUT/bash_history.txt && cat $histfile >> $OUTPUT/bash_history.txt
+done
+
+echo "Collection complete: $OUTPUT"</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Linux Persistence Locations</h2>
+      <table>
+        <tr><th>Location</th><th>Purpose</th><th>Attacker Use</th></tr>
+        <tr><td>/etc/crontab, /etc/cron.*</td><td>System cron jobs</td><td>Persistent cron backdoor</td></tr>
+        <tr><td>/var/spool/cron/crontabs/</td><td>User cron jobs</td><td>User-level persistence</td></tr>
+        <tr><td>/etc/init.d/, /etc/rc.local</td><td>Init scripts</td><td>Backdoor in startup script</td></tr>
+        <tr><td>/etc/systemd/system/</td><td>Systemd services</td><td>Malicious systemd service</td></tr>
+        <tr><td>~/.bashrc, ~/.bash_profile</td><td>Shell initialization</td><td>Code execution on shell start</td></tr>
+        <tr><td>/etc/profile.d/</td><td>Global shell init</td><td>Code execution for all users</td></tr>
+        <tr><td>~/.ssh/authorized_keys</td><td>SSH public keys</td><td>Attacker adds own SSH key</td></tr>
+        <tr><td>/etc/ld.so.preload</td><td>Library preloading</td><td>Rootkit — intercept all syscalls</td></tr>
+        <tr><td>/etc/passwd, /etc/shadow</td><td>User accounts</td><td>Add backdoor user (uid=0)</td></tr>
+      </table>
+    </div>
+
+    <!-- FORENSIC ARTIFACTS -->
+    <div class="section" id="s-artifacts">
+      <h1><span class="h1-icon">🗂️</span>Forensic Artifacts<span class="h1-tag">EVIDENCE</span></h1>
+      <h2>Windows Artifacts Quick Reference</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code># Parse Prefetch (execution evidence) with PECmd
+PECmd.exe -d C:\Windows\Prefetch\ --csv output_dir\
+
+# Parse Registry (NTUSER.DAT) — find recently run programs
+RECmd.exe --hive C:\Users\user\NTUSER.DAT --kn "SOFTWARE\Microsoft\Windows\CurrentVersion\Run" --csv output_dir\
+
+# Parse Browser history
+BrowsingHistoryView.exe /shtml history.html
+
+# Parse LNK files (recently opened files)
+LECmd.exe -d C:\Users\user\AppData\Roaming\Microsoft\Windows\Recent\ --csv output_dir\
+
+# Parse SRUM (System Resource Usage Monitor — tracks all processes + network)
+SrumECmd.exe -f C:\Windows\System32\sru\SRUDB.dat --csv output_dir\
+
+# Parse $MFT (Master File Table)
+MFTECmd.exe -f 'C:\$MFT' --csv output_dir\
+
+# Parse $UsnJrnl (file activity journal)
+MFTECmd.exe -f 'C:\$Extend\$J' --csv output_dir\ --csvf usnjrnl.csv</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Evidence Chain of Custody</h2>
+      <ul class="checklist">
+        <li>Document acquisition time, method, and tool used with version</li>
+        <li>Hash acquired image immediately (MD5 + SHA256) and record hashes</li>
+        <li>Never analyze original evidence — always work from copies</li>
+        <li>Document every tool run against evidence and its output</li>
+        <li>Store evidence in access-controlled location</li>
+        <li>Record who accessed evidence and when (chain of custody log)</li>
+      </ul>
+    </div>
+
+    <!-- THREAT HUNTING -->
+    <div class="section" id="s-hunting">
+      <h1><span class="h1-icon">🏹</span>Threat Hunting<span class="h1-tag">PROACTIVE</span></h1>
+      <div class="alert purple">Threat hunting is proactive — you're looking for threats that evaded automated detection. Start with a hypothesis, not a specific alert.</div>
+      <h2>Hunting Methodology</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Form Hypothesis</div><div class="step-desc">Based on threat intel, recent incidents, or ATT&CK techniques. e.g., "Attackers are using WMI for persistence in our environment."</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Identify Data Sources</div><div class="step-desc">What logs do you need? Process creation, registry, WMI activity, network flows? Confirm data availability.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build Hunt Queries</div><div class="step-desc">Write SIEM queries to surface anomalies related to your hypothesis. Focus on rare or unusual patterns.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Analyze Results</div><div class="step-desc">Investigate outliers. Establish baselines. Eliminate known-good. Focus on unexplained activity.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Document Findings</div><div class="step-desc">Even negative hunts are valuable — document what you ruled out. If malicious found → create incident.</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><div class="step-title">Create Detection Rule</div><div class="step-desc">Turn successful hunt into automated detection rule so it's caught automatically next time.</div></div></div>
+      </div>
+      <h2>Hunt Queries — Advanced</h2>
+      <div class="code-wrap"><div class="code-label splunk">SPLUNK SPL</div><pre><code># Hunt: Rare processes (low frequency = unusual = suspicious)
+index=windows EventCode=4688
+| stats count by NewProcessName
+| where count < 5
+| sort count
+
+# Hunt: Processes running from suspicious paths
+index=windows EventCode=4688
+| eval suspicious_path = case(
+    match(NewProcessName, "(?i)\\\\(temp|tmp|appdata|programdata|users\\\\public)\\\\.*\\.exe"), "YES",
+    match(NewProcessName, "(?i)\\\\windows\\\\(fonts|help|cursors|media)\\\\.*\\.exe"), "YES",
+    1=1, "NO")
+| where suspicious_path = "YES"
+| table _time, host, user, NewProcessName, CommandLine
+
+# Hunt: Lateral movement via admin shares
+index=windows EventCode=5140
+| where ShareName IN ("\\\\*\\C$", "\\\\*\\ADMIN$", "\\\\*\\IPC$")
+| where SubjectUserName != "SYSTEM" AND SubjectUserName != "LOCAL SERVICE"
+| stats count by SubjectUserName, IpAddress, ShareName
+| sort -count
+
+# Hunt: Unusual PowerShell module imports
+index=windows EventCode=4104
+| regex ScriptBlockText="(?i)(Import-Module|ipmo)\s+(?!(Microsoft|posh|PS|AzureAD))"
+| stats count, values(ScriptBlockText) by host, user
+| sort -count</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- HUNT HYPOTHESES -->
+    <div class="section" id="s-hypotheses">
+      <h1><span class="h1-icon">💡</span>Hunt Hypotheses Library<span class="h1-tag">HUNTING</span></h1>
+      <h2>High-Value Hunt Hypotheses</h2>
+      <table>
+        <tr><th>Hypothesis</th><th>ATT&CK</th><th>Data Source Needed</th></tr>
+        <tr><td>Attackers are living off the land (LOLBins) to evade AV</td><td>T1218</td><td>Process creation logs (4688)</td></tr>
+        <tr><td>Credentials are being harvested from LSASS via tools other than Mimikatz</td><td>T1003.001</td><td>Sysmon Event 10</td></tr>
+        <tr><td>Attackers are using scheduled tasks for persistence in non-standard paths</td><td>T1053.005</td><td>Security Event 4698, Task XML files</td></tr>
+        <tr><td>C2 traffic is hiding in allowed HTTPS to cloud providers</td><td>T1071.001</td><td>Proxy logs, NetFlow, DNS</td></tr>
+        <tr><td>Lateral movement is occurring via WMI not SMB (evades some detections)</td><td>T1047</td><td>WMI activity log, 4688</td></tr>
+        <tr><td>Attackers are using DLL search order hijacking in common app directories</td><td>T1574.001</td><td>Sysmon Event 7 (ImageLoad)</td></tr>
+        <tr><td>Malware is using DNS as C2 channel (DNS tunneling)</td><td>T1071.004</td><td>DNS query logs</td></tr>
+        <tr><td>Accounts are being used outside business hours (insider or compromised)</td><td>T1078</td><td>Auth logs (4624)</td></tr>
+        <tr><td>Service accounts are being used interactively (compromise indicator)</td><td>T1078.002</td><td>Auth logs (4624 LogonType 2/10)</td></tr>
+        <tr><td>Ransomware staging — shadow copy deletion before encryption</td><td>T1490</td><td>Process creation, WMI activity</td></tr>
+      </table>
+    </div>
+
+    <!-- SIGMA RULES -->
+    <div class="section" id="s-sigma">
+      <h1><span class="h1-icon">Σ</span>Sigma Rules<span class="h1-tag">DETECTION ENG</span></h1>
+      <h2>Sigma Rule Format</h2>
+      <div class="code-wrap"><div class="code-label sigma">SIGMA</div><pre><code>title: Suspicious PowerShell Encoded Command
+id: 12345678-1234-1234-1234-123456789abc
+status: experimental
+description: Detects PowerShell execution with encoded command parameter — common in malware delivery
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+    - https://github.com/SigmaHQ/sigma
+author: SOC L2 - Your Name
+date: 2024/01/15
+modified: 2024/01/15
+tags:
+    - attack.execution
+    - attack.t1059.001
+    - attack.defense_evasion
+    - attack.t1027
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith:
+            - '\powershell.exe'
+            - '\pwsh.exe'
+        CommandLine|contains:
+            - '-EncodedCommand'
+            - '-enc '
+            - '-ec '
+    filter_admin:
+        # Exclude known legitimate admin tools
+        ParentImage|contains:
+            - '\Microsoft\ConfigMgr'
+            - '\Tanium'
+    condition: selection and not filter_admin
+fields:
+    - CommandLine
+    - ParentImage
+    - User
+falsepositives:
+    - Legitimate admin scripts using encoded commands
+    - Configuration management tools (SCCM, Tanium)
+level: high</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Converting Sigma to SIEM Queries</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Install sigmac (sigma converter)
+pip install sigmatools
+
+# Convert to Splunk
+sigmac -t splunk rules/windows/process_creation/ps_encoded_command.yml
+
+# Convert to Elasticsearch/ELK
+sigmac -t es-qs rules/windows/process_creation/ps_encoded_command.yml
+
+# Convert to Microsoft Sentinel KQL
+sigmac -t sentinel rules/windows/process_creation/ps_encoded_command.yml
+
+# Convert to QRadar AQL
+sigmac -t qradar rules/windows/process_creation/ps_encoded_command.yml
+
+# Bulk convert all rules
+find sigma_rules/ -name "*.yml" | xargs -I{} sigmac -t splunk {} >> all_splunk_rules.conf
+
+# Use sigma-cli (newer tool)
+sigma convert -t splunk rules/windows/process_creation/ps_encoded_command.yml</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- IR LEAD -->
+    <div class="section" id="s-ir-lead">
+      <h1><span class="h1-icon">🚨</span>IR Lead Responsibilities<span class="h1-tag">INCIDENT RESPONSE</span></h1>
+      <div class="alert red">As IR Lead, you are responsible for the entire incident lifecycle. Document everything. Communicate clearly. Make decisions with available information.</div>
+      <h2>IR Lead Checklist — P1 Incident</h2>
+      <ul class="checklist">
+        <li>Confirm P1 severity — validate L1's assessment independently</li>
+        <li>Activate incident response — notify stakeholders per comms plan</li>
+        <li>Assign roles: IR Lead, Forensics, Comms, Documentation</li>
+        <li>Establish war room / incident bridge (Teams/Slack/call)</li>
+        <li>Direct L1 to execute approved containment actions immediately</li>
+        <li>Begin timeline reconstruction — establish T0 (first attacker footprint)</li>
+        <li>Conduct blast radius assessment — all affected assets identified</li>
+        <li>Maintain running timeline document (shared, real-time)</li>
+        <li>Regular status updates to management (every 30–60 min for P1)</li>
+        <li>Make containment/eradication decisions with risk assessment</li>
+        <li>Coordinate with Legal/Compliance for breach notification requirements</li>
+        <li>Call in L3 for advanced forensics if needed</li>
+        <li>Declare incident closed when: threat removed, systems clean, monitoring confirmed</li>
+        <li>Schedule post-incident review within 5 business days</li>
+      </ul>
+      <h2>Incident Communication Cadence</h2>
+      <table>
+        <tr><th>Incident Phase</th><th>Update Frequency</th><th>Audience</th></tr>
+        <tr><td>Active P1 (first hour)</td><td>Every 15-30 minutes</td><td>IR Team + Management + CISO</td></tr>
+        <tr><td>Active P1 (after first hour)</td><td>Every 60 minutes</td><td>Management + CISO</td></tr>
+        <tr><td>Active P2</td><td>Every 2-4 hours</td><td>IR Team + Manager</td></tr>
+        <tr><td>Containment achieved</td><td>Immediate + then daily</td><td>All stakeholders</td></tr>
+        <tr><td>Incident closed</td><td>Final report within 5 days</td><td>All stakeholders + Legal</td></tr>
+      </table>
+    </div>
+
+    <!-- CONTAINMENT -->
+    <div class="section" id="s-containment">
+      <h1><span class="h1-icon">🛑</span>Advanced Containment<span class="h1-tag">IR</span></h1>
+      <h2>Containment Strategy Selection</h2>
+      <table>
+        <tr><th>Scenario</th><th>Containment Strategy</th><th>Risk</th></tr>
+        <tr><td>Single host compromise, no lateral movement</td><td>Isolate host via EDR immediately</td><td>Low — contained scope</td></tr>
+        <tr><td>Lateral movement across multiple hosts</td><td>Isolate all affected hosts simultaneously</td><td>Business impact — coordinate with IT</td></tr>
+        <tr><td>Compromised domain admin account</td><td>Disable account, reset password, revoke all tokens, audit all actions</td><td>May break services using that account</td></tr>
+        <tr><td>Active ransomware spreading</td><td>VLAN isolation of entire affected segment</td><td>High business impact — escalate for approval</td></tr>
+        <tr><td>Supply chain compromise (vendor tool)</td><td>Block vendor tool's network access, alert vendor</td><td>Breaks dependent workflows</td></tr>
+        <tr><td>Insider threat</td><td>Covert monitoring before tipping off (legal advice first)</td><td>Legal — consult HR and Legal before action</td></tr>
+      </table>
+      <h2>Network Containment</h2>
+      <div class="code-wrap"><div class="code-label bash">BASH</div><pre><code># Block IP at firewall (Palo Alto via API)
+curl -k "https://PA-IP/api/?type=config&action=set&xpath=/config/devices/entry/vsys/entry/address&element=<entry name='BLOCK_IP'><ip-netmask>1.2.3.4/32</ip-netmask></entry>" \
+  --data-urlencode "key=YOUR_API_KEY"
+
+# Add to blocked URL category (PAN-OS)
+curl -k "https://PA-IP/api/?type=config&action=set&xpath=/config/devices/entry/vsys/entry/profiles/custom-url-category/entry[@name='BLOCKED']&element=<list><member>evil.com</member></list>" \
+  --data-urlencode "key=YOUR_API_KEY"
+
+# Windows — block IP via Windows Firewall
+New-NetFirewallRule -DisplayName "BLOCK_C2" -Direction Outbound -RemoteAddress "1.2.3.4" -Action Block
+New-NetFirewallRule -DisplayName "BLOCK_C2_IN" -Direction Inbound -RemoteAddress "1.2.3.4" -Action Block
+
+# Windows — isolate host via Windows Firewall (full isolation)
+# Allow only management traffic (your IR workstation IP)
+netsh advfirewall set allprofiles firewallpolicy blockinbound,blockoutbound
+netsh advfirewall firewall add rule name="IR_Allow" dir=in action=allow remoteip=10.10.10.100
+netsh advfirewall firewall add rule name="IR_Allow_Out" dir=out action=allow remoteip=10.10.10.100</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- ERADICATION -->
+    <div class="section" id="s-eradication">
+      <h1><span class="h1-icon">🧹</span>Eradication & Recovery<span class="h1-tag">IR</span></h1>
+      <h2>Eradication Checklist</h2>
+      <ul class="checklist">
+        <li>All malware files identified and removed (or hosts rebuilt from clean image)</li>
+        <li>All persistence mechanisms removed: scheduled tasks, registry keys, services, SSH keys, cron jobs</li>
+        <li>All compromised credentials reset: passwords changed, tokens revoked, API keys rotated</li>
+        <li>All attacker-created accounts disabled and removed</li>
+        <li>Vulnerabilities used for initial access patched or mitigated</li>
+        <li>Lateral movement paths closed (firewall rules, SMB disabled where not needed)</li>
+        <li>C2 infrastructure blocked at all perimeter points (firewall, DNS, proxy)</li>
+        <li>IOCs deployed to all detection tools (SIEM, EDR, YARA, firewall)</li>
+        <li>Verify eradication: re-run threat hunt queries to confirm no remaining evidence</li>
+      </ul>
+      <h2>Recovery Verification</h2>
+      <div class="code-wrap"><div class="code-label ps">POWERSHELL</div><pre><code># Verify no persistence remains on Windows
+# Scheduled tasks
+Get-ScheduledTask | Where-Object { $_.TaskPath -notlike "\Microsoft\*" } | 
+  Select-Object TaskName, TaskPath, State | Format-Table
+
+# Registry run keys
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+reg query HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce
+
+# Services not from Microsoft
+Get-Service | Where-Object { $_.Status -eq 'Running' } |
+  ForEach-Object {
+    $path = (Get-WmiObject Win32_Service -Filter "Name='$($_.Name)'").PathName
+    [PSCustomObject]@{ Name=$_.Name; Path=$path }
+  } | Where-Object { $_.Path -notlike "*system32*" -and $_.Path -notlike "*SysWOW64*" }
+
+# Open network connections (verify no C2 remains)
+Get-NetTCPConnection -State Established | 
+  Where-Object { $_.RemoteAddress -ne '0.0.0.0' -and $_.RemoteAddress -ne '::' } |
+  Select-Object LocalPort, RemoteAddress, RemotePort, OwningProcess,
+    @{N='Process';E={(Get-Process -Id $_.OwningProcess -EA SilentlyContinue).Name}}</code><button class="copy-btn">COPY</button></pre></div>
+      <h2>Post-Incident Monitoring</h2>
+      <div class="alert green">After recovery: monitor intensively for 30 days. Attackers often return to environments they know are exploitable.</div>
+      <ul>
+        <li>Create specific detection rules for the TTPs used in this incident</li>
+        <li>Set up enhanced logging on recovered hosts for 30 days</li>
+        <li>Watch for same IOCs (IPs, domains, hashes) across the entire environment</li>
+        <li>Monitor affected user accounts for unusual activity</li>
+        <li>Schedule vulnerability scan to confirm patching is complete</li>
+      </ul>
+    </div>
+
+    <!-- IOC SHARING -->
+    <div class="section" id="s-ioc-sharing">
+      <h1><span class="h1-icon">🔄</span>IOC Sharing & MISP<span class="h1-tag">THREAT INTEL</span></h1>
+      <h2>MISP — L2 Workflow</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Create Event</div><div class="step-desc">New event for each significant incident or threat campaign. Set distribution, TLP, and threat level.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Add Attributes (IOCs)</div><div class="step-desc">Add all IOCs with type: ip-dst, domain, url, md5, sha256, email-src. Tag with MITRE ATT&CK techniques.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Correlate</div><div class="step-desc">Use MISP correlation to find if IOCs match other events. Discover campaign patterns across incidents.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Export to SIEM</div><div class="step-desc">Push IOCs to SIEM watchlist, firewall blocklist, EDR, and email gateway automatically via MISP feeds.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Share (if permitted)</div><div class="step-desc">Share with trusted ISAC/community under appropriate TLP. Contributes to community defense.</div></div></div>
+      </div>
+      <h2>MISP API — Automate IOC Ingestion</h2>
+      <div class="code-wrap"><div class="code-label python">PYTHON</div><pre><code">from pymisp import PyMISP, MISPEvent, MISPAttribute
+
+misp = PyMISP('https://your-misp.com', 'YOUR_API_KEY', ssl=True)
+
+# Create new event from incident
+event = MISPEvent()
+event.info = f"INC-XXXXX — Cobalt Strike C2 Campaign"
+event.distribution = 1         # This organisation only
+event.threat_level_id = 1     # High
+event.analysis = 2            # Completed
+event.add_tag('tlp:amber')
+event.add_tag('misp-galaxy:mitre-attack-pattern="Command and Scripting Interpreter - T1059"')
+
+# Add IOCs
+iocs = [
+    ('ip-dst', '1.2.3.4', 'C2 server'),
+    ('domain', 'evil-c2.com', 'C2 domain'),
+    ('sha256', 'abc123...', 'Cobalt Strike beacon'),
+    ('url', 'https://evil-c2.com/payload', 'Payload URL'),
+]
+
+for ioc_type, value, comment in iocs:
+    attr = MISPAttribute()
+    attr.type = ioc_type
+    attr.value = value
+    attr.comment = comment
+    attr.to_ids = True        # Use for detection
+    event.add_attribute(**attr)
+
+result = misp.add_event(event)
+print(f"Event created: {result['Event']['uuid']}")</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- TUNING -->
+    <div class="section" id="s-tuning">
+      <h1><span class="h1-icon">⚙️</span>Alert Tuning & FP Reduction<span class="h1-tag">DETECTION ENG</span></h1>
+      <h2>FP Analysis Approach</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Collect FP Data</div><div class="step-desc">Gather all false positives from L1 tickets over the past 30 days. Group by rule ID. Identify the top 5 noisy rules.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Root Cause Analysis</div><div class="step-desc">For each noisy rule: why is it firing on benign activity? Is the logic too broad? Is there a legitimate use case generating noise?</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Build Exclusions</div><div class="step-desc">Add targeted exclusions: specific user, host, process, or subnet. Never exclude broadly (e.g., entire domain) without risk assessment.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Test Before Deploying</div><div class="step-desc">Run exclusion logic against 30 days of historical data. Confirm it removes FPs but doesn't eliminate TPs.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Document Everything</div><div class="step-desc">Every tuning change documented: what was changed, why, who approved, date, and risk accepted.</div></div></div>
+      </div>
+      <h2>SIEM Rule Quality Metrics</h2>
+      <table>
+        <tr><th>Metric</th><th>Formula</th><th>Target</th></tr>
+        <tr><td>False Positive Rate</td><td>FPs / Total Alerts × 100</td><td>&lt; 10%</td></tr>
+        <tr><td>Signal-to-Noise Ratio</td><td>TPs / Total Alerts × 100</td><td>&gt; 90%</td></tr>
+        <tr><td>Detection Coverage</td><td>Detected TTPs / Known TTPs × 100</td><td>Maximize</td></tr>
+        <tr><td>MTTD (Mean Time to Detect)</td><td>Avg time from attack start to alert</td><td>Minimize</td></tr>
+        <tr><td>Alerts per Analyst per Shift</td><td>Total alerts / analysts / shift</td><td>Manageable (&lt; 30)</td></tr>
+      </table>
+    </div>
+
+    <!-- USE CASE DEVELOPMENT -->
+    <div class="section" id="s-usecase">
+      <h1><span class="h1-icon">📐</span>Use Case Development<span class="h1-tag">DETECTION ENG</span></h1>
+      <h2>Detection Use Case Template</h2>
+      <div class="code-wrap"><div class="code-label">USE CASE DOC</div><pre><code>USE CASE: [Name]
+================
+Use Case ID:    UC-XXXX
+MITRE ATT&CK:   T1059.001 — PowerShell Execution
+Severity:       High
+Author:         [Name]
+Created:        [Date]
+Last Updated:   [Date]
+
+DESCRIPTION:
+Detects execution of PowerShell with encoded commands, commonly used
+by malware and attackers to evade command-line logging.
+
+THREAT SCENARIO:
+An attacker delivers a phishing email with a macro that downloads and
+executes a PowerShell encoded command to establish persistence.
+
+DATA SOURCES REQUIRED:
+  - Windows Security Event Log (Event ID 4688 with command line auditing)
+  - Sysmon Event ID 1 (process creation)
+  - PowerShell Script Block Logging (Event ID 4104)
+
+DETECTION LOGIC (Splunk SPL):
+index=windows (EventCode=4688 OR EventCode=4104)
+| search (CommandLine="*-EncodedCommand*" OR CommandLine="*-enc *" OR ScriptBlockText="*IEX*")
+| table _time, host, user, process, CommandLine
+
+TUNING / EXCLUSIONS:
+  - Exclude: SCCM/ConfigMgr service accounts
+  - Exclude: Tanium process management
+  - Review quarterly for new legitimate exclusions
+
+FALSE POSITIVE EXAMPLES:
+  - ConfigMgr software distribution using encoded PS
+  - Some vendor backup agents using encoded PS
+
+TRUE POSITIVE EXAMPLES:
+  - Emotet dropper: powershell.exe -enc [long base64]
+  - Cobalt Strike PS agent delivery
+
+VALIDATION:
+  Tested against [date] — 95% precision on test dataset
+  Atomic Red Team test: T1059.001 — PASS
+
+RESPONSE RUNBOOK: Link to phishing/malware runbook</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- REPORTING -->
+    <div class="section" id="s-reporting">
+      <h1><span class="h1-icon">📝</span>IR Report Writing<span class="h1-tag">DOCUMENTATION</span></h1>
+      <h2>Incident Report Structure</h2>
+      <ul class="checklist">
+        <li><strong>Executive Summary</strong> — 1 page max. What happened, what was impacted, what was done. For non-technical audience.</li>
+        <li><strong>Incident Overview</strong> — Type, severity, timeline (first event → detection → containment → resolution)</li>
+        <li><strong>Technical Analysis</strong> — Full attack chain with evidence. Each step with supporting log evidence.</li>
+        <li><strong>Affected Systems & Data</strong> — All hosts, users, and data involved. Data impact assessment.</li>
+        <li><strong>Root Cause Analysis</strong> — How did the attacker get in? What security control failed?</li>
+        <li><strong>IOC List</strong> — All indicators: IPs, domains, hashes, filenames, registry keys</li>
+        <li><strong>Response Actions Taken</strong> — Chronological list of containment/eradication actions with timestamps</li>
+        <li><strong>Recommendations</strong> — Short-term quick wins + long-term strategic improvements</li>
+        <li><strong>Detection Gaps Identified</strong> — What didn't fire? What log sources were missing?</li>
+        <li><strong>Appendices</strong> — Raw log evidence, screenshots, PCAP extracts</li>
+      </ul>
+      <h2>Root Cause Analysis — 5 Whys</h2>
+      <div class="code-wrap"><div class="code-label">RCA EXAMPLE</div><pre><code>INCIDENT: Ransomware deployment on file server
+
+WHY 1: Why was ransomware deployed?
+  → Attacker had domain admin credentials and lateral movement capability.
+
+WHY 2: Why did the attacker have domain admin credentials?
+  → Domain admin credentials were stolen via LSASS dump on a workstation.
+
+WHY 3: Why was LSASS dump possible?
+  → Credential Guard was not enabled. Defender for Endpoint rule for LSASS
+    protection was disabled on that OU.
+
+WHY 4: Why was Credential Guard not enabled?
+  → It was enabled in policy but an exception was made for a legacy app
+    vendor requirement 18 months ago and never re-evaluated.
+
+WHY 5: Why was the exception not re-evaluated?
+  → No process exists to review security exceptions after initial approval.
+
+ROOT CAUSE: Lack of security exception review process allowed an outdated
+            exception to persist, creating a credential theft opportunity.
+
+CORRECTIVE ACTIONS:
+  - Immediate: Enable Credential Guard on all workstations (emergency change)
+  - Short-term: Re-enable Defender LSASS protection rule
+  - Long-term: Implement quarterly security exception review process
+  - Strategic: Deploy PAM solution to reduce reliance on domain admin accounts</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+    <!-- L3 ESCALATION -->
+    <div class="section" id="s-l3escalation">
+      <h1><span class="h1-icon">⬆️</span>Escalation to L3<span class="h1-tag">ESCALATION</span></h1>
+      <h2>When to Escalate to L3</h2>
+      <div class="alert yellow">
+        ⬆ APT / nation-state indicators (sophisticated TTPs, zero-days, long dwell time)<br>
+        ⬆ Malware requiring reverse engineering beyond string analysis<br>
+        ⬆ Rootkit or bootkit suspected (OS-level compromise)<br>
+        ⬆ Novel attack technique not covered by existing runbooks<br>
+        ⬆ Legal / law enforcement involvement required<br>
+        ⬆ Large-scale breach with regulatory notification requirements<br>
+        ⬆ Incident duration &gt; 72hrs without full containment
+      </div>
+      <h2>L3 Handoff Package</h2>
+      <ul class="checklist">
+        <li>Full incident ticket with complete investigation notes</li>
+        <li>All collected evidence: memory dumps, disk images, PCAP files</li>
+        <li>Complete IOC list with enrichment results</li>
+        <li>Timeline of attack chain as reconstructed so far</li>
+        <li>All SIEM queries used and their results</li>
+        <li>Containment status — what is contained, what is not</li>
+        <li>MITRE ATT&CK techniques identified so far</li>
+        <li>Open questions and unknowns requiring deeper analysis</li>
+        <li>Current business impact and urgency</li>
+      </ul>
+      <h2>L3 Escalation Template</h2>
+      <div class="code-wrap"><div class="code-label">L3 HANDOFF</div><pre><code">L3 ESCALATION — [Incident Name] — [Priority]
+============================================
+Escalated By: [L2 Name]
+Date/Time: [YYYY-MM-DD HH:MM UTC]
+Ticket: [INC-XXXXX]
+
+REASON FOR L3 ESCALATION:
+[e.g., "Suspected APT — multiple zero-day TTPs, long dwell time (30+ days), 
+ targeted exfiltration of R&D data, Cobalt Strike with custom malleable C2 profile"]
+
+INVESTIGATION SUMMARY:
+[2-3 paragraph narrative of what has been found]
+
+ATTACK CHAIN (CURRENT UNDERSTANDING):
+  T0 (estimated): [Initial access method]
+  T+Xd/Xh: [Each step identified]
+  T+NOW: [Current attacker position]
+
+EVIDENCE COLLECTED:
+  ☑ Memory dump: /evidence/INC-XXXXX/memory.raw (SHA256: xxx)
+  ☑ Disk image: /evidence/INC-XXXXX/disk.E01 (SHA256: xxx)
+  ☑ PCAP: /evidence/INC-XXXXX/capture.pcap
+  ☑ SIEM export: /evidence/INC-XXXXX/siem_export.csv
+
+CONTAINMENT STATUS:
+  Contained: [list]
+  NOT Yet Contained: [list — urgent]
+
+OPEN QUESTIONS FOR L3:
+  1. [What you need L3 to answer]
+  2. [e.g., "Is this malware related to DARKHOTEL APT?"]
+  3. [e.g., "What is the initial dropper mechanism?"]
+
+BUSINESS IMPACT: [Current known impact]
+REGULATORY OBLIGATION: [PII/PHI/PCI data involved? Yes/No/TBD]</code><button class="copy-btn">COPY</button></pre></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+function updateClock() {
+  const t = new Date().toUTCString().slice(17,25)+' UTC';
+  document.getElementById('clock').textContent = t;
+  document.getElementById('clock2').textContent = t;
+}
+updateClock(); setInterval(updateClock, 1000);
+
+const sections = [
+  {id:'home',label:'Home'},{id:'roles',label:'L2 Roles & Scope'},
+  {id:'l1handoff',label:'L1 Escalation Intake'},
+  {id:'investigation',label:'Investigation Methodology'},
+  {id:'loganalysis',label:'Deep Log Analysis'},
+  {id:'correlation',label:'Event Correlation'},
+  {id:'attackchain',label:'Attack Chain Analysis'},
+  {id:'staticanalysis',label:'Static Analysis'},
+  {id:'dynamicanalysis',label:'Dynamic / Behavioral'},
+  {id:'yara',label:'YARA Rules'},
+  {id:'memoryforensics',label:'Memory Forensics'},
+  {id:'pcap',label:'PCAP Analysis'},
+  {id:'c2analysis',label:'C2 Detection & Analysis'},
+  {id:'netforensics',label:'Network Forensics'},
+  {id:'dfir',label:'DFIR — Windows'},
+  {id:'linuxforensics',label:'DFIR — Linux'},
+  {id:'artifacts',label:'Forensic Artifacts'},
+  {id:'hunting',label:'Threat Hunting'},
+  {id:'hypotheses',label:'Hunt Hypotheses'},
+  {id:'sigma',label:'Sigma Rules'},
+  {id:'ir-lead',label:'IR Lead Responsibilities'},
+  {id:'containment',label:'Advanced Containment'},
+  {id:'eradication',label:'Eradication & Recovery'},
+  {id:'ioc-sharing',label:'IOC Sharing & MISP'},
+  {id:'tuning',label:'Alert Tuning & FP Reduction'},
+  {id:'usecase',label:'Use Case Development'},
+  {id:'reporting',label:'IR Report Writing'},
+  {id:'l3escalation',label:'Escalation to L3'}
+];
+
+const cardDescs = {
+  home:'L2 mission & golden rules',
+  roles:'Scope vs L1 and L3',
+  l1handoff:'Intake validation process',
+  investigation:'PICERL & attack reconstruction',
+  loganalysis:'Windows, Sysmon, Linux deep dives',
+  correlation:'Temporal & entity-based correlation',
+  attackchain:'MITRE ATT&CK chain reconstruction',
+  staticanalysis:'PE analysis, strings, imports',
+  dynamicanalysis:'Sandbox & behavioral analysis',
+  yara:'Writing & running YARA rules',
+  memoryforensics:'Volatility 3 & memory acquisition',
+  pcap:'Wireshark, tshark, NetworkMiner',
+  c2analysis:'Cobalt Strike, Metasploit, beaconing',
+  netforensics:'Network evidence collection',
+  dfir:'Windows live response & artifacts',
+  linuxforensics:'Linux IR & persistence locations',
+  artifacts:'Prefetch, MFT, Registry, SRUM',
+  hunting:'Hypothesis-driven threat hunting',
+  hypotheses:'Ready-to-use hunt scenarios',
+  sigma:'Writing & converting Sigma rules',
+  'ir-lead':'P1 IR leadership & communication',
+  containment:'Network isolation & account lockout',
+  eradication:'Cleanup verification & recovery',
+  'ioc-sharing':'MISP workflow & IOC automation',
+  tuning:'FP reduction & rule quality metrics',
+  usecase:'Detection use case development',
+  reporting:'Full IR report with RCA template',
+  l3escalation:'When & how to escalate to L3'
+};
+
+const grid = document.getElementById('home-grid');
+sections.slice(1).forEach(s => {
+  const c = document.createElement('div');
+  c.className = 'home-card';
+  c.innerHTML = `<div class="card-title">${s.label}</div><div class="card-desc">${cardDescs[s.id]||''}</div>`;
+  c.addEventListener('click', () => nav(s.id));
+  grid.appendChild(c);
+});
+
+function nav(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById('s-'+id);
+  const navEl = document.querySelector(`.nav-item[data-section="${id}"]`);
+  if (sec) sec.classList.add('active');
+  if (navEl) { navEl.classList.add('active'); navEl.scrollIntoView({block:'nearest'}); }
+  const lbl = sections.find(s => s.id === id);
+  document.getElementById('bread-current').textContent = lbl ? lbl.label.toUpperCase() : id.toUpperCase();
+  document.getElementById('content').scrollTop = 0;
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => nav(item.dataset.section));
+});
+
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const text = pre ? pre.innerText.replace(/COPY$/,'').trim() : '';
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent='COPIED!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent='COPY'; btn.classList.remove('copied'); }, 1500);
+    });
+  });
+});
+
+const si = document.getElementById('search');
+si.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  if (!q) { document.querySelectorAll('.nav-item,.nav-section-label,.nav-section').forEach(n => n.style.display=''); return; }
+  document.querySelectorAll('.nav-item').forEach(n => { n.style.display = n.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  document.querySelectorAll('.nav-section').forEach(g => {
+    g.style.display = Array.from(g.querySelectorAll('.nav-item')).some(n => n.style.display!=='none') ? '' : 'none';
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key==='/' && document.activeElement!==si) { e.preventDefault(); si.focus(); }
+  if (e.key==='Escape') si.blur();
+});
+
+document.getElementById('dl-btn').addEventListener('click', () => {
+  const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'SOC-L2-Playbook.html';
+  a.click();
+});
+</script>
+</body>
+</html>

