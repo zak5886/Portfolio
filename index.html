@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zakir Hussain | Penetration Tester & Security Researcher</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --neon-orange: #ff6b35;
+            --neon-red: #ff2a2a;
+            --neon-yellow: #ffd700;
+            --neon-green: #00ff88;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 20, 30, 0.85);
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-glow: rgba(255, 107, 53, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animated Background Canvas */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+
+        /* Scanline Effect */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 5%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-glow);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-red), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-orange), var(--neon-red));
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-orange);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 1.5rem;
+            color: var(--neon-orange);
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 5% 4rem;
+            position: relative;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .glitch {
+            position: relative;
+            color: var(--neon-orange);
+            text-shadow: 
+                0 0 10px rgba(255, 107, 53, 0.8),
+                0 0 20px rgba(255, 107, 53, 0.5),
+                0 0 40px rgba(255, 107, 53, 0.3);
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 1px); }
+            94% { transform: translate(2px, -1px); }
+            96% { transform: translate(-1px, 2px); }
+        }
+
+        .hero-text .subtitle {
+            font-size: 1.3rem;
+            color: var(--neon-yellow);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .hero-text .description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border: 1px solid;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .badge-orange {
+            border-color: var(--neon-orange);
+            color: var(--neon-orange);
+            box-shadow: 0 0 10px rgba(255, 107, 53, 0.2);
+        }
+
+        .badge-red {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 42, 42, 0.2);
+        }
+
+        .badge-green {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--neon-orange), var(--neon-red));
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .btn-outline:hover {
+            background: rgba(0, 255, 136, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero-image {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            width: 320px;
+            height: 320px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid var(--neon-orange);
+            box-shadow: 
+                0 0 30px rgba(255, 107, 53, 0.4),
+                0 0 60px rgba(255, 107, 53, 0.2),
+                inset 0 0 30px rgba(255, 107, 53, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-image::before {
+            content: '';
+            position: absolute;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            border: 2px dashed var(--neon-yellow);
+            animation: spin 20s linear infinite;
+            opacity: 0.5;
+        }
+
+        .hero-image::after {
+            content: '';
+            position: absolute;
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            border: 1px solid var(--neon-red);
+            animation: spin 30s linear infinite reverse;
+            opacity: 0.3;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-orange), var(--neon-red), var(--neon-yellow));
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+        }
+
+        /* About Section */
+        .about {
+            background: var(--darker-bg);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        .about-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-orange), var(--neon-red), var(--neon-yellow), var(--neon-green));
+        }
+
+        .about-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-orange);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .about-card ul {
+            list-style: none;
+        }
+
+        .about-card li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .about-card li:last-child {
+            border-bottom: none;
+        }
+
+        .about-card li i {
+            color: var(--neon-green);
+            width: 20px;
+        }
+
+        /* CPTS Section */
+        .cpts-section {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(255, 42, 42, 0.05));
+        }
+
+        .cpts-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .cpts-badge-large {
+            text-align: center;
+            padding: 3rem;
+            background: var(--card-bg);
+            border: 2px solid var(--neon-orange);
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(255, 107, 53, 0.15);
+        }
+
+        .cpts-badge-large .icon {
+            font-size: 4rem;
+            color: var(--neon-orange);
+            margin-bottom: 1rem;
+        }
+
+        .cpts-badge-large h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--neon-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .cpts-badge-large .cert-name {
+            font-size: 1.1rem;
+            color: var(--neon-yellow);
+            font-weight: 700;
+        }
+
+        .cpts-badge-large .cert-org {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .cpts-details h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--neon-yellow);
+        }
+
+        .cpts-details p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .skill-tag {
+            padding: 0.4rem 1rem;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--neon-orange);
+            transition: all 0.3s;
+        }
+
+        .skill-tag:hover {
+            background: rgba(255, 107, 53, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Red Team / Blue Team Section */
+        .team-section {
+            background: var(--dark-bg);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .team-card.red-team {
+            border: 1px solid rgba(255, 42, 42, 0.3);
+            box-shadow: 0 0 30px rgba(255, 42, 42, 0.1);
+        }
+
+        .team-card.red-team::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-orange));
+        }
+
+        .team-card.blue-team {
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+        }
+
+        .team-card.blue-team::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-yellow));
+        }
+
+        .team-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .red-team .team-icon {
+            color: var(--neon-red);
+            text-shadow: 0 0 20px rgba(255, 42, 42, 0.5);
+        }
+
+        .blue-team .team-icon {
+            color: var(--neon-green);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .team-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .red-team h3 {
+            color: var(--neon-red);
+        }
+
+        .blue-team h3 {
+            color: var(--neon-green);
+        }
+
+        .team-card p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .team-skills {
+            text-align: left;
+        }
+
+        .team-skills li {
+            list-style: none;
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .red-team .team-skills li i {
+            color: var(--neon-red);
+        }
+
+        .blue-team .team-skills li i {
+            color: var(--neon-green);
+        }
+
+        /* HTB Writeups Section */
+        .writeups {
+            background: var(--darker-bg);
+        }
+
+        .writeups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .writeup-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .writeup-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-yellow), var(--neon-orange));
+        }
+
+        .writeup-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--neon-yellow);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.15);
+        }
+
+        .writeup-card .difficulty {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-easy {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 215, 0, 0.15);
+            color: var(--neon-yellow);
+            border: 1px solid var(--neon-yellow);
+        }
+
+        .difficulty-hard {
+            background: rgba(255, 42, 42, 0.15);
+            color: var(--neon-red);
+            border: 1px solid var(--neon-red);
+        }
+
+        .writeup-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .writeup-card p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .writeup-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .writeup-card .tag {
+            padding: 0.2rem 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .writeup-card a {
+            color: var(--neon-orange);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: gap 0.3s;
+        }
+
+        .writeup-card a:hover {
+            gap: 1rem;
+            color: var(--neon-yellow);
+        }
+
+        /* Pro Lab Section */
+        .prolab {
+            background: linear-gradient(135deg, rgba(255, 42, 42, 0.05), rgba(255, 107, 53, 0.05));
+        }
+
+        .prolab-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 42, 42, 0.3);
+            border-radius: 16px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prolab-container::before {
+            content: 'PRO';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 8rem;
+            font-weight: 900;
+            color: rgba(255, 42, 42, 0.05);
+            transform: rotate(-15deg);
+        }
+
+        .prolab-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .prolab-header i {
+            font-size: 3rem;
+            color: var(--neon-red);
+        }
+
+        .prolab-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--neon-red);
+        }
+
+        .prolab-header span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .prolab-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .prolab-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 42, 42, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 42, 42, 0.2);
+        }
+
+        .stat-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            color: var(--neon-red);
+            font-weight: 900;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Experience Section */
+        .experience {
+            background: var(--dark-bg);
+        }
+
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-orange), var(--neon-red), var(--neon-yellow));
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 50%;
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+            padding-right: 0;
+            padding-left: 50%;
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 350px;
+            position: relative;
+            margin-right: 2rem;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-right: 0;
+            margin-left: 2rem;
+        }
+
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: var(--neon-orange);
+            border-radius: 50%;
+            top: 20px;
+            box-shadow: 0 0 10px var(--neon-orange);
+        }
+
+        .timeline-item .timeline-content::after {
+            right: -42px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content::after {
+            right: auto;
+            left: -42px;
+        }
+
+        .timeline-content h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-orange);
+            margin-bottom: 0.3rem;
+            font-size: 1rem;
+        }
+
+        .timeline-content .company {
+            color: var(--neon-yellow);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-content .period {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Contact / Footer */
+        .contact {
+            background: var(--darker-bg);
+            text-align: center;
+            padding: 4rem 5%;
+        }
+
+        .contact h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-orange);
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            background: var(--neon-orange);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .footer span {
+            color: var(--neon-red);
+        }
+
+        /* Terminal typing effect */
+        .typing-text {
+            overflow: hidden;
+            border-right: 2px solid var(--neon-green);
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+            display: inline-block;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--neon-green); }
+        }
+
+        /* Scroll animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Resource Link Lists (Red Team / Blue Team) */
+        .resource-heading {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1.25rem;
+        }
+
+        .resource-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .resource-links li a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 0.55rem 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            transition: all 0.25s ease;
+        }
+
+        .red-team .resource-links li a {
+            color: var(--text-primary);
+        }
+
+        .red-team .resource-links li a:hover {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            background: rgba(255, 42, 42, 0.08);
+            transform: translateX(4px);
+        }
+
+        .blue-team .resource-links li a {
+            color: var(--text-primary);
+        }
+
+        .blue-team .resource-links li a:hover {
+            border-color: #00d4ff;
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.08);
+            transform: translateX(4px);
+        }
+
+        .resource-links li a i.fa-arrow-right {
+            margin-left: auto;
+            font-size: 0.7rem;
+            opacity: 0.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-badges, .hero-buttons {
+                justify-content: center;
+            }
+
+            .about-grid, .cpts-container, .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item,
+            .timeline-item:nth-child(even) {
+                justify-content: flex-start;
+                padding-left: 50px;
+                padding-right: 0;
+            }
+
+            .timeline-content {
+                margin-left: 0;
+                margin-right: 0;
+                max-width: 100%;
+            }
+
+            .timeline-item .timeline-content::after,
+            .timeline-item:nth-child(even) .timeline-content::after {
+                left: -37px;
+                right: auto;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .prolab-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="scanlines"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">&lt;ZAKIR_HUSSAIN /&gt;</div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#cpts">CPTS</a></li>
+            <li><a href="#redteam">Red Team</a></li>
+            <li><a href="#blueteam">Blue Team</a></li>
+            <li><a href="#writeups">Writeups</a></li>
+            <li><a href="#prolab">Pro Lab</a></li>
+            <li><a href="#experience">Experience</a></li>
+        </ul>
+        <div class="mobile-menu" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-text">
+                <h1>
+                    <span class="glitch">ZAKIR</span><br>
+                    <span style="color: var(--neon-yellow);">HUSSAIN</span>
+                </h1>
+                <p class="subtitle">&gt; Aspiring Penetration Tester</p>
+                <p class="description">
+                    Cybersecurity enthusiast with a passion for offensive security, vulnerability research, 
+                    and ethical hacking. Certified Penetration Testing Specialist (CPTS) from Hack The Box. 
+                    Constantly exploring the attack surface to build stronger defenses.
+                </p>
+                <div class="hero-badges">
+                    <span class="badge badge-orange"><i class="fas fa-shield-alt"></i> CPTS Certified</span>
+                    <span class="badge badge-red"><i class="fas fa-bug"></i> Bug Hunter</span>
+                    <span class="badge badge-green"><i class="fas fa-terminal"></i> HTB Player</span>
+                </div>
+                <div class="hero-buttons">
+                    <a href="#writeups" class="btn btn-primary">
+                        <i class="fas fa-book"></i> View Writeups
+                    </a>
+                    <a href="https://www.linkedin.com/in/zakir-hussain-75b5b148/" target="_blank" class="btn btn-outline">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="zak.jpg" alt="Zakir Hussain">
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="section-header fade-in">
+            <h2>ABOUT_ME<span style="color: var(--neon-green);">.json</span></h2>
+            <p>Background, qualifications, and the journey into cybersecurity.</p>
+        </div>
+        <div class="about-grid">
+            <div class="about-card fade-in">
+                <h3><i class="fas fa-graduation-cap"></i> Qualifications</h3>
+                <ul>
+                    <li><i class="fas fa-certificate"></i> CPTS — Certified Penetration Testing Specialist (HTB)</li>
+                    <li><i class="fas fa-certificate"></i> [Add your degree/certification here]</li>
+                    <li><i class="fas fa-certificate"></i> [Add certification here, e.g., eJPT, OSCP]</li>
+                    <li><i class="fas fa-certificate"></i> [Add relevant training/courses]</li>
+                </ul>
+            </div>
+            <div class="about-card fade-in">
+                <h3><i class="fas fa-tools"></i> Technical Arsenal</h3>
+                <ul>
+                    <li><i class="fas fa-terminal"></i> Penetration Testing (Web, Network, AD)</li>
+                    <li><i class="fas fa-code"></i> Python, Bash, PowerShell Scripting</li>
+                    <li><i class="fas fa-network-wired"></i> Network Security & Traffic Analysis</li>
+                    <li><i class="fas fa-bug"></i> Vulnerability Assessment & Exploitation</li>
+                    <li><i class="fas fa-lock"></i> OWASP Top 10 & Secure Coding</li>
+                    <li><i class="fas fa-search"></i> OSINT & Reconnaissance</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CPTS Section -->
+    <section class="cpts-section" id="cpts">
+        <div class="section-header fade-in">
+            <h2>CPTS<span style="color: var(--neon-red);">_CERTIFICATION</span></h2>
+            <p>Hack The Box Certified Penetration Testing Specialist</p>
+        </div>
+        <div class="cpts-container">
+            <div class="cpts-badge-large fade-in">
+                <div class="icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>CPTS</h3>
+                <div class="cert-name">Certified Penetration Testing Specialist</div>
+                <div class="cert-org">Hack The Box Academy</div>
+            </div>
+            <div class="cpts-details fade-in">
+                <h3>What CPTS Covers</h3>
+                <p>
+                    The CPTS certification validates practical skills in penetration testing across 
+                    multiple domains including network exploitation, web application attacks, 
+                    Active Directory compromise, and post-exploitation techniques.
+                </p>
+                <div class="skill-tags">
+                    <span class="skill-tag">Network Pentesting</span>
+                    <span class="skill-tag">Web Exploitation</span>
+                    <span class="skill-tag">Active Directory</span>
+                    <span class="skill-tag">Privilege Escalation</span>
+                    <span class="skill-tag">Lateral Movement</span>
+                    <span class="skill-tag">Report Writing</span>
+                    <span class="skill-tag">OSINT</span>
+                    <span class="skill-tag">Post-Exploitation</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Red Team / Blue Team Section -->
+    <section class="team-section" id="teams">
+        <div class="section-header fade-in">
+            <h2>OFFENSIVE_<span style="color: var(--neon-red);">&</span>_DEFENSIVE</h2>
+            <p>Capabilities across the full security spectrum</p>
+        </div>
+        <div class="team-grid">
+            <div class="team-card red-team fade-in" id="redteam">
+                <div class="team-icon"><i class="fas fa-fire"></i></div>
+                <h3>RED TEAM</h3>
+                <p>Offensive security operations simulating real-world adversaries to test organizational resilience.</p>
+                <ul class="team-skills">
+                    <li><i class="fas fa-check"></i> External & Internal Pentesting</li>
+                    <li><i class="fas fa-check"></i> Social Engineering & Phishing</li>
+                    <li><i class="fas fa-check"></i> Active Directory Attacks</li>
+                    <li><i class="fas fa-check"></i> Web App Exploitation (SQLi, XSS, LFI/RFI)</li>
+                    <li><i class="fas fa-check"></i> Binary Exploitation & Reverse Engineering</li>
+                    <li><i class="fas fa-check"></i> C2 Infrastructure & Malware Dev Basics</li>
+                </ul>
+                <div class="resource-heading">// RED TEAM REFERENCE LIBRARY</div>
+                <ul class="resource-links">
+                    <li><a href="red-team/AD_ESC_reference.html" target="_blank">AD ESC REFERENCE <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/AD_Pentest_flow.html" target="_blank">AD PENTEST FLOW <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/AD_mind_map_Final.html" target="_blank">AD MIND MAP <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/active_directory_reference.html" target="_blank">ACTIVE DIRECTORY REFERENCE <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/atlas.html" target="_blank">HTB ATTACK CHAINS ATLAS <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/CPTS_Field_Manual.html" target="_blank">CPTS FIELD MANUAL <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/CPTS_TRACK.html" target="_blank">CPTS ULTIMATE PLAYBOOK <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/cpts-vault2.html" target="_blank">CPTS EXAM VAULT <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/master_tools_collection_part1.html" target="_blank">MASTER TOOLS COLLECTION PART 1 <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/master_tools_collection_part2.html" target="_blank">MASTER TOOLS COLLECTION PART 2 <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/PentestOPS_Part1.html" target="_blank">PENTESTOPS PART 1 <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/PentestOPS_Part2.html" target="_blank">PENTESTOPS PART 2 <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/Senior_Pentester_Master.html" target="_blank">SENIOR PENTESTER MASTER CHECKLIST <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="red-team/web-vuln-field-guide_v1.html" target="_blank">WEB VULN FIELD GUIDE <i class="fas fa-arrow-right"></i></a></li>
+                </ul>
+            </div>
+            <div class="team-card blue-team fade-in" id="blueteam">
+                <div class="team-icon"><i class="fas fa-shield-virus"></i></div>
+                <h3>BLUE TEAM</h3>
+                <p>Defensive security operations focused on detection, monitoring, and incident response.</p>
+                <ul class="team-skills">
+                    <li><i class="fas fa-check"></i> SIEM & Log Analysis</li>
+                    <li><i class="fas fa-check"></i> Threat Hunting & Detection Engineering</li>
+                    <li><i class="fas fa-check"></i> Incident Response & Forensics</li>
+                    <li><i class="fas fa-check"></i> Network Traffic Analysis (Wireshark, Zeek)</li>
+                    <li><i class="fas fa-check"></i> Vulnerability Management</li>
+                    <li><i class="fas fa-check"></i> Security Hardening & Baselines</li>
+                </ul>
+                <div class="resource-heading">// BLUE TEAM REFERENCE LIBRARY</div>
+                <ul class="resource-links">
+                    <li><a href="blue-team/SOC-L1-Playbook.html" target="_blank">SOC L1 PLAYBOOK <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="blue-team/SOC-L2-Playbook.html" target="_blank">SOC L2 PLAYBOOK <i class="fas fa-arrow-right"></i></a></li>
+                    <li><a href="blue-team/SOC-L3-Playbook.html" target="_blank">SOC L3 PLAYBOOK <i class="fas fa-arrow-right"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- HTB Writeups Section -->
+    <section class="writeups" id="writeups">
+        <div class="section-header fade-in">
+            <h2>HTB<span style="color: var(--neon-yellow);">_WRITEUPS</span></h2>
+            <p>Detailed walkthroughs, reports, and exploitation notes from Hack The Box machines.</p>
+        </div>
+        <div class="writeups-grid">
+            <!-- Template Card 1 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-easy">Easy</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Linux</span>
+                    <span class="tag">Web</span>
+                    <span class="tag">SUID</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Template Card 2 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-medium">Medium</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Windows</span>
+                    <span class="tag">AD</span>
+                    <span class="tag">Kerberoast</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Template Card 3 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-hard">Hard</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Linux</span>
+                    <span class="tag">Custom Exploit</span>
+                    <span class="tag">Kernel</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Template Card 4 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-medium">Medium</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Windows</span>
+                    <span class="tag">SQL Injection</span>
+                    <span class="tag">SeImpersonate</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Template Card 5 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-easy">Easy</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Linux</span>
+                    <span class="tag">CMS</span>
+                    <span class="tag">Cronjob</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Template Card 6 -->
+            <div class="writeup-card fade-in">
+                <span class="difficulty difficulty-hard">Hard</span>
+                <h3>Machine Name</h3>
+                <p>Short description of the machine, techniques used, and key learnings from the exploitation path.</p>
+                <div class="tags">
+                    <span class="tag">Windows</span>
+                    <span class="tag">AD CS</span>
+                    <span class="tag">ESC8</span>
+                </div>
+                <a href="#" target="_blank">Read Writeup <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pro Lab Section -->
+    <section class="prolab" id="prolab">
+        <div class="section-header fade-in">
+            <h2>HTB<span style="color: var(--neon-red);">_PRO_LAB</span></h2>
+            <p>Enterprise-grade penetration testing report from Hack The Box Pro Labs.</p>
+        </div>
+        <div class="prolab-container fade-in">
+            <div class="prolab-header">
+                <i class="fas fa-flask"></i>
+                <div>
+                    <h3>Pro Lab Report</h3>
+                    <span>[Pro Lab Name, e.g., RastaLabs, CyberNet, Zephyr]</span>
+                </div>
+            </div>
+            <div class="prolab-content">
+                <p>
+                    A comprehensive penetration test report documenting the full attack chain from 
+                    initial foothold to domain compromise within the HTB Pro Lab environment. 
+                    This report demonstrates proficiency in enterprise network penetration testing, 
+                    including Active Directory exploitation, lateral movement, and persistence techniques.
+                </p>
+                <div class="prolab-stats">
+                    <div class="stat">
+                        <div class="stat-number">XX</div>
+                        <div class="stat-label">Machines Owned</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">XX</div>
+                        <div class="stat-label">Days to Complete</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">XX</div>
+                        <div class="stat-label">Flags Captured</div>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i class="fas fa-file-pdf"></i> Download Full Report
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section class="experience" id="experience">
+        <div class="section-header fade-in">
+            <h2>WORK<span style="color: var(--neon-orange);">_EXPERIENCE</span></h2>
+            <p>Professional journey and hands-on experience in cybersecurity.</p>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <h4>Penetration Tester / Security Analyst</h4>
+                    <div class="company">[Company Name]</div>
+                    <div class="period">[Start Date] — Present</div>
+                    <p>Describe your role, responsibilities, and key achievements in offensive security.</p>
+                </div>
+            </div>
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <h4>[Previous Role Title]</h4>
+                    <div class="company">[Company Name]</div>
+                    <div class="period">[Start Date] — [End Date]</div>
+                    <p>Describe your previous role and how it contributed to your security career.</p>
+                </div>
+            </div>
+            <div class="timeline-item fade-in">
+                <div class="timeline-content">
+                    <h4>[Internship / Junior Role]</h4>
+                    <div class="company">[Company Name]</div>
+                    <div class="period">[Start Date] — [End Date]</div>
+                    <p>Describe your early experience and foundational skills developed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact / Footer -->
+    <section class="contact">
+        <h2>LET'S <span style="color: var(--neon-green);">CONNECT</span></h2>
+        <p>Open to penetration testing roles, red team opportunities, and collaborative security research.</p>
+        <div class="social-links">
+            <a href="https://www.linkedin.com/in/zakir-hussain-75b5b148/" target="_blank" title="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="https://github.com/" target="_blank" title="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://app.hackthebox.com/" target="_blank" title="Hack The Box">
+                <i class="fas fa-cube"></i>
+            </a>
+            <a href="mailto:your.email@example.com" title="Email">
+                <i class="fas fa-envelope"></i>
+            </a>
+        </div>
+    </section>
+
+    <div class="footer">
+        <p>Built with <span>♥</span> and lots of <span>caffeine</span> | © 2026 Zakir Hussain</p>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff6b35';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 35);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Scroll Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+            navLinks.style.position = 'absolute';
+            navLinks.style.top = '100%';
+            navLinks.style.left = '0';
+            navLinks.style.right = '0';
+            navLinks.style.flexDirection = 'column';
+            navLinks.style.background = 'rgba(10, 10, 15, 0.98)';
+            navLinks.style.padding = '2rem';
+            navLinks.style.borderBottom = '1px solid var(--border-glow)';
+        }
+    </script>
+</body>
+</html>
