@@ -467,6 +467,26 @@
             margin-top: 0.5rem;
         }
 
+        .cpts-badge-large .cert-image-link {
+            display: block;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cpts-badge-large .cert-image-link:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
+        }
+
+        .cpts-badge-large .cert-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
         .cpts-details h3 {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
@@ -1205,11 +1225,13 @@
         </div>
         <div class="cpts-container">
             <div class="cpts-badge-large fade-in">
-                <div class="icon"><i class="fas fa-shield-alt"></i></div>
-                <h3>CPTS</h3>
-                <div class="cert-name">Certified Penetration Testing Specialist</div>
-                <div class="cert-org">Hack The Box Academy</div>
-            </div>
+    <a href="certs/cpts-certificate.pdf" target="_blank" rel="noopener" class="cert-image-link">
+        <img src="certs/cpts-certificate.png" alt="HTB CPTS Certificate - Zakir Hussain Koolaneri" class="cert-image">
+    </a>
+    <h3>CPTS</h3>
+    <div class="cert-name">Certified Penetration Testing Specialist</div>
+    <div class="cert-org">Hack The Box Academy · Earned 24 Sep 2026</div>
+</div>
             <div class="cpts-details fade-in">
                 <h3>What CPTS Covers</h3>
                 <p>
